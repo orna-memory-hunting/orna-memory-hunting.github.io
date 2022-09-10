@@ -1,0 +1,19 @@
+{
+  "name": "orna-memory-hunting",
+  "description": "Orna Memory Hunting",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "fastify": "4.5.3",
+    "@fastify/static": "6.5.0"
+  },
+  "devDependencies": {
+    "@nodutilus/project-config": "latest"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "Unlicense"
+}
