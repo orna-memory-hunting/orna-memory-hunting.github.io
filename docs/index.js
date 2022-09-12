@@ -132,6 +132,7 @@ function questionClick(event) {
       element.classList.remove('active')
       element.classList.remove('hide')
     })
+    document.getElementById('upload')?.classList.add('hide')
   }
 }
 
@@ -159,5 +160,27 @@ function answerClick(event) {
     }
   })
 
-  if (!isClose) answer.classList.add('active')
+  if (!isClose) {
+    answer.classList.add('active')
+    document.getElementById('upload')?.classList.remove('hide')
+  } else {
+    document.getElementById('upload')?.classList.add('hide')
+  }
+}
+
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieFile = document.getElementById('amitie-file')
+/** @type {HTMLImageElement} */// @ts-ignore
+const amitieImg = document.getElementById('amitie-img')
+
+amitieFile.addEventListener('change', handleAmitieFile)
+
+function handleAmitieFile() {
+  if (amitieFile.files?.length) {
+    amitieImg.src = URL.createObjectURL(amitieFile.files[0])
+    amitieImg.classList.remove('hide')
+  } else {
+    amitieImg.src = ''
+    amitieImg.classList.add('hide')
+  }
 }
