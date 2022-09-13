@@ -322,18 +322,7 @@ function handleAmitieFile() {
         index = lastIndex
 
         // Ищем разделители между бафами кнопками и бонусами
-        while (1) {
-          const imgData = context.getImageData(0, index, image.width, 1).data
-          const cData = imgData.filter(i => i < 255)
-          const avg = cData.reduce((p, c) => p + c, 0) / cData.length
-
-          console.log(avg)
-
-          index++
-          if (index > image.height) {
-            break
-          }
-        }
+        // TODO
       }
 
       const amitieSize = amitiePos[1] - amitiePos[0]
