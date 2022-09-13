@@ -234,7 +234,7 @@ function handleAmitieFile() {
           Math.abs(imgData[1] - medium) +
           Math.abs(imgData[2] - medium))
 
-        if (medium > 50 && coloured > 50) {
+        if (medium > 100 && coloured > 50) {
           amitiePos[0] = index
           index++
           break
@@ -345,10 +345,42 @@ function handleAmitieFile() {
         // # 2 - Не удалось распонать осколок со скрина с завершения последнего испытания
         //   ищем по скрину со склада
       } else {
-        index = lastIndex
+        const blockArea = []
+        let heightEmptyBlock = 0
+        let patternEmptyBlock = 0
 
-        // Ищем разделители между бафами кнопками и бонусами
-        // TODO
+        index = lastIndex
+        while (1) {
+          const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
+          const maxData = Math.max(...imgData.filter(i => i < 255))
+
+          console.log(maxData)
+          if (maxData < 100) {
+            heightEmptyBlock++
+          } else if (!patternEmptyBlock) {
+            patternEmptyBlock = heightEmptyBlock * 1.8 ^ 0
+          } else if (heightEmptyBlock > patternEmptyBlock) {
+            if (blockArea.length === 0) {
+              blockArea.push(index)
+            } else if (blockArea.length === 1) {
+              blockArea.push(index - heightEmptyBlock)
+            }
+            heightEmptyBlock = 0
+            if (blockArea.length > 1) {
+              break
+            }
+          } else {
+            heightEmptyBlock = 0
+          }
+
+          index++
+          if (index > image.height) {
+            break
+          }
+        }
+        if (blockArea.length === 2) {
+          [baffsPos[0], baffsPos[1]] = blockArea
+        }
       }
 
       const amitieSize = amitiePos[1] - amitiePos[0]
