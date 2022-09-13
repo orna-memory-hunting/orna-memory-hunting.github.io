@@ -1,4 +1,19 @@
+/** @type {HTMLDivElement} */// @ts-ignore
 const questions = document.getElementById('questions')
+/** @type {HTMLInputElement} */// @ts-ignore
+const timeSelect = document.getElementById('time-select')
+/** @type {HTMLSpanElement} */// @ts-ignore
+const timeFileField = document.getElementById('time-file-field')
+/** @type {HTMLSpanElement} */// @ts-ignore
+const timeFile = document.getElementById('time-file')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieFile = document.getElementById('amitie-file')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitiePrep = document.getElementById('amitie-preprocessing')
+/** @type {HTMLCanvasElement} */// @ts-ignore
+const amitieCanvas = document.getElementById('amitie-canvas')
+/** @type {CanvasRenderingContext2D} */// @ts-ignore
+const amitieContext = amitieCanvas.getContext('2d')
 const qData = [
   {
     q: 'Как ты считаешь, кто такие Непокорённые по своей сути...',
@@ -67,15 +82,13 @@ const qData = [
 ]
 const qLabels = ['1.', '2.', '3.', '4.', '5.', '6.', '7.']
 const aLabels = ['А.', 'Б.', 'В.', 'Г.', 'Д.']
+let html = ''
 
-if (questions) {
-  let html = ''
+for (let qIndex = 0; qIndex < qData.length; qIndex++) {
+  const question = qData[qIndex]
+  const answers = question.a
 
-  for (let qIndex = 0; qIndex < qData.length; qIndex++) {
-    const question = qData[qIndex]
-    const answers = question.a
-
-    html += `
+  html += `
       <div class="question-content">
         <span class="question" data-qid="${qIndex}">
           <span class="arrow-back">⇦</span>
@@ -84,22 +97,22 @@ if (questions) {
         <div class="answers">
     `
 
-    for (let aIndex = 0; aIndex < answers.length; aIndex++) {
-      const answer = answers[aIndex]
+  for (let aIndex = 0; aIndex < answers.length; aIndex++) {
+    const answer = answers[aIndex]
 
-      html += `
+    html += `
         <span class="answer" data-aid="${aIndex}">
           <span class="arrow-back">⇦</span>
           <span>${aLabels[aIndex]} ${answer}</span>
         </span>
       `
-    }
-
-    html += '</div></div>'
   }
 
-  questions.innerHTML = html
+  html += '</div></div>'
 }
+
+questions.innerHTML = html
+
 
 // @ts-ignore
 document.querySelectorAll('.question').forEach((/** @type {HTMLDivElement} */ element) => {
@@ -174,30 +187,26 @@ function toggleUpload(status) {
   const upload = document.getElementById('upload')
 
   if (status) {
+    if (!amitieFile.files?.length) {
+      timeSelect.value = ('0' + new Date().getHours()).slice(-2)
+    }
     upload.classList.remove('hide')
   } else {
     upload.classList.add('hide')
   }
 }
 
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitieFile = document.getElementById('amitie-file')
-/** @type {HTMLDivElement} */// @ts-ignore
-const amitiePrep = document.getElementById('amitie-preprocessing')
-/** @type {HTMLCanvasElement} */// @ts-ignore
-const amitieCanvas = document.getElementById('amitie-canvas')
-/** @type {CanvasRenderingContext2D} */// @ts-ignore
-const amitieContext = amitieCanvas.getContext('2d')
-
 amitieFile.addEventListener('change', handleAmitieFile)
 
 function handleAmitieFile() {
   if (amitieFile.files?.length) {
+    /** @type {File} */// @ts-ignore
+    const [file] = amitieFile.files
     const image = new window.Image()
 
     amitieCanvas.classList.add('hide')
     amitiePrep.classList.remove('hide')
-    image.src = URL.createObjectURL(amitieFile.files[0])
+    image.src = URL.createObjectURL(file)
     image.onload = () => {
       const canvas = document.createElement('canvas')
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
@@ -358,10 +367,17 @@ function handleAmitieFile() {
 
       amitiePrep.classList.add('hide')
       amitieCanvas.classList.remove('hide')
+
+      const lDate = new Date(file.lastModified)
+
+      timeSelect.value = ('0' + lDate.getHours()).slice(-2)
+      timeFile.textContent = lDate.toLocaleString()
+      timeFileField.classList.remove('hide')
     }
   } else {
     amitiePrep.classList.add('hide')
     amitieCanvas.classList.add('hide')
+    timeFileField.classList.add('hide')
     amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
   }
 }

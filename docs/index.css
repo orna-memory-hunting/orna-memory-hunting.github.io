@@ -69,12 +69,19 @@
 }
 
 .time-field {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  display      : flex;
+  align-items  : baseline;
 }
 
 .time-select {
   margin-left : 4px;
   margin-right: 4px;
+}
+
+.time-file {
+  font-size: 75%;
+  opacity  : 0.5;
 }
 
 .amitie-field {
@@ -90,6 +97,7 @@
 .amitie-label {
   width  : 100%;
   display: flex;
+  align-items: baseline;
 }
 
 .amitie-file {
