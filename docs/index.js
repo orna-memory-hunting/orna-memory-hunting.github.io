@@ -132,7 +132,7 @@ function questionClick(event) {
       element.classList.remove('active')
       element.classList.remove('hide')
     })
-    document.getElementById('upload')?.classList.add('hide')
+    toggleUpload(false)
   }
 }
 
@@ -162,9 +162,21 @@ function answerClick(event) {
 
   if (!isClose) {
     answer.classList.add('active')
-    document.getElementById('upload')?.classList.remove('hide')
+    toggleUpload(true)
   } else {
-    document.getElementById('upload')?.classList.add('hide')
+    toggleUpload(false)
+  }
+}
+
+/** @param {boolean} status  */
+function toggleUpload(status) {
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const upload = document.getElementById('upload')
+
+  if (status) {
+    upload.classList.remove('hide')
+  } else {
+    upload.classList.add('hide')
   }
 }
 

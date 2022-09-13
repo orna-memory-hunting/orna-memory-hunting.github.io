@@ -26,9 +26,40 @@
   <div id="questions" class="questions"></div>
   <div id="upload" class="upload hide">
     <h3>Укажите сведения о найденном осколке</h3>
+    <div class="time-field">
+      <label class="amitie-label">
+        Время ответа:
+        <select id="time-select" class="time-select">
+          <option value="00">00:00-00:59</option>
+          <option value="01">01:00-01:59</option>
+          <option value="02">02:00-02:59</option>
+          <option value="03">03:00-03:59</option>
+          <option value="04">04:00-04:59</option>
+          <option value="05">05:00-05:59</option>
+          <option value="06">06:00-06:59</option>
+          <option value="07">07:00-07:59</option>
+          <option value="08">08:00-08:59</option>
+          <option value="09">09:00-09:59</option>
+          <option value="10">10:00-10:59</option>
+          <option value="11">11:00-11:59</option>
+          <option value="12">12:00-12:59</option>
+          <option value="13">13:00-13:59</option>
+          <option value="14">14:00-14:59</option>
+          <option value="15">15:00-15:59</option>
+          <option value="16">16:00-16:59</option>
+          <option value="17">17:00-17:59</option>
+          <option value="18">18:00-18:59</option>
+          <option value="19">19:00-19:59</option>
+          <option value="20">20:00-20:59</option>
+          <option value="21">21:00-21:59</option>
+          <option value="22">22:00-22:59</option>
+          <option value="23">23:00-23:59</option>
+        </select>
+      </label>
+    </div>
     <div class="amitie-field">
       <label class="amitie-label">
-        Выберите скрин осколка
+        Скрин осколка:
         <input id="amitie-file" class="amitie-file" type="file" accept=".jpg, .jpeg, .png">
       </label>
       <div id="amitie-preprocessing" class="amitie-preprocessing hide">Подождите. Идет обработка изображения...</div>
