@@ -170,8 +170,11 @@ function answerClick(event) {
 
 /** @type {HTMLInputElement} */// @ts-ignore
 const amitieFile = document.getElementById('amitie-file')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitiePrep = document.getElementById('amitie-preprocessing')
 /** @type {HTMLCanvasElement} */// @ts-ignore
 const amitieCanvas = document.getElementById('amitie-canvas')
+/** @type {CanvasRenderingContext2D} */// @ts-ignore
 const amitieContext = amitieCanvas.getContext('2d')
 
 amitieFile.addEventListener('change', handleAmitieFile)
@@ -180,11 +183,16 @@ function handleAmitieFile() {
   if (amitieFile.files?.length) {
     const image = new window.Image()
 
+    amitieCanvas.classList.add('hide')
+    amitiePrep.classList.remove('hide')
     image.src = URL.createObjectURL(amitieFile.files[0])
     image.onload = () => {
       const canvas = document.createElement('canvas')
+      /** @type {CanvasRenderingContext2D} */// @ts-ignore
       const context = canvas.getContext('2d')
       const imgMiddle = image.width / 2 ^ 0
+      const imgQuarterLeft = imgMiddle / 2 ^ 0
+      const imgQuarterRight = image.height - imgQuarterLeft
       const amitiePos = [0, image.height]
       const baffsPos = [0, 0]
       let index = 0
@@ -219,13 +227,10 @@ function handleAmitieFile() {
 
       // Проходим рисунок осколка
       while (1) {
-        const imgData = context.getImageData(imgMiddle, index, 1, 1).data
-        const medium = (imgData[0] + imgData[1] + imgData[2]) / 3
-        const coloured = (Math.abs(imgData[0] - medium) +
-          Math.abs(imgData[1] - medium) +
-          Math.abs(imgData[2] - medium))
+        const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
+        const maxData = imgData.filter(i => i < 255 && i > 100)
 
-        if (medium < 50 && coloured < 50) {
+        if (!maxData.length) {
           amitiePos[0] = index
           index++
           break
@@ -239,7 +244,7 @@ function handleAmitieFile() {
 
       // Ищем начало текста названия осколка
       while (1) {
-        const imgData = context.getImageData(0, index, image.width, 1).data
+        const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
         const maxData = imgData.filter(i => i < 255 && i > 100)
 
         if (maxData.length) {
@@ -256,7 +261,7 @@ function handleAmitieFile() {
 
       // Ищем конец текста названия осколка
       while (1) {
-        const imgData = context.getImageData(0, index, image.width, 1).data
+        const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
         const maxData = imgData.filter(i => i < 255 && i > 100)
 
         if (!maxData.length) {
@@ -278,12 +283,12 @@ function handleAmitieFile() {
       lastIndex = index
       while (1) {
         // imgData -> RGBA -- Ищем синий
-        const imgData = aSplit(context.getImageData(0, index, image.width, 1).data, 4)
+        const imgData = aSplit(context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data, 4)
         const blue = imgData
           .map(i => i[2] - Math.max(i[0], i[1]))
           .filter(i => i > 25)
 
-        if (blue.length > 15) {
+        if (blue.length > 25) {
           isBlue = index - 12
           index++
           break
@@ -296,12 +301,12 @@ function handleAmitieFile() {
       }
       while (1) {
         // imgData -> RGBA -- ищем красный
-        const imgData = aSplit(context.getImageData(0, backward, image.width, 1).data, 4)
+        const imgData = aSplit(context.getImageData(imgQuarterLeft, backward, imgQuarterRight, 1).data, 4)
         const red = imgData
           .map(i => i[0] - Math.max(i[1], i[2]))
           .filter(i => i > 25)
 
-        if (red.length > 15) {
+        if (red.length > 25) {
           isRed = backward + 6
           backward--
           break
@@ -338,11 +343,12 @@ function handleAmitieFile() {
         0, baffsPos[0], canvas.width, baffsSize,
         0, amitieSize, canvas.width, baffsSize
       )
-      // amitieContext.drawImage(canvas, amitieSize + 1, -baffsPos[0])
-    }
 
-    amitieCanvas.classList.remove('hide')
+      amitiePrep.classList.add('hide')
+      amitieCanvas.classList.remove('hide')
+    }
   } else {
+    amitiePrep.classList.add('hide')
     amitieCanvas.classList.add('hide')
     amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
   }
