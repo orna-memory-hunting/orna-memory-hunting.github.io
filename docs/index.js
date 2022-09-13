@@ -170,17 +170,199 @@ function answerClick(event) {
 
 /** @type {HTMLInputElement} */// @ts-ignore
 const amitieFile = document.getElementById('amitie-file')
-/** @type {HTMLImageElement} */// @ts-ignore
-const amitieImg = document.getElementById('amitie-img')
+/** @type {HTMLCanvasElement} */// @ts-ignore
+const amitieCanvas = document.getElementById('amitie-canvas')
+const amitieContext = amitieCanvas.getContext('2d')
 
 amitieFile.addEventListener('change', handleAmitieFile)
 
 function handleAmitieFile() {
   if (amitieFile.files?.length) {
-    amitieImg.src = URL.createObjectURL(amitieFile.files[0])
-    amitieImg.classList.remove('hide')
+    const image = new window.Image()
+
+    image.src = URL.createObjectURL(amitieFile.files[0])
+    image.onload = () => {
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      const imgMiddle = image.width / 2 ^ 0
+      const amitiePos = [0, image.height]
+      const baffsPos = [0, 0]
+      let index = 0
+      let lastIndex = 0 // Сохранеине индекса, если нужно начать поиск с предыдущей фазы
+      let backward = image.height
+      let isBlue = 0
+      let isRed = 0
+
+      canvas.width = image.width
+      canvas.height = image.height
+      context.drawImage(image, 0, 0)
+
+      // Идем до начала рисунка осколка
+      while (1) {
+        const imgData = context.getImageData(imgMiddle, index, 1, 1).data
+        const medium = (imgData[0] + imgData[1] + imgData[2]) / 3
+        const coloured = (Math.abs(imgData[0] - medium) +
+          Math.abs(imgData[1] - medium) +
+          Math.abs(imgData[2] - medium))
+
+        if (medium > 50 && coloured > 50) {
+          amitiePos[0] = index
+          index++
+          break
+        }
+
+        index++
+        if (index > image.height) {
+          break
+        }
+      }
+
+      // Проходим рисунок осколка
+      while (1) {
+        const imgData = context.getImageData(imgMiddle, index, 1, 1).data
+        const medium = (imgData[0] + imgData[1] + imgData[2]) / 3
+        const coloured = (Math.abs(imgData[0] - medium) +
+          Math.abs(imgData[1] - medium) +
+          Math.abs(imgData[2] - medium))
+
+        if (medium < 50 && coloured < 50) {
+          amitiePos[0] = index
+          index++
+          break
+        }
+
+        index++
+        if (index > image.height) {
+          break
+        }
+      }
+
+      // Ищем начало текста названия осколка
+      while (1) {
+        const imgData = context.getImageData(0, index, image.width, 1).data
+        const maxData = imgData.filter(i => i < 255 && i > 100)
+
+        if (maxData.length) {
+          amitiePos[0] = index - 2
+          index++
+          break
+        }
+
+        index++
+        if (index > image.height) {
+          break
+        }
+      }
+
+      // Ищем конец текста названия осколка
+      while (1) {
+        const imgData = context.getImageData(0, index, image.width, 1).data
+        const maxData = imgData.filter(i => i < 255 && i > 100)
+
+        if (!maxData.length) {
+          amitiePos[1] = index + 12
+          index++
+          break
+        }
+
+        index++
+        if (index > image.height) {
+          break
+        }
+      }
+
+      baffsPos[0] = amitiePos[1] + 1
+      baffsPos[1] = image.height
+
+      // # 1 - Бафы после вопроса, синий сверху -> красный снизу
+      lastIndex = index
+      while (1) {
+        // imgData -> RGBA -- Ищем синий
+        const imgData = aSplit(context.getImageData(0, index, image.width, 1).data, 4)
+        const blue = imgData
+          .map(i => i[2] - Math.max(i[0], i[1]))
+          .filter(i => i > 25)
+
+        if (blue.length > 15) {
+          isBlue = index - 12
+          index++
+          break
+        }
+
+        index++
+        if (index > image.height) {
+          break
+        }
+      }
+      while (1) {
+        // imgData -> RGBA -- ищем красный
+        const imgData = aSplit(context.getImageData(0, backward, image.width, 1).data, 4)
+        const red = imgData
+          .map(i => i[0] - Math.max(i[1], i[2]))
+          .filter(i => i > 25)
+
+        if (red.length > 15) {
+          isRed = backward + 6
+          backward--
+          break
+        }
+
+        backward--
+        if (backward < index) {
+          break
+        }
+      }
+
+      if (isBlue && isRed) {
+        baffsPos[0] = isBlue
+        baffsPos[1] = isRed
+        // # 2 - Не удалось распонать осколок со скрина с завершения последнего испытания
+        //   ищем по скрину со склада
+      } else {
+        index = lastIndex
+
+        // Ищем разделители между бафами кнопками и бонусами
+        while (1) {
+          const imgData = context.getImageData(0, index, image.width, 1).data
+          const cData = imgData.filter(i => i < 255)
+          const avg = cData.reduce((p, c) => p + c, 0) / cData.length
+
+          console.log(avg)
+
+          index++
+          if (index > image.height) {
+            break
+          }
+        }
+      }
+
+      const amitieSize = amitiePos[1] - amitiePos[0]
+      const baffsSize = baffsPos[1] - baffsPos[0]
+
+      amitieCanvas.width = canvas.width
+      amitieCanvas.height = amitieSize + baffsSize
+      amitieContext.drawImage(canvas,
+        0, amitiePos[0], canvas.width, amitieSize,
+        0, 0, canvas.width, amitieSize
+      )
+      amitieContext.drawImage(canvas,
+        0, baffsPos[0], canvas.width, baffsSize,
+        0, amitieSize, canvas.width, baffsSize
+      )
+      // amitieContext.drawImage(canvas, amitieSize + 1, -baffsPos[0])
+    }
+
+    amitieCanvas.classList.remove('hide')
   } else {
-    amitieImg.src = ''
-    amitieImg.classList.add('hide')
+    amitieCanvas.classList.add('hide')
+    amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
   }
+}
+
+function aSplit(arr, partSize) {
+  const numParts = arr.length / partSize | 0
+
+  return Array
+    .from({ length: numParts }, (n, i) => i * partSize)
+    .map((n, i, a) => arr.slice(n, a[i + 1]))
 }
