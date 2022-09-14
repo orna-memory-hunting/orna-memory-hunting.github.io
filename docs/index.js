@@ -224,11 +224,20 @@ function handleAmitieFile() {
       context.drawImage(image, 0, 0)
 
       for (let index = 0; index < image.height; index++) {
-        // imgData -> RGBA * len
         const imgData = context.getImageData(leftShift, index, rightShift, 1).data
-        const maxData = imgData.filter(i => i < 255 && i > 128)
+        let match = false
+        let iDataIndex = 0
 
-        if (maxData.length) {
+        while (iDataIndex < imgData.length) {
+          // imgData -> RGBA * len
+          if (Math.max(imgData[iDataIndex], imgData[iDataIndex + 1], imgData[iDataIndex + 2]) > 128) {
+            match = true
+            break
+          }
+          iDataIndex += 4
+        }
+
+        if (match) {
           if (!currentBlock) {
             currentBlock = index
           }
