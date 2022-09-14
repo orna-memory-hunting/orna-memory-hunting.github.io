@@ -211,7 +211,7 @@ function handleAmitieFile() {
       const canvas = document.createElement('canvas')
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
       const context = canvas.getContext('2d')
-      const leftShift = image.width / 5 ^ 0
+      const leftShift = image.width / 9 ^ 0
       const rightShift = image.width - leftShift
       const dataBlocks = []
       let currentBlock = 0
@@ -226,7 +226,7 @@ function handleAmitieFile() {
       for (let index = 0; index < image.height; index++) {
         // imgData -> RGBA * len
         const imgData = context.getImageData(leftShift, index, rightShift, 1).data
-        const maxData = imgData.filter(i => i < 255 && i > 100)
+        const maxData = imgData.filter(i => i < 255 && i > 128)
 
         if (maxData.length) {
           if (!currentBlock) {
@@ -239,13 +239,21 @@ function handleAmitieFile() {
           index += 2
 
           const h = currentBlockEnd - currentBlock
-          const newY = dataBlocks.length ? dataBlocks[dataBlocks.length - 1].totalH : 0
-          const totalH = newY + h
 
-          dataBlocks.push({ y: currentBlock, newY, h, totalH })
+          dataBlocks.push({ y: currentBlock, newY: 0, h, totalH: 0 })
           currentBlock = 0
           currentBlockEnd = 0
         }
+      }
+
+      // TODO Убираем ненужные строки
+
+      dataBlocks[0].totalH = dataBlocks[0].h
+      for (let index = 1; index < dataBlocks.length; index++) {
+        const dataBlock = dataBlocks[index]
+
+        dataBlock.newY = dataBlocks[index - 1].totalH + 1
+        dataBlock.totalH = dataBlock.newY + dataBlock.h
       }
 
       amitieCanvas.height = dataBlocks[dataBlocks.length - 1].totalH
@@ -254,6 +262,8 @@ function handleAmitieFile() {
           0, dataBlock.y, canvas.width, dataBlock.h,
           0, dataBlock.newY, canvas.width, dataBlock.h
         )
+        amitieContext.fillStyle = 'red'
+        amitieContext.fillRect(0, dataBlock.totalH, canvas.width, 1)
       }
 
       amitiePrep.classList.add('hide')
