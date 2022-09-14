@@ -211,11 +211,13 @@ function handleAmitieFile() {
       const canvas = document.createElement('canvas')
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
       const context = canvas.getContext('2d')
+      const imgMiddle = image.width / 2 ^ 0
       const leftShift = image.width / 9 ^ 0
       const rightShift = image.width - leftShift
       const dataBlocks = []
       let currentBlock = 0
       let currentBlockEnd = 0
+      let spaceHeight = 0
 
       canvas.width = image.width
       canvas.height = image.height
@@ -242,10 +244,14 @@ function handleAmitieFile() {
             currentBlock = index
           }
           currentBlockEnd = index
+          spaceHeight = 0
+        } else if (spaceHeight < 8) {
+          spaceHeight++
         } else if (currentBlock) {
           currentBlock -= 2
           currentBlockEnd += 2
           index += 2
+          spaceHeight = 0
 
           const h = currentBlockEnd - currentBlock
 
@@ -255,7 +261,33 @@ function handleAmitieFile() {
         }
       }
 
-      // TODO Убираем ненужные строки
+      // 2 блока с полями перед названием осколка
+      dataBlocks.shift()
+      dataBlocks.shift()
+      // фота осколка
+      dataBlocks.shift()
+
+      // зеленая кнопка в скрине с завершения поиска / imgData -> RGBA
+      const isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
+
+      if (isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16) {
+        // Кнопка
+        dataBlocks.pop()
+        // опыт/золото/орн
+        dataBlocks.pop()
+        dataBlocks.pop()
+        dataBlocks.pop()
+      } else {
+        // Кнопки
+        dataBlocks.pop()
+        dataBlocks.pop()
+        dataBlocks.pop()
+        // получение / доступноть
+        dataBlocks.pop()
+        dataBlocks.pop()
+        // ранг
+        dataBlocks.pop()
+      }
 
       dataBlocks[0].totalH = dataBlocks[0].h
       for (let index = 1; index < dataBlocks.length; index++) {
