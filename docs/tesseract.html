@@ -6,7 +6,8 @@
     <input type="file" id="uploader">
     <script>
       // Проверить возможность распознания
-      //
+      // https://github.com/naptha/tesseract.js
+      // PS: быстро справляется на вырезанных их скрина текстах
       const recognize = async ({ target: { files }  }) => {
         const { data: { text } } = await Tesseract.recognize(files[0], 'eng+rus+ukr', {
           corePath: 'https://unpkg.com/tesseract.js-core@3.0.2/tesseract-core.asm.js',
