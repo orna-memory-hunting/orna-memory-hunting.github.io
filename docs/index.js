@@ -211,191 +211,50 @@ function handleAmitieFile() {
       const canvas = document.createElement('canvas')
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
       const context = canvas.getContext('2d')
-      const imgMiddle = image.width / 2 ^ 0
-      const imgQuarterLeft = imgMiddle / 2 ^ 0
-      const imgQuarterRight = image.height - imgQuarterLeft
-      const amitiePos = [0, image.height]
-      const baffsPos = [0, 0]
-      let index = 0
-      let lastIndex = 0 // Сохранеине индекса, если нужно начать поиск с предыдущей фазы
-      let backward = image.height
-      let isBlue = 0
-      let isRed = 0
+      const leftShift = image.width / 5 ^ 0
+      const rightShift = image.width - leftShift
+      const dataBlocks = []
+      let currentBlock = 0
+      let currentBlockEnd = 0
 
       canvas.width = image.width
       canvas.height = image.height
+      amitieCanvas.width = canvas.width
+      amitieCanvas.height = 0
       context.drawImage(image, 0, 0)
 
-      // Идем до начала рисунка осколка
-      while (1) {
-        const imgData = context.getImageData(imgMiddle, index, 1, 1).data
-        const medium = (imgData[0] + imgData[1] + imgData[2]) / 3
-        const coloured = (Math.abs(imgData[0] - medium) +
-          Math.abs(imgData[1] - medium) +
-          Math.abs(imgData[2] - medium))
-
-        if (medium > 100 && coloured > 50) {
-          amitiePos[0] = index
-          index++
-          break
-        }
-
-        index++
-        if (index > image.height) {
-          break
-        }
-      }
-
-      // Проходим рисунок осколка
-      while (1) {
-        const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
-        const maxData = imgData.filter(i => i < 255 && i > 100)
-
-        if (!maxData.length) {
-          amitiePos[0] = index
-          index++
-          break
-        }
-
-        index++
-        if (index > image.height) {
-          break
-        }
-      }
-
-      // Ищем начало текста названия осколка
-      while (1) {
-        const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
+      for (let index = 0; index < image.height; index++) {
+        // imgData -> RGBA * len
+        const imgData = context.getImageData(leftShift, index, rightShift, 1).data
         const maxData = imgData.filter(i => i < 255 && i > 100)
 
         if (maxData.length) {
-          amitiePos[0] = index - 2
-          index++
-          break
-        }
-
-        index++
-        if (index > image.height) {
-          break
-        }
-      }
-
-      // Ищем конец текста названия осколка
-      while (1) {
-        const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
-        const maxData = imgData.filter(i => i < 255 && i > 100)
-
-        if (!maxData.length) {
-          amitiePos[1] = index + 12
-          index++
-          break
-        }
-
-        index++
-        if (index > image.height) {
-          break
-        }
-      }
-
-      baffsPos[0] = amitiePos[1] + 1
-      baffsPos[1] = image.height
-
-      // # 1 - Бафы после вопроса, синий сверху -> красный снизу
-      lastIndex = index
-      while (1) {
-        // imgData -> RGBA -- Ищем синий
-        const imgData = aSplit(context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data, 4)
-        const blue = imgData
-          .map(i => i[2] - Math.max(i[0], i[1]))
-          .filter(i => i > 25)
-
-        if (blue.length > 25) {
-          isBlue = index - 12
-          index++
-          break
-        }
-
-        index++
-        if (index > image.height) {
-          break
-        }
-      }
-      while (1) {
-        // imgData -> RGBA -- ищем красный
-        const imgData = aSplit(context.getImageData(imgQuarterLeft, backward, imgQuarterRight, 1).data, 4)
-        const red = imgData
-          .map(i => i[0] - Math.max(i[1], i[2]))
-          .filter(i => i > 25)
-
-        if (red.length > 25) {
-          isRed = backward + 6
-          backward--
-          break
-        }
-
-        backward--
-        if (backward < index) {
-          break
-        }
-      }
-
-      if (isBlue && isRed) {
-        baffsPos[0] = isBlue
-        baffsPos[1] = isRed
-        // # 2 - Не удалось распонать осколок со скрина с завершения последнего испытания
-        //   ищем по скрину со склада
-      } else {
-        const blockArea = []
-        let heightEmptyBlock = 0
-        let patternEmptyBlock = 0
-
-        index = lastIndex
-        while (1) {
-          const imgData = context.getImageData(imgQuarterLeft, index, imgQuarterRight, 1).data
-          const maxData = Math.max(...imgData.filter(i => i < 255))
-
-          console.log(maxData)
-          if (maxData < 100) {
-            heightEmptyBlock++
-          } else if (!patternEmptyBlock) {
-            patternEmptyBlock = heightEmptyBlock * 1.8 ^ 0
-          } else if (heightEmptyBlock > patternEmptyBlock) {
-            if (blockArea.length === 0) {
-              blockArea.push(index)
-            } else if (blockArea.length === 1) {
-              blockArea.push(index - heightEmptyBlock)
-            }
-            heightEmptyBlock = 0
-            if (blockArea.length > 1) {
-              break
-            }
-          } else {
-            heightEmptyBlock = 0
+          if (!currentBlock) {
+            currentBlock = index
           }
+          currentBlockEnd = index
+        } else if (currentBlock) {
+          currentBlock -= 2
+          currentBlockEnd += 2
+          index += 2
 
-          index++
-          if (index > image.height) {
-            break
-          }
-        }
-        if (blockArea.length === 2) {
-          [baffsPos[0], baffsPos[1]] = blockArea
+          const h = currentBlockEnd - currentBlock
+          const newY = dataBlocks.length ? dataBlocks[dataBlocks.length - 1].totalH : 0
+          const totalH = newY + h
+
+          dataBlocks.push({ y: currentBlock, newY, h, totalH })
+          currentBlock = 0
+          currentBlockEnd = 0
         }
       }
 
-      const amitieSize = amitiePos[1] - amitiePos[0]
-      const baffsSize = baffsPos[1] - baffsPos[0]
-
-      amitieCanvas.width = canvas.width
-      amitieCanvas.height = amitieSize + baffsSize
-      amitieContext.drawImage(canvas,
-        0, amitiePos[0], canvas.width, amitieSize,
-        0, 0, canvas.width, amitieSize
-      )
-      amitieContext.drawImage(canvas,
-        0, baffsPos[0], canvas.width, baffsSize,
-        0, amitieSize, canvas.width, baffsSize
-      )
+      amitieCanvas.height = dataBlocks[dataBlocks.length - 1].totalH
+      for (const dataBlock of dataBlocks) {
+        amitieContext.drawImage(canvas,
+          0, dataBlock.y, canvas.width, dataBlock.h,
+          0, dataBlock.newY, canvas.width, dataBlock.h
+        )
+      }
 
       amitiePrep.classList.add('hide')
       amitieCanvas.classList.remove('hide')
@@ -412,12 +271,4 @@ function handleAmitieFile() {
     timeFileField.classList.add('hide')
     amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
   }
-}
-
-function aSplit(arr, partSize) {
-  const numParts = arr.length / partSize | 0
-
-  return Array
-    .from({ length: numParts }, (n, i) => i * partSize)
-    .map((n, i, a) => arr.slice(n, a[i + 1]))
 }
