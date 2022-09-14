@@ -230,10 +230,10 @@ function handleAmitieFile() {
 
         while (iDataIndex < imgData.length) {
           // imgData -> RGBA * len
-          if (Math.max(imgData[iDataIndex], imgData[iDataIndex + 1], imgData[iDataIndex + 2]) > 128) {
-            match = true
-            break
-          }
+          match = imgData[iDataIndex] > 128 ||
+            imgData[iDataIndex + 1] > 128 ||
+            imgData[iDataIndex + 2] > 128
+          if (match) break
           iDataIndex += 4
         }
 
