@@ -214,7 +214,7 @@ function handleAmitieFile() {
       const imgMiddle = image.width / 2 ^ 0
       const leftShift = image.width / 9 ^ 0
       const rightShift = image.width - leftShift
-      const dataBlocks = []
+      let dataBlocks = []
       let currentBlock = 0
       let currentBlockEnd = 0
       let spaceHeight = 0
@@ -261,33 +261,82 @@ function handleAmitieFile() {
         }
       }
 
-      // 2 блока с полями перед названием осколка
-      dataBlocks.shift()
-      dataBlocks.shift()
-      // фота осколка
-      dataBlocks.shift()
+      let firstBaffIndex = 0
+      let lastBaffIndex = 0
+      const rawBaffsBlock = []
+      let isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
 
-      // зеленая кнопка в скрине с завершения поиска / imgData -> RGBA
-      const isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
+      isGreenButton = isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16
 
-      if (isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16) {
-        // Кнопка
-        dataBlocks.pop()
-        // опыт/золото/орн
-        dataBlocks.pop()
-        dataBlocks.pop()
-        dataBlocks.pop()
-      } else {
-        // Кнопки
-        dataBlocks.pop()
-        dataBlocks.pop()
-        dataBlocks.pop()
-        // получение / доступноть
-        dataBlocks.pop()
-        dataBlocks.pop()
-        // ранг
-        dataBlocks.pop()
+      for (let index = 1; index < dataBlocks.length - 1; index++) {
+        const prevBlock = dataBlocks[index - 1]
+        const dataBlock = dataBlocks[index]
+        const nextBlock = dataBlocks[index + 1]
+        const prevSpace = dataBlock.y - prevBlock.y - prevBlock.h
+        const nextSpace = nextBlock.y - dataBlock.y - dataBlock.h
+
+
+        if (dataBlock.h < prevSpace) {
+          firstBaffIndex = index
+        }
+        if (firstBaffIndex && (nextBlock.h < nextSpace || dataBlock.h * 2 < nextSpace)) {
+          lastBaffIndex = index
+        }
+
+        if (firstBaffIndex && lastBaffIndex) {
+          if (lastBaffIndex - firstBaffIndex > 0) {
+            rawBaffsBlock.push([firstBaffIndex, lastBaffIndex])
+            firstBaffIndex = lastBaffIndex = 0
+          } else {
+            firstBaffIndex = lastBaffIndex = 0
+          }
+        }
       }
+
+      if (rawBaffsBlock.length) {
+        const tmpBlocks = [dataBlocks[rawBaffsBlock[0][0] - 1]]
+
+        if (isGreenButton) {
+          rawBaffsBlock.pop()
+          rawBaffsBlock[0][0]++
+        } else {
+          rawBaffsBlock.shift()
+        }
+
+        console.log(rawBaffsBlock.length)
+        rawBaffsBlock.forEach(itm => {
+          tmpBlocks.push(...dataBlocks.slice(itm[0], itm[1] + 1))
+        })
+        dataBlocks = tmpBlocks
+      }
+
+      // // 2 блока с полями перед названием осколка
+      // dataBlocks.shift()
+      // dataBlocks.shift()
+      // // фота осколка
+      // dataBlocks.shift()
+
+      // // зеленая кнопка в скрине с завершения поиска / imgData -> RGBA
+      // const isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
+
+      // if (isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16) {
+      //   // Кнопка
+      //   dataBlocks.pop()
+      //   // опыт/золото/орн
+      //   dataBlocks.pop()
+      //   dataBlocks.pop()
+      //   dataBlocks.pop()
+      // } else {
+      //   // Кнопки
+      //   dataBlocks.pop()
+      //   dataBlocks.pop()
+      //   dataBlocks.pop()
+      //   // получение / доступноть
+      //   dataBlocks.pop()
+      //   dataBlocks.pop()
+      //   // ранг
+      //   dataBlocks.pop()
+      // }
 
       dataBlocks[0].totalH = dataBlocks[0].h
       for (let index = 1; index < dataBlocks.length; index++) {
