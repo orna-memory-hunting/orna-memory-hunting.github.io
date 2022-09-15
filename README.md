@@ -1,1 +1,1 @@
-# Orna: Memory Hunting
+# Orna: Memory Hunting - App home page
