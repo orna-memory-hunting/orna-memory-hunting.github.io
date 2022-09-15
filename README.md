@@ -1,2 +1,1 @@
-# orna-memory-hunting
-Orna Memory Hunting
+# Orna: Memory Hunting
