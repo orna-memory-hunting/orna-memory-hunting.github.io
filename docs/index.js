@@ -16,6 +16,16 @@ const amitieCanvas = document.getElementById('amitie-canvas')
 const amitieContext = amitieCanvas.getContext('2d')
 const qData = [
   {
+    q: 'Что висит над твоим камином?',
+    a: [
+      'щит',
+      'меч',
+      'посох',
+      'голова дракона',
+      'ничего'
+    ]
+  },
+  {
     q: 'Как ты считаешь, кто такие Непокорённые по своей сути...',
     a: [
       'герои',
@@ -67,16 +77,6 @@ const qData = [
       'партнёру по тренировочным боям',
       'питомцу',
       'себе'
-    ]
-  },
-  {
-    q: 'Что висит над твоим камином?',
-    a: [
-      'щит',
-      'меч',
-      'посох',
-      'голова дракона',
-      'ничего'
     ]
   }
 ]
@@ -248,9 +248,9 @@ function handleAmitieFile() {
         } else if (spaceHeight < 8) {
           spaceHeight++
         } else if (currentBlock) {
-          currentBlock -= 2
-          currentBlockEnd += 2
-          index += 2
+          currentBlock -= 1
+          currentBlockEnd += 1
+          index += 1
           spaceHeight = 0
 
           const h = currentBlockEnd - currentBlock
@@ -263,10 +263,6 @@ function handleAmitieFile() {
 
       let firstBaffIndex = 0
       let lastBaffIndex = 0
-      const rawBaffsBlock = []
-      let isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
-
-      isGreenButton = isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16
 
       for (let index = 1; index < dataBlocks.length - 1; index++) {
         const prevBlock = dataBlocks[index - 1]
@@ -276,73 +272,43 @@ function handleAmitieFile() {
         const nextSpace = nextBlock.y - dataBlock.y - dataBlock.h
 
 
-        if (dataBlock.h < prevSpace) {
+        if (dataBlock.h * 2 < prevSpace) {
           firstBaffIndex = index
         }
-        if (firstBaffIndex && (nextBlock.h < nextSpace || dataBlock.h * 2 < nextSpace)) {
+        if (firstBaffIndex && dataBlock.h * 2 < nextSpace) {
           lastBaffIndex = index
         }
 
         if (firstBaffIndex && lastBaffIndex) {
           if (lastBaffIndex - firstBaffIndex > 0) {
-            rawBaffsBlock.push([firstBaffIndex, lastBaffIndex])
-            firstBaffIndex = lastBaffIndex = 0
+            break
           } else {
             firstBaffIndex = lastBaffIndex = 0
           }
         }
       }
 
-      if (rawBaffsBlock.length) {
-        const tmpBlocks = [dataBlocks[rawBaffsBlock[0][0] - 1]]
+      if (firstBaffIndex && lastBaffIndex) {
+        const isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
 
-        if (isGreenButton) {
-          rawBaffsBlock.pop()
-          rawBaffsBlock[0][0]++
+        if (isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16) {
+          dataBlocks = [
+            dataBlocks[firstBaffIndex - 1],
+            ...dataBlocks.slice(firstBaffIndex + 1, lastBaffIndex + 1)
+          ]
         } else {
-          rawBaffsBlock.shift()
+          dataBlocks = [
+            dataBlocks[firstBaffIndex - 5],
+            ...dataBlocks.slice(firstBaffIndex, lastBaffIndex + 1)
+          ]
         }
-
-        console.log(rawBaffsBlock.length)
-        rawBaffsBlock.forEach(itm => {
-          tmpBlocks.push(...dataBlocks.slice(itm[0], itm[1] + 1))
-        })
-        dataBlocks = tmpBlocks
       }
-
-      // // 2 блока с полями перед названием осколка
-      // dataBlocks.shift()
-      // dataBlocks.shift()
-      // // фота осколка
-      // dataBlocks.shift()
-
-      // // зеленая кнопка в скрине с завершения поиска / imgData -> RGBA
-      // const isGreenButton = context.getImageData(imgMiddle, dataBlocks[dataBlocks.length - 1].y + 3, 1, 1).data.slice(0, 3)
-
-      // if (isGreenButton[1] - (isGreenButton[0] + isGreenButton[2]) / 2 > 16) {
-      //   // Кнопка
-      //   dataBlocks.pop()
-      //   // опыт/золото/орн
-      //   dataBlocks.pop()
-      //   dataBlocks.pop()
-      //   dataBlocks.pop()
-      // } else {
-      //   // Кнопки
-      //   dataBlocks.pop()
-      //   dataBlocks.pop()
-      //   dataBlocks.pop()
-      //   // получение / доступноть
-      //   dataBlocks.pop()
-      //   dataBlocks.pop()
-      //   // ранг
-      //   dataBlocks.pop()
-      // }
 
       dataBlocks[0].totalH = dataBlocks[0].h
       for (let index = 1; index < dataBlocks.length; index++) {
         const dataBlock = dataBlocks[index]
 
-        dataBlock.newY = dataBlocks[index - 1].totalH + 1
+        dataBlock.newY = dataBlocks[index - 1].totalH
         dataBlock.totalH = dataBlock.newY + dataBlock.h
       }
 
@@ -352,8 +318,6 @@ function handleAmitieFile() {
           0, dataBlock.y, canvas.width, dataBlock.h,
           0, dataBlock.newY, canvas.width, dataBlock.h
         )
-        amitieContext.fillStyle = 'red'
-        amitieContext.fillRect(0, dataBlock.totalH, canvas.width, 1)
       }
 
       amitiePrep.classList.add('hide')

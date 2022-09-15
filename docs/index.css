@@ -28,7 +28,7 @@
   padding      : 12px 10px;
   display      : inline-block;
   border-radius: 4px;
-  user-select  : none
+  user-select  : none;
 }
 
 .question:hover,
@@ -95,8 +95,8 @@
 }
 
 .amitie-label {
-  width  : 100%;
-  display: flex;
+  width      : 100%;
+  display    : flex;
   align-items: baseline;
 }
 
