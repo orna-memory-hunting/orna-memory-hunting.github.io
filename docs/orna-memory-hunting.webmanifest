@@ -1,0 +1,14 @@
+{
+  "name": "Orna: Memory Hunting",
+  "short_name": "Memory Hunting",
+  "description": "Memory Hunting - Catalog and organize attain Amities",
+  "lang": "ru-Ru",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#362e2b",
+  "theme_color": "#362e2b",
+  "categories": [
+    "games"
+  ]
+}
