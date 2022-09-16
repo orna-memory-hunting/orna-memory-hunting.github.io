@@ -4,6 +4,7 @@ import { resolve } from 'path'
 import { readFile } from 'fs/promises'
 
 const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debug' : 'error' } })
+const buildNumber = new Date().toISOString()
 
 app
   .register(fastifyStatic, {
@@ -18,6 +19,15 @@ app
     reply.type('text/html')
 
     return index
+  })
+  .get('/version.js', async (req, reply) => {
+    const version = (await readFile('./docs/version.js', 'utf-8'))
+      .replace(/---\n---\n/, '')
+      .replace(/{{ site.github.build_revision }}/, buildNumber)
+
+    reply.type('application/javascript')
+
+    return version
   })
   .get('/orna-memory-hunting.webmanifest', async (req, reply) => {
     const manifest = (await readFile('./docs/orna-memory-hunting.webmanifest', 'utf-8'))

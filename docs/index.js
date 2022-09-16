@@ -84,6 +84,31 @@ const qLabels = ['1.', '2.', '3.', '4.', '5.', '6.', '7.']
 const aLabels = ['А.', 'Б.', 'В.', 'Г.', 'Д.']
 let html = ''
 
+if ('serviceWorker' in window.navigator) {
+  (async () => {
+    const { serviceWorker } = window.navigator
+
+    serviceWorker.addEventListener('message', event => {
+      if (event.data.name) {
+        switch (event.data.name) {
+          case 'force-refresh':
+            window.location.reload()
+            break
+          case 'pong':
+            console.log(`serviceWorker succeeded. buildNumber = ${event.data.buildNumber}`)
+            break
+        }
+      }
+    })
+
+    await serviceWorker.register('/offline.js', { scope: '/', type: 'module' })
+
+    navigator.serviceWorker.ready.then((worker) => {
+      worker.active.postMessage({ name: 'ping' })
+    })
+  })().catch(console.error)
+}
+
 for (let qIndex = 0; qIndex < qData.length; qIndex++) {
   const question = qData[qIndex]
   const answers = question.a
