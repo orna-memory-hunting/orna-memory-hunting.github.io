@@ -4,16 +4,20 @@ import { buildNumber } from './version.js'
 const appResources = [
   './',
   './index.js',
-  './index.css'
+  './index.css',
+  './lib/utils.js',
+  './lib/questions.js'
 ]
+/** @type {ServiceWorkerGlobalScope} */// @ts-ignore
+const workerScope = self
 
-self.addEventListener('install', (event) => {
-  self.skipWaiting()
+workerScope.addEventListener('install', (event) => {
+  workerScope.skipWaiting()
   event.waitUntil(caches.open(buildNumber)
     .then((cache) => cache.addAll(appResources)))
 })
 
-self.addEventListener('activate', (event) => {
+workerScope.addEventListener('activate', (event) => {
   event.waitUntil(caches.keys()
     .then(async keyList => {
       let isUpdate = false
@@ -26,7 +30,7 @@ self.addEventListener('activate', (event) => {
       }))
 
       if (isUpdate) {
-        await self.clients.matchAll().then((clients) => {
+        await workerScope.clients.matchAll().then((clients) => {
           clients.forEach((client) => {
             client.postMessage({ name: 'force-refresh' })
           })
@@ -35,7 +39,7 @@ self.addEventListener('activate', (event) => {
     }))
 })
 
-self.addEventListener('fetch', (event) => {
+workerScope.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request).then((response) => {
@@ -51,7 +55,7 @@ self.addEventListener('fetch', (event) => {
   )
 })
 
-self.addEventListener('message', (event) => {
+workerScope.addEventListener('message', (event) => {
   if (event.data.name) {
     switch (event.data.name) {
       case 'ping':
