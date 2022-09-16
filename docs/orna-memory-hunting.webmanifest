@@ -10,5 +10,27 @@
   "theme_color": "#362e2b",
   "categories": [
     "games"
+  ],
+  "icons": [
+    {
+      "src": "/img/x32-memory-end-app.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "/img/x64-memory-end-app.png",
+      "type": "image/png",
+      "sizes": "64x64"
+    },
+    {
+      "src": "/img/x128-memory-end-app.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/img/x256-memory-end-app.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
   ]
 }
