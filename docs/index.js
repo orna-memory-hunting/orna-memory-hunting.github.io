@@ -147,7 +147,7 @@ function handleAmitieFile() {
 /** @param {File} file */
 async function prepareAmitieImage(file) {
   const lightColorBorder = 128
-  const colorIntensityLimit = 16
+  const colorIntensityLimit = 24
   const animationTime = 100
   const image = new window.Image()
 
@@ -192,7 +192,9 @@ async function prepareAmitieImage(file) {
       const b = imgData[iDataIndex + 2]
 
       match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
-      if (match) break
+      if (match) {
+        break
+      }
       iDataIndex += 4
     }
 
@@ -278,14 +280,9 @@ async function prepareAmitieImage(file) {
       iDataIndex += 4
     }
 
-
-    if (isGreenButton) {
-      nameBlock = dataBlocks[firstBaffIndex - 1]
-      firstBaffIndex++
-    } else {
-      nameBlock = dataBlocks[firstBaffIndex - 5]
-
-      const imgData = context.getImageData(leftShift, nameBlock.y + nameBlock.h / 2, rightShift, 1).data
+    for (let index = firstBaffIndex - 1; index > 0; index--) {
+      const dataBlock = dataBlocks[index]
+      const imgData = context.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
       let iDataIndex = 0
 
       while (iDataIndex < imgData.length) {
@@ -301,12 +298,15 @@ async function prepareAmitieImage(file) {
             (g > (b + r) / 2 + colorIntensityLimit) ||
             (b > (r + g) / 2 + colorIntensityLimit)
 
-          if (!colored) {
-            nameBlock = dataBlocks[firstBaffIndex - 6]
+          if (colored) {
+            nameBlock = dataBlock
+            break
           }
-          break
         }
 
+        if (nameBlock) {
+          break
+        }
         iDataIndex += 4
       }
     }
@@ -319,6 +319,10 @@ async function prepareAmitieImage(file) {
       amitieContext.fillStyle = '#00f1'
       amitieContext.fillRect(0, nameBlock.y, image.width, nameBlock.h)
       await nextTick(animationTime)
+    }
+
+    if (isGreenButton) {
+      firstBaffIndex++
     }
 
     for (let index = firstBaffIndex; index < lastBaffIndex + 1; index++) {
