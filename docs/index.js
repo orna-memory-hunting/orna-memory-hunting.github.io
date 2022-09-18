@@ -156,6 +156,12 @@ async function prepareAmitieImage(file) {
 
   await new Promise((resolve) => { image.onload = resolve })
 
+  const lDate = new Date(file.lastModified)
+
+  timeSelect.value = ('0' + lDate.getHours()).slice(-2)
+  timeFile.textContent = lDate.toLocaleString()
+  timeFileField.classList.remove('hide')
+
   await nextAnimationFrame()
   amitieCanvas.width = image.width
   amitieCanvas.height = image.height
@@ -388,10 +394,4 @@ async function prepareAmitieImage(file) {
       )
     }
   }
-
-  const lDate = new Date(file.lastModified)
-
-  timeSelect.value = ('0' + lDate.getHours()).slice(-2)
-  timeFile.textContent = lDate.toLocaleString()
-  timeFileField.classList.remove('hide')
 }
