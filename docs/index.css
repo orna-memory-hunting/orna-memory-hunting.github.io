@@ -106,3 +106,9 @@
   border    : 1px solid;
   margin-top: 4px;
 }
+
+.recognizing-text-log {
+  white-space: pre;
+  text-align : center;
+  padding    : 6px;
+}

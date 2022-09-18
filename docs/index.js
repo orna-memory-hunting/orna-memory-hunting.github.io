@@ -1,6 +1,9 @@
 import { doAsync, nextTick, nextAnimationFrame, registerServiceWorker } from './lib/utils.js'
 import { questionList, questionLabels, answerLabels } from './lib/questions.js'
 
+/** @type {{Tesseract:import('tesseract.js')}} */
+const { Tesseract } = window
+const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@3.0.2/tesseract-core.wasm.js'
 /** @type {HTMLDivElement} */// @ts-ignore
 const questions = document.getElementById('questions')
 /** @type {HTMLInputElement} */// @ts-ignore
@@ -213,9 +216,9 @@ async function prepareAmitieImage(file) {
     } else if (spaceHeight < 8) {
       spaceHeight++
     } else if (currentBlock) {
-      currentBlock -= 1
-      currentBlockEnd += 1
-      index += 1
+      currentBlock -= 2
+      currentBlockEnd += 2
+      index += 2
       spaceHeight = 0
 
       const h = currentBlockEnd - currentBlock
@@ -255,6 +258,7 @@ async function prepareAmitieImage(file) {
 
     if (firstBaffIndex && lastBaffIndex) {
       if (lastBaffIndex - firstBaffIndex > 0) {
+        // TODO - добавить проверку что секция содержит хотя бы 1 крастный блок
         break
       } else {
         firstBaffIndex = lastBaffIndex = 0
@@ -280,7 +284,7 @@ async function prepareAmitieImage(file) {
       const match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
 
       if (match) {
-        isGreenButton = g > (r + b) / 2 + colorIntensityLimit
+        isGreenButton = g > (r + b) / 2 + colorIntensityLimit / 2
         if (isGreenButton) break
       }
       iDataIndex += 4
@@ -369,7 +373,7 @@ async function prepareAmitieImage(file) {
     }
 
     dataBlocks = [
-      nameBlock,
+      ...(nameBlock ? [nameBlock] : []),
       ...plusBlocks,
       ...minusBlocks
     ]
@@ -393,5 +397,51 @@ async function prepareAmitieImage(file) {
         0, dataBlock.newY, canvas.width, dataBlock.h
       )
     }
+  }
+
+  if (dataBlocks.length) {
+    const recognizingTextLog = document.getElementById('recognizing-text-log')
+    let currentStep = 0
+    const logRecognizingText = (msg) => {
+      const percent = ((currentStep + msg.progress) / dataBlocks.length * 10000 ^ 0) / 100
+
+      if (msg.status === 'recognizing text') {
+        recognizingTextLog.textContent = `${msg.status} ~ ${percent}%`
+        if (msg.progress === 1) {
+          currentStep++
+        }
+      } else {
+        recognizingTextLog.textContent = msg.status
+      }
+    }
+    const scheduler = Tesseract.createScheduler()
+    const worker1 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
+    const worker2 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
+
+    await Promise.all([worker1.load(), worker2.load()])
+    await Promise.all([worker1.loadLanguage('rus'), worker2.loadLanguage('rus')])
+    await Promise.all([worker1.initialize('rus'), worker2.initialize('rus')])
+    scheduler.addWorker(worker1)
+    scheduler.addWorker(worker2)
+
+    const results = await Promise.all(dataBlocks.map(dataBlock => {
+      const rCanvas = document.createElement('canvas')
+      /** @type {CanvasRenderingContext2D} */// @ts-ignore
+      const rContext = rCanvas.getContext('2d')
+
+      rCanvas.width = canvas.width
+      rCanvas.height = dataBlock.h + 2
+      rContext.drawImage(canvas,
+        0, dataBlock.y, canvas.width, dataBlock.h,
+        1, 0, canvas.width, dataBlock.h
+      )
+
+      return scheduler.addJob('recognize', rCanvas)
+        .then((/** @type {import('tesseract.js').RecognizeResult} */result) => result.data.text)
+    }))
+
+    recognizingTextLog.textContent = results.join('')
+
+    await scheduler.terminate()
   }
 }

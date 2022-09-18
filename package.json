@@ -10,7 +10,8 @@
     "@fastify/static": "6.5.0"
   },
   "devDependencies": {
-    "@nodutilus/project-config": "latest"
+    "@nodutilus/project-config": "latest",
+    "tesseract.js": "3.0.2"
   },
   "engines": {
     "node": ">=16"

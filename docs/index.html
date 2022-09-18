@@ -65,11 +65,13 @@
         Скрин осколка:
         <input id="amitie-file" class="amitie-file" type="file" accept=".jpg, .jpeg, .png">
       </label>
-      <canvas id="amitie-canvas" class="amitie-canvas hide">
+      <canvas id="amitie-canvas" class="amitie-canvas hide"></canvas>
+      <div id="recognizing-text-log" class="recognizing-text-log"></div>
     </div>
   </div>
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@3.0.2/dist/tesseract.min.js"></script>
 <script type="module" src="./index.js"></script>
 
 </html>
