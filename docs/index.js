@@ -146,6 +146,9 @@ function handleAmitieFile() {
 
 /** @param {File} file */
 async function prepareAmitieImage(file) {
+  const lightColorBorder = 128
+  const colorIntensityLimit = 16
+  const animationTime = 100
   const image = new window.Image()
 
   amitieCanvas.classList.add('hide')
@@ -167,9 +170,11 @@ async function prepareAmitieImage(file) {
   const rightShift = image.width - leftShift
   let dataBlocks = []
   let currentBlock = 0
-  let currentBlockRGB = [0, 0, 0]
   let currentBlockEnd = 0
   let spaceHeight = 0
+  let nameBlock = null
+  const plusBlocks = []
+  const minusBlocks = []
 
   canvas.width = image.width
   canvas.height = image.height
@@ -177,16 +182,16 @@ async function prepareAmitieImage(file) {
 
   for (let index = 0; index < image.height; index++) {
     const imgData = context.getImageData(leftShift, index, rightShift, 1).data
-    let [r, g, b] = [0, 0, 0]
     let match = false
     let iDataIndex = 0
 
     while (iDataIndex < imgData.length) {
       // imgData -> RGBA * len
-      r = imgData[iDataIndex]
-      g = imgData[iDataIndex + 1]
-      b = imgData[iDataIndex + 2]
-      match = r > 96 || g > 96 || b > 96
+      const r = imgData[iDataIndex]
+      const g = imgData[iDataIndex + 1]
+      const b = imgData[iDataIndex + 2]
+
+      match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
       if (match) break
       iDataIndex += 4
     }
@@ -194,14 +199,12 @@ async function prepareAmitieImage(file) {
     if (match) {
       if (!currentBlock) {
         currentBlock = index
-        currentBlockRGB = [r, g, b]
       }
       currentBlockEnd = index
       spaceHeight = 0
     } else if (spaceHeight < 8) {
       spaceHeight++
     } else if (currentBlock) {
-      [r, g, b] = currentBlockRGB
       currentBlock -= 1
       currentBlockEnd += 1
       index += 1
@@ -209,8 +212,7 @@ async function prepareAmitieImage(file) {
 
       const h = currentBlockEnd - currentBlock
 
-
-      dataBlocks.push({ y: currentBlock, newY: 0, h, totalH: 0, color: { r, g, b } })
+      dataBlocks.push({ y: currentBlock, newY: 0, h, totalH: 0 })
 
       await nextAnimationFrame()
       amitieContext.lineWidth = 0.5
@@ -218,7 +220,7 @@ async function prepareAmitieImage(file) {
       amitieContext.strokeRect(0, currentBlock, image.width, h)
       amitieContext.fillStyle = '#f0f1'
       amitieContext.fillRect(0, currentBlock, image.width, h)
-      await nextTick(150)
+      await nextTick(animationTime)
 
       currentBlock = 0
       currentBlockEnd = 0
@@ -257,15 +259,56 @@ async function prepareAmitieImage(file) {
   await nextTick()
 
   if (firstBaffIndex && lastBaffIndex) {
-    let nameBlock = null
+    let isGreenButton = false
     const lastBlock = dataBlocks[dataBlocks.length - 1]
-    const isGreenButton = lastBlock.color.g > (lastBlock.color.r + lastBlock.color.b) / 2
+    const imgData = context.getImageData(leftShift, lastBlock.y + lastBlock.h / 2, rightShift, 1).data
+    let iDataIndex = 0
+
+    while (iDataIndex < imgData.length) {
+      // imgData -> RGBA * len
+      const r = imgData[iDataIndex]
+      const g = imgData[iDataIndex + 1]
+      const b = imgData[iDataIndex + 2]
+      const match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
+
+      if (match) {
+        isGreenButton = g > (r + b) / 2 + colorIntensityLimit
+        if (isGreenButton) break
+      }
+      iDataIndex += 4
+    }
+
 
     if (isGreenButton) {
       nameBlock = dataBlocks[firstBaffIndex - 1]
       firstBaffIndex++
     } else {
       nameBlock = dataBlocks[firstBaffIndex - 5]
+
+      const imgData = context.getImageData(leftShift, nameBlock.y + nameBlock.h / 2, rightShift, 1).data
+      let iDataIndex = 0
+
+      while (iDataIndex < imgData.length) {
+        // imgData -> RGBA * len
+        const r = imgData[iDataIndex]
+        const g = imgData[iDataIndex + 1]
+        const b = imgData[iDataIndex + 2]
+        const match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
+
+        if (match) {
+          const colored =
+            (r > (g + b) / 2 + colorIntensityLimit) ||
+            (g > (b + r) / 2 + colorIntensityLimit) ||
+            (b > (r + g) / 2 + colorIntensityLimit)
+
+          if (!colored) {
+            nameBlock = dataBlocks[firstBaffIndex - 6]
+          }
+          break
+        }
+
+        iDataIndex += 4
+      }
     }
 
     if (nameBlock) {
@@ -275,45 +318,71 @@ async function prepareAmitieImage(file) {
       amitieContext.strokeRect(0, nameBlock.y, image.width, nameBlock.h)
       amitieContext.fillStyle = '#00f1'
       amitieContext.fillRect(0, nameBlock.y, image.width, nameBlock.h)
-      await nextTick(150)
+      await nextTick(animationTime)
     }
 
     for (let index = firstBaffIndex; index < lastBaffIndex + 1; index++) {
       const dataBlock = dataBlocks[index]
-      const isRed = dataBlock.color.r > (dataBlock.color.g + dataBlock.color.b)
+      const imgData = context.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
+      let iDataIndex = 0
+      let isRed = false
 
+      while (iDataIndex < imgData.length) {
+        // imgData -> RGBA * len
+        const r = imgData[iDataIndex]
+        const g = imgData[iDataIndex + 1]
+        const b = imgData[iDataIndex + 2]
+        const match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
+
+        if (match) {
+          isRed = r > (b + g) / 2 + colorIntensityLimit
+          break
+        }
+
+        iDataIndex += 4
+      }
 
       await nextAnimationFrame()
+      if (isRed) {
+        minusBlocks.push(dataBlock)
+        amitieContext.strokeStyle = '#f00e'
+        amitieContext.fillStyle = '#f001'
+      } else {
+        plusBlocks.push(dataBlock)
+        amitieContext.strokeStyle = '#0f0e'
+        amitieContext.fillStyle = '#0f01'
+      }
       amitieContext.lineWidth = 0.5
-      amitieContext.strokeStyle = isRed ? '#f00e' : '#0f0e'
       amitieContext.strokeRect(0, dataBlock.y, image.width, dataBlock.h)
-      amitieContext.fillStyle = isRed ? '#f001' : '#0f01'
       amitieContext.fillRect(0, dataBlock.y, image.width, dataBlock.h)
-      await nextTick(150)
+      await nextTick(animationTime)
     }
 
     dataBlocks = [
       nameBlock,
-      ...dataBlocks.slice(firstBaffIndex, lastBaffIndex + 1)
+      ...plusBlocks,
+      ...minusBlocks
     ]
   }
 
-  dataBlocks[0].totalH = dataBlocks[0].h
-  for (let index = 1; index < dataBlocks.length; index++) {
-    const dataBlock = dataBlocks[index]
+  if (dataBlocks.length) {
+    dataBlocks[0].totalH = dataBlocks[0].h
+    for (let index = 1; index < dataBlocks.length; index++) {
+      const dataBlock = dataBlocks[index]
 
-    dataBlock.newY = dataBlocks[index - 1].totalH
-    dataBlock.totalH = dataBlock.newY + dataBlock.h
-  }
+      dataBlock.newY = dataBlocks[index - 1].totalH
+      dataBlock.totalH = dataBlock.newY + dataBlock.h
+    }
 
-  await nextAnimationFrame()
-  amitieCanvas.width = canvas.width
-  amitieCanvas.height = dataBlocks[dataBlocks.length - 1].totalH
-  for (const dataBlock of dataBlocks) {
-    amitieContext.drawImage(canvas,
-      0, dataBlock.y, canvas.width, dataBlock.h,
-      0, dataBlock.newY, canvas.width, dataBlock.h
-    )
+    await nextAnimationFrame()
+    amitieCanvas.width = canvas.width
+    amitieCanvas.height = dataBlocks[dataBlocks.length - 1].totalH
+    for (const dataBlock of dataBlocks) {
+      amitieContext.drawImage(canvas,
+        0, dataBlock.y, canvas.width, dataBlock.h,
+        0, dataBlock.newY, canvas.width, dataBlock.h
+      )
+    }
   }
 
   const lDate = new Date(file.lastModified)
