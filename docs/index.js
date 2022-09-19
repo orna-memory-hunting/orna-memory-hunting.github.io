@@ -20,8 +20,9 @@ const amitieCanvas = document.getElementById('amitie-canvas')
 const amitieContext = amitieCanvas.getContext('2d')
 let html = ''
 
-doAsync(registerServiceWorker)
-
+if (window.location.hostname !== 'localhost') {
+  doAsync(registerServiceWorker)
+}
 
 for (let qIndex = 0; qIndex < questionList.length; qIndex++) {
   const question = questionList[qIndex]
@@ -216,11 +217,6 @@ async function prepareAmitieImage(file) {
     } else if (spaceHeight < 8) {
       spaceHeight++
     } else if (currentBlock) {
-      currentBlock -= 2
-      currentBlockEnd += 2
-      index += 2
-      spaceHeight = 0
-
       const h = currentBlockEnd - currentBlock
 
       dataBlocks.push({ y: currentBlock, newY: 0, h, totalH: 0 })
@@ -235,6 +231,7 @@ async function prepareAmitieImage(file) {
 
       currentBlock = 0
       currentBlockEnd = 0
+      spaceHeight = 0
     }
   }
 
