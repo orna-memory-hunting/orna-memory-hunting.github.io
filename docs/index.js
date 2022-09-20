@@ -378,10 +378,13 @@ async function prepareAmitieImage(file) {
 
   if (dataBlocks.length) {
     dataBlocks[0].totalH = dataBlocks[0].h
-    for (let index = 1; index < dataBlocks.length; index++) {
+    for (let index = 0; index < dataBlocks.length; index++) {
       const dataBlock = dataBlocks[index]
 
-      dataBlock.newY = dataBlocks[index - 1].totalH
+      dataBlock.y -= 6
+      dataBlock.h += 12
+
+      dataBlock.newY = index > 0 ? dataBlocks[index - 1].totalH : 0
       dataBlock.totalH = dataBlock.newY + dataBlock.h
     }
 
