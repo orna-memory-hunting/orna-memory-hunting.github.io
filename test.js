@@ -29,6 +29,15 @@ app
 
     return version
   })
+  .get('/version.json', async (req, reply) => {
+    const version = (await readFile('./docs/version.json', 'utf-8'))
+      .replace(/---\n---\n/, '')
+      .replace(/{{ site.github.build_revision }}/, buildNumber)
+
+    reply.type('application/json')
+
+    return version
+  })
   .get('/orna-memory-hunting.webmanifest', async (req, reply) => {
     const manifest = (await readFile('./docs/orna-memory-hunting.webmanifest', 'utf-8'))
       .replace(/Memory Hunting/g, 'Memory Hunting (DEV)')

@@ -2,7 +2,6 @@
 import { buildNumber } from './version.js'
 
 const appResources = [
-  './',
   './index.js',
   './index.css',
   './lib/utils.js',
@@ -17,31 +16,51 @@ workerScope.addEventListener('install', (event) => {
     .then((cache) => cache.addAll(appResources)))
 })
 
-workerScope.addEventListener('activate', (event) => {
-  event.waitUntil(caches.keys()
-    .then(async keyList => {
-      let isUpdate = false
+// workerScope.addEventListener('activate', (event) => {
+//   event.waitUntil(caches.keys()
+//     .then(async keyList => {
+//       let isUpdate = false
 
-      await Promise.all(keyList.map(async key => {
-        if (key !== buildNumber) {
-          isUpdate = true
-          await caches.delete(key)
+//       await Promise.all(keyList.map(async key => {
+//         if (key !== buildNumber) {
+//           isUpdate = true
+//           await caches.delete(key)
+//         }
+//       }))
+
+//       if (isUpdate) {
+//         await workerScope.clients.matchAll().then((clients) => {
+//           clients.forEach((client) => {
+//             client.postMessage({ name: 'force-refresh' })
+//           })
+//         })
+//       }
+//     }))
+// })
+
+workerScope.addEventListener('fetch', event => {
+  event.respondWith((async () => {
+    if (new URL(event.request.url).pathname === '/') {
+      const data = await fetch(`./version.json?t=${new Date().toJSON()}`).catch(() => null)
+
+      if (data) {
+        const version = await data.json()
+
+        if (version.buildNumber !== buildNumber) {
+          const keyList = await caches.keys()
+
+          for (const key of keyList) {
+            if (key !== buildNumber) {
+              await caches.delete(key)
+            }
+          }
+
+          workerScope.registration.update()
         }
-      }))
-
-      if (isUpdate) {
-        await workerScope.clients.matchAll().then((clients) => {
-          clients.forEach((client) => {
-            client.postMessage({ name: 'force-refresh' })
-          })
-        })
       }
-    }))
-})
+    }
 
-workerScope.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
+    return caches.match(event.request).then((response) => {
       return response || fetch(event.request).then((response) => {
         return caches.open(buildNumber).then((cache) => {
           if (event.request.url.startsWith('http')) {
@@ -52,7 +71,7 @@ workerScope.addEventListener('fetch', (event) => {
         })
       })
     })
-  )
+  })())
 })
 
 workerScope.addEventListener('message', (event) => {

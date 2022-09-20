@@ -1,0 +1,5 @@
+---
+---
+{
+  "buildNumber": "{{ site.github.build_revision }}"
+}
