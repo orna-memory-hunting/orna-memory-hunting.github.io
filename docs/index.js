@@ -12,7 +12,6 @@ const timeSelect = document.getElementById('time-select')
 const timeFileField = document.getElementById('time-file-field')
 /** @type {HTMLSpanElement} */// @ts-ignore
 const timeFile = document.getElementById('time-file')
-
 /** @type {HTMLCanvasElement} */// @ts-ignore
 const amitieCanvas = document.getElementById('amitie-canvas')
 /** @type {CanvasRenderingContext2D} */// @ts-ignore
@@ -156,6 +155,8 @@ amitiUploadHield.ondrop = (/** @type {DragEvent} */ event) => {
 
   if (files.length) {
     doAsync(() => prepareAmitieImage(files[0]))
+  } else {
+    window.alert('Не удалось найти файл изображения!')
   }
 }
 
@@ -167,6 +168,8 @@ document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
 
   if (files.length) {
     doAsync(() => prepareAmitieImage(files[0]))
+  } else {
+    window.alert('Не удалось найти файл изображения!')
   }
 })
 
