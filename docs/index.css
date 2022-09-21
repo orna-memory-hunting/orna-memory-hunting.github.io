@@ -69,13 +69,15 @@
 }
 
 .amitie-upload-field {
-  text-align   : center;
-  padding      : 6px;
-  border       : dashed 1px #fff;
-  font-size    : 90%;
-  border-radius: 8px;
-  opacity      : 0.5;
-  user-select  : none;
+  display       : flex;
+  flex-direction: column;
+  text-align    : center;
+  padding       : 6px;
+  border        : dashed 1px #fff;
+  font-size     : 90%;
+  border-radius : 8px;
+  opacity       : 0.5;
+  user-select   : none;
 }
 
 .amitie-file-name {
@@ -125,4 +127,15 @@
   white-space: pre;
   text-align : center;
   padding    : 6px;
+}
+
+.aslink {
+  cursor               : pointer;
+  text-decoration      : underline;
+  text-decoration-style: dotted;
+}
+
+.aslink:hover {
+  text-decoration-style: solid;
+
 }

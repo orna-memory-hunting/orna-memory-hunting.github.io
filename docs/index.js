@@ -124,32 +124,34 @@ const amitieFile = document.getElementById('amitie-file')
 /** @type {HTMLDivElement} */// @ts-ignore
 const amitieFileName = document.getElementById('amitie-file-name')
 /** @type {HTMLDivElement} */// @ts-ignore
-const amitiUploadHield = document.getElementById('amitie-upload-field')
+const amitiUploadField = document.getElementById('amitie-upload-field')
+/** @type {HTMLSpanElement} */// @ts-ignore
+const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
 /** @type {HTMLDivElement} */// @ts-ignore
 const recognizingTextLog = document.getElementById('recognizing-text-log')
 
-amitiUploadHield.onclick = () => {
+amitiUploadField.onclick = () => {
   amitieFile.click()
 }
 
-amitiUploadHield.ondragover = (/** @type {DragEvent} */ event) => {
+amitiUploadField.ondragover = (/** @type {DragEvent} */ event) => {
   event.preventDefault()
   event.stopPropagation()
   if (event.dataTransfer.items.length) {
-    amitiUploadHield.classList.add('dragenter')
+    amitiUploadField.classList.add('dragenter')
   }
 }
 
-amitiUploadHield.ondragleave = (/** @type {Event} */ event) => {
+amitiUploadField.ondragleave = (/** @type {Event} */ event) => {
   event.preventDefault()
   event.stopPropagation()
-  amitiUploadHield.classList.remove('dragenter')
+  amitiUploadField.classList.remove('dragenter')
 }
 
-amitiUploadHield.ondrop = (/** @type {DragEvent} */ event) => {
+amitiUploadField.ondrop = (/** @type {DragEvent} */ event) => {
   event.preventDefault()
   event.stopPropagation()
-  amitiUploadHield.classList.remove('dragenter')
+  amitiUploadField.classList.remove('dragenter')
 
   const { files } = event.dataTransfer
 
@@ -172,6 +174,30 @@ document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
     window.alert('Не удалось найти файл изображения!')
   }
 })
+
+amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
+  navigator.clipboard.read().then(clipboardItems => {
+    if (clipboardItems.length) {
+      const [clipboardItem] = clipboardItems
+
+      if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
+        clipboardItem.getType(clipboardItem.types[0]).then(data => {
+          const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
+
+          doAsync(() => prepareAmitieImage(file))
+        })
+      } else {
+        window.alert('Не удалось найти файл изображения!')
+      }
+    } else {
+      window.alert('Не удалось найти файл изображения!')
+    }
+  })
+
+  event.preventDefault()
+  event.stopPropagation()
+}
+
 
 /** @param {boolean} status  */
 function toggleUpload(status) {
