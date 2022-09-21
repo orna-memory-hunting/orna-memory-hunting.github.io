@@ -50,9 +50,7 @@ workerScope.addEventListener('fetch', event => {
           const keyList = await caches.keys()
 
           for (const key of keyList) {
-            if (key !== buildNumber) {
-              await caches.delete(key)
-            }
+            await caches.delete(key)
           }
 
           workerScope.registration.update()
