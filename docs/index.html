@@ -25,6 +25,11 @@
   <div id="questions" class="questions"></div>
   <div id="upload" class="upload hide">
     <h3>Укажите сведения о найденном осколке</h3>
+    <div id="amitie-upload-field" class="amitie-upload-field">
+      <input id="amitie-file" class="amitie-file" type="file" accept=".jpg, .jpeg, .png">
+      <span>Нажмите для выбора скрина осколка из галереи, перетащите сюда файл или нажмите Ctrl + V</span>
+      <div id="amitie-file-name" class="amitie-file-name"></div>
+    </div>
     <div class="time-field">
       <label for="time-select">
         Время ответа:
@@ -60,11 +65,7 @@
         <span id="time-file"></span>
       </span>
     </div>
-    <div class="amitie-field">
-      <label for="amitie-file" class="amitie-label">
-        Скрин осколка:
-        <input id="amitie-file" class="amitie-file" type="file" accept=".jpg, .jpeg, .png">
-      </label>
+    <div class="amitie-results">
       <canvas id="amitie-canvas" class="amitie-canvas hide"></canvas>
       <div id="recognizing-text-log" class="recognizing-text-log"></div>
     </div>

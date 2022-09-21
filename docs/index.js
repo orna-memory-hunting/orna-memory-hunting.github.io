@@ -12,8 +12,7 @@ const timeSelect = document.getElementById('time-select')
 const timeFileField = document.getElementById('time-file-field')
 /** @type {HTMLSpanElement} */// @ts-ignore
 const timeFile = document.getElementById('time-file')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitieFile = document.getElementById('amitie-file')
+
 /** @type {HTMLCanvasElement} */// @ts-ignore
 const amitieCanvas = document.getElementById('amitie-canvas')
 /** @type {CanvasRenderingContext2D} */// @ts-ignore
@@ -121,6 +120,56 @@ function answerClick(event) {
   }
 }
 
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieFile = document.getElementById('amitie-file')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitieFileName = document.getElementById('amitie-file-name')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitiUploadHield = document.getElementById('amitie-upload-field')
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingTextLog = document.getElementById('recognizing-text-log')
+
+amitiUploadHield.onclick = () => {
+  amitieFile.click()
+}
+
+amitiUploadHield.ondragover = (/** @type {DragEvent} */ event) => {
+  event.preventDefault()
+  event.stopPropagation()
+  if (event.dataTransfer.items.length) {
+    amitiUploadHield.classList.add('dragenter')
+  }
+}
+
+amitiUploadHield.ondragleave = (/** @type {Event} */ event) => {
+  event.preventDefault()
+  event.stopPropagation()
+  amitiUploadHield.classList.remove('dragenter')
+}
+
+amitiUploadHield.ondrop = (/** @type {DragEvent} */ event) => {
+  event.preventDefault()
+  event.stopPropagation()
+  amitiUploadHield.classList.remove('dragenter')
+
+  const { files } = event.dataTransfer
+
+  if (files.length) {
+    doAsync(() => prepareAmitieImage(files[0]))
+  }
+}
+
+document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
+  event.preventDefault()
+  event.stopPropagation()
+
+  const { files } = event.clipboardData
+
+  if (files.length) {
+    doAsync(() => prepareAmitieImage(files[0]))
+  }
+})
+
 /** @param {boolean} status  */
 function toggleUpload(status) {
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -142,6 +191,8 @@ function handleAmitieFile() {
   if (amitieFile.files?.length) {
     doAsync(() => prepareAmitieImage(amitieFile.files[0]))
   } else {
+    amitieFileName.textContent = ''
+    recognizingTextLog.textContent = ''
     amitieCanvas.classList.add('hide')
     timeFileField.classList.add('hide')
     amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
@@ -155,6 +206,8 @@ async function prepareAmitieImage(file) {
   const animationTime = 100
   const image = new window.Image()
 
+  recognizingTextLog.textContent = ''
+  amitieFileName.textContent = `Файл: ${file.name}`
   amitieCanvas.classList.add('hide')
   image.src = URL.createObjectURL(file)
 
@@ -400,7 +453,6 @@ async function prepareAmitieImage(file) {
   }
 
   if (dataBlocks.length) {
-    const recognizingTextLog = document.getElementById('recognizing-text-log')
     let currentStep = 0
     const logRecognizingText = (msg) => {
       const percent = ((currentStep + msg.progress) / dataBlocks.length * 10000 ^ 0) / 100
@@ -419,8 +471,8 @@ async function prepareAmitieImage(file) {
     const worker2 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
 
     await Promise.all([worker1.load(), worker2.load()])
-    await Promise.all([worker1.loadLanguage('rus'), worker2.loadLanguage('rus')])
-    await Promise.all([worker1.initialize('rus'), worker2.initialize('rus')])
+    await Promise.all([worker1.loadLanguage('eng+rus'), worker2.loadLanguage('eng+rus')])
+    await Promise.all([worker1.initialize('eng+rus'), worker2.initialize('eng+rus')])
     scheduler.addWorker(worker1)
     scheduler.addWorker(worker2)
 
