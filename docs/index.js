@@ -176,6 +176,9 @@ document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
 })
 
 amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
+  event.preventDefault()
+  event.stopPropagation()
+
   navigator.clipboard.read().then(clipboardItems => {
     if (clipboardItems.length) {
       const [clipboardItem] = clipboardItems
@@ -193,11 +196,15 @@ amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
       window.alert('Не удалось найти файл изображения!')
     }
   })
-
-  event.preventDefault()
-  event.stopPropagation()
 }
 
+// @ts-ignore
+navigator.permissions.query({ name: 'clipboard-read' }).then(permission => {
+  if (permission.state === 'denied') {
+    amitieFileFromClipboard.classList.remove('aslink')
+    amitieFileFromClipboard.onclick = null
+  }
+})
 
 /** @param {boolean} status  */
 function toggleUpload(status) {
