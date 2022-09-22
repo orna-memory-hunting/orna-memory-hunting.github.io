@@ -1,12 +1,12 @@
 import { fastify } from 'fastify'
 import fastifyStatic from '@fastify/static'
+import fastifyCaching from '@fastify/caching'
 import { resolve } from 'path'
 import { readFile } from 'fs/promises'
 
-const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debug' : 'error' } })
 const buildNumber = new Date().toISOString()
-
-app
+const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debug' : 'error' } })
+  .register(fastifyCaching)
   .register(fastifyStatic, {
     root: resolve('docs'),
     prefix: '/'
@@ -46,14 +46,15 @@ app
 
     return manifest
   })
-  .ready(async () => {
-    try {
-      const port = parseInt(process.env.PORT || '8080')
 
-      await app.listen({ port, host: '0.0.0.0' })
-      console.log('listening on http://localhost:' + port)
-    } catch (err) {
-      app.log.error(err)
-      process.exit(1)
-    }
-  })
+app.ready(async () => {
+  try {
+    const port = parseInt(process.env.PORT || '8080')
+
+    await app.listen({ port, host: '0.0.0.0' })
+    console.log('listening on http://localhost:' + port)
+  } catch (err) {
+    app.log.error(err)
+    process.exit(1)
+  }
+})

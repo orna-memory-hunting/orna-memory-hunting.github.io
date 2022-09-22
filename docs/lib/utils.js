@@ -1,3 +1,5 @@
+import { buildNumber } from '../version.js'
+
 /** @param {()=> Promise} fn */
 function doAsync(fn) {
   fn().catch(console.error)
@@ -44,7 +46,7 @@ async function registerServiceWorker() {
 
     navigator.serviceWorker.ready.then((/** @type {ServiceWorkerRegistration} */worker) => {
       if (worker.active) {
-        worker.active.postMessage({ name: 'ping' })
+        worker.active.postMessage({ name: 'ping', buildNumber })
       }
     })
   }
