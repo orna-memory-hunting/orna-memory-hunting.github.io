@@ -269,6 +269,9 @@ async function prepareAmitieImage(file) {
   const rightShift = image.width - leftShift
   let dataBlocks = []
   let currentBlock = 0
+  let cBlockR = 0
+  let cBlockG = 0
+  let cBlockB = 0
   let currentBlockEnd = 0
   let spaceHeight = 0
   let nameBlock = null
@@ -292,6 +295,9 @@ async function prepareAmitieImage(file) {
 
       match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
       if (match) {
+        cBlockR = r
+        cBlockG = g
+        cBlockB = b
         break
       }
       iDataIndex += 4
@@ -308,7 +314,7 @@ async function prepareAmitieImage(file) {
     } else if (currentBlock) {
       const h = currentBlockEnd - currentBlock
 
-      dataBlocks.push({ y: currentBlock, newY: 0, h, totalH: 0 })
+      dataBlocks.push({ y: currentBlock, newY: 0, h, totalH: 0, r: cBlockR, g: cBlockG, b: cBlockB })
 
       await nextAnimationFrame()
       amitieContext.lineWidth = 0.5
@@ -324,8 +330,13 @@ async function prepareAmitieImage(file) {
     }
   }
 
+  await nextAnimationFrame()
+  amitieContext.drawImage(image, 0, 0)
+  await nextTick()
+
   let firstBaffIndex = 0
   let lastBaffIndex = 0
+  let hasRedBlock = false
 
   for (let index = 1; index < dataBlocks.length - 1; index++) {
     const prevBlock = dataBlocks[index - 1]
@@ -333,21 +344,54 @@ async function prepareAmitieImage(file) {
     const nextBlock = dataBlocks[index + 1]
     const prevSpace = dataBlock.y - prevBlock.y - prevBlock.h
     const nextSpace = nextBlock.y - dataBlock.y - dataBlock.h
+    const requiredH = Math.min(
+      Math.max(prevBlock.h, dataBlock.h),
+      Math.max(dataBlock.h, nextBlock.h)
+    ) * 2
 
 
-    if (dataBlock.h * 2 < prevSpace) {
+    if (requiredH < prevSpace) {
       firstBaffIndex = index
     }
-    if (firstBaffIndex && dataBlock.h * 2 < nextSpace) {
-      lastBaffIndex = index
+    if (firstBaffIndex) {
+      if (requiredH < nextSpace) {
+        lastBaffIndex = index
+      }
+      if (!hasRedBlock) {
+        hasRedBlock = dataBlock.r > (dataBlock.b + dataBlock.g) / 2 + colorIntensityLimit
+      }
+      await nextAnimationFrame()
+      amitieContext.lineWidth = 0.5
+      amitieContext.strokeStyle = '#f0fe'
+      amitieContext.strokeRect(0, dataBlock.y, image.width, dataBlock.h)
+      amitieContext.fillStyle = '#f0f1'
+      amitieContext.fillRect(0, dataBlock.y, image.width, dataBlock.h)
+      await nextTick(animationTime)
+    } else {
+      await nextAnimationFrame()
+      amitieContext.lineWidth = 0.5
+      amitieContext.strokeStyle = '#fffe'
+      amitieContext.strokeRect(0, dataBlock.y, image.width, dataBlock.h)
+      amitieContext.fillStyle = '#fff1'
+      amitieContext.fillRect(0, dataBlock.y, image.width, dataBlock.h)
+      await nextTick(animationTime)
     }
 
     if (firstBaffIndex && lastBaffIndex) {
       if (lastBaffIndex - firstBaffIndex > 0) {
-        // TODO - добавить проверку что секция содержит хотя бы 1 крастный блок
-        break
+        if (hasRedBlock) {
+          break
+        } else {
+          firstBaffIndex = lastBaffIndex = 0
+          await nextAnimationFrame()
+          amitieContext.drawImage(image, 0, 0)
+          await nextTick()
+        }
       } else {
         firstBaffIndex = lastBaffIndex = 0
+        await nextAnimationFrame()
+        amitieContext.drawImage(image, 0, 0)
+        await nextTick()
       }
     }
   }
