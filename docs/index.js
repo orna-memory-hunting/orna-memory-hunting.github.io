@@ -237,7 +237,7 @@ function handleAmitieFile() {
 
 /** @param {File} file */
 async function prepareAmitieImage(file) {
-  const lightColorBorder = 128
+  const lightColorBorder = 116
   const colorIntensityLimit = 24
   const animationTime = 100
   const image = new window.Image()
@@ -358,7 +358,7 @@ async function prepareAmitieImage(file) {
         lastBaffIndex = index
       }
       if (!hasRedBlock) {
-        hasRedBlock = dataBlock.r > (dataBlock.b + dataBlock.g) / 2 + colorIntensityLimit
+        hasRedBlock = dataBlock.r > (dataBlock.b + dataBlock.g) / 2 + colorIntensityLimit / 2
       }
       await nextAnimationFrame()
       amitieContext.lineWidth = 0.5
