@@ -16,7 +16,10 @@ const timeFile = document.getElementById('time-file')
 const amitieCanvas = document.getElementById('amitie-canvas')
 /** @type {CanvasRenderingContext2D} */// @ts-ignore
 const amitieContext = amitieCanvas.getContext('2d')
+/** @type {HTMLButtonElement} */// @ts-ignore
+const sendToGithub = document.getElementById('send-to-github')
 let html = ''
+let githubIssuesURL = ''
 
 if (window.location.hostname !== 'localhost') {
   doAsync(registerServiceWorker)
@@ -242,9 +245,11 @@ async function prepareAmitieImage(file) {
   const animationTime = 100
   const image = new window.Image()
 
+  githubIssuesURL = ''
   recognizingTextLog.textContent = ''
   amitieFileName.textContent = `Файл: ${file.name}`
   amitieCanvas.classList.add('hide')
+  sendToGithub.classList.add('hide')
   image.src = URL.createObjectURL(file)
 
   await new Promise((resolve) => { image.onload = resolve })
@@ -556,7 +561,12 @@ async function prepareAmitieImage(file) {
     scheduler.addWorker(worker1)
     scheduler.addWorker(worker2)
 
-    const results = await Promise.all(dataBlocks.map(dataBlock => {
+    const results = {
+      name: '',
+      plusBlocks: [],
+      minusBlocks: []
+    }
+    let resultsTmp = await Promise.all(dataBlocks.map(dataBlock => {
       const rCanvas = document.createElement('canvas')
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
       const rContext = rCanvas.getContext('2d')
@@ -569,11 +579,55 @@ async function prepareAmitieImage(file) {
       )
 
       return scheduler.addJob('recognize', rCanvas)
-        .then((/** @type {import('tesseract.js').RecognizeResult} */result) => result.data.text)
+        .then((/** @type {import('tesseract.js').RecognizeResult} */result) => (result.data.text || '').trim())
     }))
 
-    recognizingTextLog.textContent = results.join('')
+    resultsTmp = resultsTmp.reduce((prev, cur) => {
+      if (cur) {
+        if (prev.length > 0) {
+          if ((/^[А-ЯA-Z]/).test(cur)) {
+            prev.push(cur)
+          } else {
+            prev[prev.length - 1] += ` ${cur}`
+          }
+        } else {
+          prev.push(cur)
+        }
+      }
+
+      return prev
+    }, [])
+
+    results.name = resultsTmp.shift()
+    if (resultsTmp.length % 2 === 0) {
+      results.plusBlocks = resultsTmp.slice(0, resultsTmp.length / 2)
+      results.minusBlocks = resultsTmp.slice(resultsTmp.length / 2, resultsTmp.length)
+    }
+
+    if (results.name &&
+      results.plusBlocks.length > 0 &&
+      results.plusBlocks.length === results.minusBlocks.length) {
+      sendToGithub.classList.remove('hide')
+      githubIssuesURL = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
+        `title=${results.plusBlocks[0].replace('%', '%25')}` +
+        `&body=%23 ${results.name}%0A` +
+        '%23%23%23 Плюсы%0A' +
+        results.plusBlocks.reduce((prev, cur) => {
+          return prev + `- **${cur.replace('%', '%25')}**%0A`
+        }, '') +
+        '%23%23%23 Минусы%0A' +
+        results.minusBlocks.reduce((prev, cur) => {
+          return prev + `- _${cur.replace('%', '%25')}_%0A`
+        }, '')
+    } else {
+      recognizingTextLog.textContent = results.name + '\n' + resultsTmp.join('\n')
+      recognizingTextLog.textContent += '\n// Не удалось распознать осколок!'
+    }
 
     await scheduler.terminate()
   }
+}
+
+sendToGithub.onclick = () => {
+  if (githubIssuesURL) window.open(githubIssuesURL, '_blank')
 }
