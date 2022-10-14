@@ -614,8 +614,8 @@ function updateGithubLink() {
   const timeUTC = `time ${('0' + time.getUTCHours()).slice(-2)}h UTC`
   const timeMSK = `time ${('0' + (time.getUTCHours() + 3) % 24).slice(-2)}h MSK`
   const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa},${timeUTC},${timeMSK}`
-  const sWeek = new Date(time.setDate(time.getDate() - time.getDay() + 1))
-  const eWeek = new Date(time.setDate(time.getDate() + (7 - time.getDay())))
+  const sWeek = new Date(time.setUTCDate(time.getUTCDate() - time.getUTCDay() + 1))
+  const eWeek = new Date(time.setUTCDate(time.getUTCDate() + (7 - time.getUTCDay())))
   const milestone = sWeek.toJSON().replace(/.*\d\d(\d\d)(-\d\d-\d\d).*/, '$1$2').split('-').reverse().join('.') +
     ' - ' + eWeek.toJSON().replace(/.*\d\d(\d\d)(-\d\d-\d\d).*/, '$1$2').split('-').reverse().join('.')
 
