@@ -190,6 +190,7 @@ function toggleUpload(status) {
     if (!amitieFile.files?.length) {
       timeSelect.value = ('0' + new Date().getHours()).slice(-2)
     }
+    updateGithubLink()
     upload.classList.remove('hide')
   } else {
     upload.classList.add('hide')
@@ -220,7 +221,7 @@ async function prepareAmitieImage(file) {
   const image = new window.Image()
 
   results = { name: '', plusBlocks: [], minusBlocks: [] }
-  sendToGithubLink.href = '#'
+  updateGithubLink()
   recognizingTextLog.textContent = ''
   amitieFileName.textContent = `Файл: ${file.name}`
   amitieCanvas.classList.add('hide')
@@ -574,34 +575,46 @@ async function prepareAmitieImage(file) {
       results.minusBlocks = resultsTmp.slice(resultsTmp.length / 2, resultsTmp.length)
     }
 
-    if (results.name &&
+    if (!(results.name &&
       results.plusBlocks.length > 0 &&
-      results.plusBlocks.length === results.minusBlocks.length) {
-      const answer = getSelectedAnswer()
-      const p = encodeURIComponent('%')
-      const h = encodeURIComponent('#')
-      const n = encodeURIComponent('\n')
-      const title = results.plusBlocks[0].replace('%', p)
-      const plusBlocks = results.plusBlocks.reduce((prev, cur) => {
-        return prev + `- **${cur.replace('%', p)}**${n}`
-      }, '')
-      const minusBlocks = results.minusBlocks.reduce((prev, cur) => {
-        return prev + `- _${cur.replace('%', p)}_${n}`
-      }, '')
-      const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
-
-      sendToGithub.classList.remove('hide')
-      sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
-        `title=${title}` +
-        `&labels=${labels}` +
-        `&body=${h} ${results.name}${n}` +
-        `${h + h + h} Плюсы${n}${plusBlocks}` +
-        `${h + h + h} Минусы${n}${minusBlocks}`
-    } else {
+      results.plusBlocks.length === results.minusBlocks.length)) {
+      results = { name: '', plusBlocks: [], minusBlocks: [] }
       recognizingTextLog.textContent = results.name + '\n' + resultsTmp.join('\n')
       recognizingTextLog.textContent += '\n// Не удалось распознать осколок!'
     }
+    updateGithubLink()
 
     await scheduler.terminate()
   }
+}
+
+function updateGithubLink() {
+  const answer = getSelectedAnswer()
+  const available = results.name && answer.a
+
+  if (!available) {
+    sendToGithubLink.href = '#'
+
+    return false
+  }
+
+  const p = encodeURIComponent('%')
+  const h = encodeURIComponent('#')
+  const n = encodeURIComponent('\n')
+  const title = results.plusBlocks[0].replace('%', p)
+  const plusBlocks = results.plusBlocks.reduce((prev, cur) => {
+    return prev + `- **${cur.replace('%', p)}**${n}`
+  }, '')
+  const minusBlocks = results.minusBlocks.reduce((prev, cur) => {
+    return prev + `- _${cur.replace('%', p)}_${n}`
+  }, '')
+  const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
+
+  sendToGithub.classList.remove('hide')
+  sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
+    `title=${title}` +
+    `&labels=${labels}` +
+    `&body=${h} ${results.name}${n}` +
+    `${h + h + h} Плюсы${n}${plusBlocks}` +
+    `${h + h + h} Минусы${n}${minusBlocks}`
 }
