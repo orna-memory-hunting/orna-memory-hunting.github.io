@@ -142,14 +142,17 @@
 
 .send-button {
   background-color: #4e6d4e;
-  appearance      : none;
   border          : 1px solid #4e6d4e;
   border-radius   : 4px;
-  padding         : 8px 16px;
-  color           : #f5f1e8;
-  font-weight     : bold;
   cursor          : pointer;
   margin          : 16px;
+}
+
+.send-button a {
+  display        : inline-block;
+  padding        : 8px 16px;
+  color          : #f5f1e8;
+  text-decoration: none;
 }
 
 .send-button:hover {

@@ -1,5 +1,5 @@
 import { doAsync, nextTick, nextAnimationFrame, registerServiceWorker } from './lib/utils.js'
-import { questionList, questionLabels, answerLabels } from './lib/questions.js'
+import { renderQuestionList, getSelectedAnswer } from './lib/questions.js'
 
 /** @type {{Tesseract:import('tesseract.js')}} */
 const { Tesseract } = window
@@ -18,42 +18,14 @@ const amitieCanvas = document.getElementById('amitie-canvas')
 const amitieContext = amitieCanvas.getContext('2d')
 /** @type {HTMLButtonElement} */// @ts-ignore
 const sendToGithub = document.getElementById('send-to-github')
-let html = ''
-let githubIssuesURL = ''
+/** @type {HTMLLinkElement} */// @ts-ignore
+const sendToGithubLink = document.getElementById('send-to-github-link')
 
 if (window.location.hostname !== 'localhost') {
   doAsync(registerServiceWorker)
 }
 
-for (let qIndex = 0; qIndex < questionList.length; qIndex++) {
-  const question = questionList[qIndex]
-  const answers = question.a
-
-  html += `
-      <div class="question-content">
-        <span class="question" data-qid="${qIndex}">
-          <span class="arrow-back">⇦</span>
-          <span>${questionLabels[qIndex]} ${question.q}</span>
-        </span>
-        <div class="answers">
-    `
-
-  for (let aIndex = 0; aIndex < answers.length; aIndex++) {
-    const answer = answers[aIndex]
-
-    html += `
-        <span class="answer" data-aid="${aIndex}">
-          <span class="arrow-back">⇦</span>
-          <span>${answerLabels[aIndex]} ${answer}</span>
-        </span>
-      `
-  }
-
-  html += '</div></div>'
-}
-
-questions.innerHTML = html
-
+questions.innerHTML = renderQuestionList()
 
 // @ts-ignore
 document.querySelectorAll('.question').forEach((/** @type {HTMLDivElement} */ element) => {
@@ -238,6 +210,8 @@ function handleAmitieFile() {
   }
 }
 
+let results = { name: '', plusBlocks: [], minusBlocks: [] }
+
 /** @param {File} file */
 async function prepareAmitieImage(file) {
   const lightColorBorder = 116
@@ -245,7 +219,8 @@ async function prepareAmitieImage(file) {
   const animationTime = 100
   const image = new window.Image()
 
-  githubIssuesURL = ''
+  results = { name: '', plusBlocks: [], minusBlocks: [] }
+  sendToGithubLink.href = '#'
   recognizingTextLog.textContent = ''
   amitieFileName.textContent = `Файл: ${file.name}`
   amitieCanvas.classList.add('hide')
@@ -561,11 +536,6 @@ async function prepareAmitieImage(file) {
     scheduler.addWorker(worker1)
     scheduler.addWorker(worker2)
 
-    const results = {
-      name: '',
-      plusBlocks: [],
-      minusBlocks: []
-    }
     let resultsTmp = await Promise.all(dataBlocks.map(dataBlock => {
       const rCanvas = document.createElement('canvas')
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
@@ -607,18 +577,26 @@ async function prepareAmitieImage(file) {
     if (results.name &&
       results.plusBlocks.length > 0 &&
       results.plusBlocks.length === results.minusBlocks.length) {
+      const answer = getSelectedAnswer()
+      const p = encodeURIComponent('%')
+      const h = encodeURIComponent('#')
+      const n = encodeURIComponent('\n')
+      const title = results.plusBlocks[0].replace('%', p)
+      const plusBlocks = results.plusBlocks.reduce((prev, cur) => {
+        return prev + `- **${cur.replace('%', p)}**${n}`
+      }, '')
+      const minusBlocks = results.minusBlocks.reduce((prev, cur) => {
+        return prev + `- _${cur.replace('%', p)}_${n}`
+      }, '')
+      const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
+
       sendToGithub.classList.remove('hide')
-      githubIssuesURL = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
-        `title=${results.plusBlocks[0].replace('%', '%25')}` +
-        `&body=%23 ${results.name}%0A` +
-        '%23%23%23 Плюсы%0A' +
-        results.plusBlocks.reduce((prev, cur) => {
-          return prev + `- **${cur.replace('%', '%25')}**%0A`
-        }, '') +
-        '%23%23%23 Минусы%0A' +
-        results.minusBlocks.reduce((prev, cur) => {
-          return prev + `- _${cur.replace('%', '%25')}_%0A`
-        }, '')
+      sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
+        `title=${title}` +
+        `&labels=${labels}` +
+        `&body=${h} ${results.name}${n}` +
+        `${h + h + h} Плюсы${n}${plusBlocks}` +
+        `${h + h + h} Минусы${n}${minusBlocks}`
     } else {
       recognizingTextLog.textContent = results.name + '\n' + resultsTmp.join('\n')
       recognizingTextLog.textContent += '\n// Не удалось распознать осколок!'
@@ -626,8 +604,4 @@ async function prepareAmitieImage(file) {
 
     await scheduler.terminate()
   }
-}
-
-sendToGithub.onclick = () => {
-  if (githubIssuesURL) window.open(githubIssuesURL, '_blank')
 }
