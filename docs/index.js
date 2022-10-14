@@ -181,6 +181,8 @@ navigator.permissions.query({ name: 'clipboard-read' }).then(permission => {
   }
 })
 
+timeSelect.onchange = () => updateGithubLink()
+
 /** @param {boolean} status  */
 function toggleUpload(status) {
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -608,7 +610,10 @@ function updateGithubLink() {
   const minusBlocks = results.minusBlocks.reduce((prev, cur) => {
     return prev + `- _${cur.replace('%', p)}_${n}`
   }, '')
-  const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
+  const time = new Date(new Date().setHours(Number(timeSelect.value)))
+  const timeUTC = `time ${('0' + time.getUTCHours()).slice(-2)}h UTC`
+  const timeMSK = `time ${('0' + (time.getUTCHours() + 3) % 24).slice(-2)}h MSK`
+  const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa},${timeUTC},${timeMSK}`
 
   sendToGithub.classList.remove('hide')
   sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
