@@ -13,6 +13,7 @@
   <!-- Шрифты / иконки Material -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+  <link href="./main.css" rel="stylesheet">
   <link href="./index.css" rel="stylesheet">
   <!-- Иконка сайта -->
   <link type="image/png" rel="icon" href="/img/x128-memory-end-app.png">
@@ -22,61 +23,18 @@
 </head>
 
 <body class="body-font">
-  <div id="questions" class="questions"></div>
-  <div id="upload" class="upload hide">
-    <h3>Укажите сведения о найденном осколке</h3>
-    <div id="amitie-upload-field" class="amitie-upload-field">
-      <input id="amitie-file" class="amitie-file" type="file" accept=".jpg, .jpeg, .png">
-      <span>Нажмите для выбора скрина осколка из галереи, перетащите сюда файл или нажмите
-        <span id="amitie-file-from-clipboard" class="aslink">нажмите Ctrl + V</span></span>
-      <div id="amitie-file-name" class="amitie-file-name"></div>
+
+  <div class="main-content">
+
+    <div class="green-button">
+      <a class="astext" target="_self" href="./add-amitie.html">Добавить осколок</a>
     </div>
-    <div class="time-field">
-      <label for="time-select">
-        Время ответа (Местное):
-        <select id="time-select" class="time-select">
-          <option value="00">00:00-00:59</option>
-          <option value="01">01:00-01:59</option>
-          <option value="02">02:00-02:59</option>
-          <option value="03">03:00-03:59</option>
-          <option value="04">04:00-04:59</option>
-          <option value="05">05:00-05:59</option>
-          <option value="06">06:00-06:59</option>
-          <option value="07">07:00-07:59</option>
-          <option value="08">08:00-08:59</option>
-          <option value="09">09:00-09:59</option>
-          <option value="10">10:00-10:59</option>
-          <option value="11">11:00-11:59</option>
-          <option value="12">12:00-12:59</option>
-          <option value="13">13:00-13:59</option>
-          <option value="14">14:00-14:59</option>
-          <option value="15">15:00-15:59</option>
-          <option value="16">16:00-16:59</option>
-          <option value="17">17:00-17:59</option>
-          <option value="18">18:00-18:59</option>
-          <option value="19">19:00-19:59</option>
-          <option value="20">20:00-20:59</option>
-          <option value="21">21:00-21:59</option>
-          <option value="22">22:00-22:59</option>
-          <option value="23">23:00-23:59</option>
-        </select>
-      </label>
-      <span id="time-file-field" class="time-file hide">
-        <span>по скрину:</span>
-        <span id="time-file"></span>
-      </span>
-    </div>
-    <div class="amitie-results">
-      <canvas id="amitie-canvas" class="amitie-canvas hide"></canvas>
-      <div id="recognizing-text-log" class="recognizing-text-log"></div>
-      <div id="send-to-github" class="send-button hide">
-        <a id="send-to-github-link" target="_blank" href="">Опубликовать</a>
-      </div>
-    </div>
+
   </div>
+
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@3.0.2/dist/tesseract.min.js"></script>
+<script type="module" src="./main.js"></script>
 <script type="module" src="./index.js"></script>
 
 </html>

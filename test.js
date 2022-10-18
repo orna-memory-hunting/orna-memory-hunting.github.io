@@ -20,6 +20,15 @@ const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debu
 
     return index
   })
+  .get('/add-amitie.html', async (req, reply) => {
+    const index = (await readFile('./docs/add-amitie.html', 'utf-8'))
+      .replace(/---\n---\n/, '')
+      .replace(/Memory Hunting - Orna/, 'Memory Hunting - Orna (DEV)')
+
+    reply.type('text/html')
+
+    return index
+  })
   .get('/version.js', async (req, reply) => {
     const version = (await readFile('./docs/version.js', 'utf-8'))
       .replace(/---\n---\n/, '')

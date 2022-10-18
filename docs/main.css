@@ -1,0 +1,86 @@
+.body-font {
+  font-family     : 'Roboto', sans-serif;
+  color           : #f5f1e8;
+  margin          : 0;
+  background-color: #362e2b;
+  height          : 100%;
+}
+
+.nav-head {
+  display        : flex;
+  justify-content: space-between;
+  align-items    : baseline;
+  padding        : 4px;
+  border-bottom  : 1px solid #403c3b;
+}
+
+.nav-title {
+  font-size  : 20px;
+  font-weight: bold;
+  padding    : 4px;
+}
+
+.nav-close {
+  font-size    : 22px;
+  width        : 24px;
+  height       : 24px;
+  border-radius: 4px;
+  border       : 1px solid transparent;
+  text-align   : center;
+}
+
+.nav-close:hover {
+  cursor      : pointer;
+  color       : #fffdf8;
+  border-style: solid;
+  border-color: #f5f1e8;
+}
+
+.main-content {
+  margin: 12px;
+}
+
+.hide {
+  display: none !important;
+}
+
+.astext {
+  color          : #f5f1e8;
+  text-decoration: none;
+}
+
+.aslink {
+  cursor               : pointer;
+  text-decoration      : underline;
+  text-decoration-style: dotted;
+}
+
+.aslink:hover {
+  text-decoration-style: solid;
+
+}
+
+.green-button {
+  background-color: #4e6d4e;
+  border          : 1px solid #4e6d4e;
+  border-radius   : 4px;
+  cursor          : pointer;
+  margin          : 16px;
+  display         : flex;
+  justify-content : center;
+}
+
+.green-button a {
+  display   : inline-block;
+  padding   : 8px 16px;
+  width     : 100%;
+  text-align: center;
+}
+
+.green-button:hover {
+  border-color: #f5f1e8;
+}
+
+h4 {
+  margin: 12px 0;
+}

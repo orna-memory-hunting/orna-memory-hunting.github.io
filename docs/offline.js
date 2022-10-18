@@ -2,8 +2,13 @@
 import { buildNumber } from './version.js'
 
 const appResources = [
-  './index.js',
+  './add-amitie.css',
+  './add-amitie.html',
+  './add-amitie.js',
   './index.css',
+  './index.js',
+  './main.css',
+  './main.js',
   './lib/utils.js',
   './lib/questions.js'
 ]
