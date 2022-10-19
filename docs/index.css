@@ -1,0 +1,9 @@
+.time-lap {
+  display    : flex;
+  gap        : 4px;
+  align-items: baseline;
+}
+
+.current-time {
+  font-size: 14px;
+}

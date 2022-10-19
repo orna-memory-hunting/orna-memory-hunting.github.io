@@ -9,31 +9,16 @@
 .nav-head {
   display        : flex;
   justify-content: space-between;
-  align-items    : baseline;
+  align-items    : center;
   padding        : 4px;
   border-bottom  : 1px solid #403c3b;
+  height         : 32px;
 }
 
 .nav-title {
   font-size  : 20px;
   font-weight: bold;
   padding    : 4px;
-}
-
-.nav-close {
-  font-size    : 22px;
-  width        : 24px;
-  height       : 24px;
-  border-radius: 4px;
-  border       : 1px solid transparent;
-  text-align   : center;
-}
-
-.nav-close:hover {
-  cursor      : pointer;
-  color       : #fffdf8;
-  border-style: solid;
-  border-color: #f5f1e8;
 }
 
 .main-content {
@@ -58,6 +43,23 @@
 .aslink:hover {
   text-decoration-style: solid;
 
+}
+
+.text-button {
+  user-select  : none;
+  font-size    : 22px;
+  width        : 24px;
+  height       : 24px;
+  border-radius: 4px;
+  border       : 1px solid transparent;
+  text-align   : center;
+}
+
+.text-button:hover {
+  cursor      : pointer;
+  color       : #fffdf8;
+  border-style: solid;
+  border-color: #f5f1e8;
 }
 
 .green-button {
