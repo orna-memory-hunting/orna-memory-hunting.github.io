@@ -7,3 +7,9 @@
 .current-time {
   font-size: 14px;
 }
+
+.add-amitie-block {
+  display        : flex;
+  justify-content: center;
+  width          : 100%;
+}

@@ -1,3 +1,11 @@
+html,
+body {
+  display       : flex;
+  flex-direction: column;
+  min-height    : 100%;
+  flex-grow     : 1;
+}
+
 .body-font {
   font-family     : 'Roboto', sans-serif;
   color           : #f5f1e8;
@@ -12,7 +20,7 @@
   align-items    : center;
   padding        : 4px;
   border-bottom  : 1px solid #403c3b;
-  height         : 32px;
+  min-height     : 32px;
 }
 
 .nav-title {
@@ -22,7 +30,17 @@
 }
 
 .main-content {
-  margin: 12px;
+  margin   : 12px;
+  flex-grow: 1;
+}
+
+.footer {
+  display        : flex;
+  justify-content: space-between;
+  align-items    : center;
+  padding        : 4px;
+  border-top     : 1px solid #403c3b;
+  min-height     : 32px;
 }
 
 .hide {
@@ -67,7 +85,7 @@
   border          : 1px solid #4e6d4e;
   border-radius   : 4px;
   cursor          : pointer;
-  margin          : 16px;
+  margin          : 12px;
   display         : flex;
   justify-content : center;
 }
