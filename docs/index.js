@@ -1,5 +1,5 @@
 import { doAsync } from './lib/utils.js'
-import { ghAPI, getAmitieMilestone, getTimeLabels } from './lib/github.js'
+import { ghAPI, getAmitieMilestone, getTimeLabels, parseIssue } from './lib/github.js'
 
 /** @type {HTMLDivElement} */// @ts-ignore
 const currentTime = document.getElementById('current-time')
@@ -84,8 +84,12 @@ async function loadAmitieList() {
   let issuesHTML = ''
 
 
-  for (const issue of issues) {
+  for (const issueRaw of issues) {
+    const issue = parseIssue(issueRaw)
+
+    issuesHTML += `<div>${issue.answerLabel}</div>`
     issuesHTML += `<div>${issue.title}</div>`
+    issuesHTML += `<div>${issue.body}</div>`
   }
 
   amitieList.innerHTML = issuesHTML

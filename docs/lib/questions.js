@@ -157,7 +157,30 @@ function getSelectedAnswer() {
 }
 
 
+/**
+ * @param {string} question
+ * @param {string} answer
+ * @returns {object}
+ */
+function getAnswerByLabels(question, answer) {
+  const qid = Number(question) - 1
+  const aid = answerLabels.indexOf(answer)
+
+  return {
+    qid,
+    aid,
+    q: questionList[qid].q,
+    sq: questionList[qid].sq || questionList[qid].q,
+    a: questionList[qid].a[aid],
+    sa: (questionList[qid].sa || questionList[qid].a)[aid],
+    qLabel: questionLabels[qid],
+    aLabel: answerLabels[aid]
+  }
+}
+
+
 export {
   renderQuestionList,
-  getSelectedAnswer
+  getSelectedAnswer,
+  getAnswerByLabels
 }
