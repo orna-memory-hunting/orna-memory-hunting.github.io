@@ -117,3 +117,19 @@
   text-align : center;
   padding    : 6px;
 }
+
+.amitie-text-results {
+  display       : flex;
+  flex-direction: column;
+  width         : 100%;
+}
+
+.amitie-text-results-label {
+  font-size    : 13px;
+  margin-bottom: 2px;
+  font-weight  : bold;
+}
+
+.amitie-text-results-field {
+  margin-bottom: 6px;
+}

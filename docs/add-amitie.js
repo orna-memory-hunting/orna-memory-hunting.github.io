@@ -17,6 +17,22 @@ const timeFile = document.getElementById('time-file')
 const amitieCanvas = document.getElementById('amitie-canvas')
 /** @type {CanvasRenderingContext2D} */// @ts-ignore
 const amitieContext = amitieCanvas.getContext('2d')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitieTextResults = document.getElementById('amitie-text-results')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieName = document.getElementById('amitie-name')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitiePlus1 = document.getElementById('amitie-plus1')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitiePlus2 = document.getElementById('amitie-plus2')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitiePlus3 = document.getElementById('amitie-plus3')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieMinus1 = document.getElementById('amitie-minus1')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieMinus2 = document.getElementById('amitie-minus2')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieMinus3 = document.getElementById('amitie-minus3')
 /** @type {HTMLButtonElement} */// @ts-ignore
 const sendToGithub = document.getElementById('send-to-github')
 /** @type {HTMLLinkElement} */// @ts-ignore
@@ -224,6 +240,12 @@ async function prepareAmitieImage(file) {
   recognizingTextLog.textContent = ''
   amitieFileName.textContent = `Файл: ${file.name}`
   amitieCanvas.classList.add('hide')
+  amitieTextResults.classList.add('hide')
+  amitiePlus3.classList.remove('hide')
+  amitieMinus3.classList.remove('hide')
+  amitiePlus2.classList.remove('hide')
+  amitieMinus2.classList.remove('hide')
+
   sendToGithub.classList.add('hide')
   image.src = URL.createObjectURL(file)
 
@@ -531,8 +553,8 @@ async function prepareAmitieImage(file) {
     const worker2 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
 
     await Promise.all([worker1.load(), worker2.load()])
-    await Promise.all([worker1.loadLanguage('eng+rus'), worker2.loadLanguage('eng+rus')])
-    await Promise.all([worker1.initialize('eng+rus'), worker2.initialize('eng+rus')])
+    await Promise.all([worker1.loadLanguage('eng+rus+ukr'), worker2.loadLanguage('eng+rus+ukr')])
+    await Promise.all([worker1.initialize('eng+rus+ukr'), worker2.initialize('eng+rus+ukr')])
     scheduler.addWorker(worker1)
     scheduler.addWorker(worker2)
 
@@ -552,6 +574,7 @@ async function prepareAmitieImage(file) {
         .then((/** @type {import('tesseract.js').RecognizeResult} */result) => (result.data.text || '').trim())
     }))
 
+    recognizingTextLog.textContent = ''
     resultsTmp = resultsTmp.reduce((prev, cur) => {
       if (cur) {
         if (prev.length > 0) {
@@ -581,6 +604,25 @@ async function prepareAmitieImage(file) {
       recognizingTextLog.textContent = results.name + '\n' + resultsTmp.join('\n')
       recognizingTextLog.textContent += '\n// Не удалось распознать осколок!'
     }
+    amitieName.value = results.name
+    amitiePlus1.value = results.plusBlocks[0] || ''
+    amitiePlus2.value = results.plusBlocks[1] || ''
+    amitiePlus3.value = results.plusBlocks[2] || ''
+    amitieMinus1.value = results.minusBlocks[0] || ''
+    amitieMinus2.value = results.minusBlocks[1] || ''
+    amitieMinus3.value = results.minusBlocks[2] || ''
+    if (results.plusBlocks.length) {
+      if (results.plusBlocks.length < 3) {
+        amitiePlus3.classList.add('hide')
+        amitieMinus3.classList.add('hide')
+      }
+      if (results.plusBlocks.length < 2) {
+        amitiePlus2.classList.add('hide')
+        amitieMinus2.classList.add('hide')
+      }
+    }
+    amitieTextResults.classList.remove('hide')
+
     updateGithubLink()
 
     await scheduler.terminate()
