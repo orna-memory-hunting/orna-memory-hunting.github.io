@@ -8,6 +8,19 @@
   font-size: 14px;
 }
 
+.amitie-list {
+  display       : flex;
+  flex-direction: column;
+  flex-grow     : 1;
+}
+
+.amitie-list-middle {
+  flex-grow      : 1;
+  align-items    : center;
+  justify-content: center;
+  display        : flex;
+}
+
 .add-amitie-block {
   display        : flex;
   justify-content: center;
