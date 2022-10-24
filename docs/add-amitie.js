@@ -18,9 +18,11 @@ const amitieCanvas = document.getElementById('amitie-canvas')
 /** @type {CanvasRenderingContext2D} */// @ts-ignore
 const amitieContext = amitieCanvas.getContext('2d')
 /** @type {HTMLDivElement} */// @ts-ignore
-const amitieTextResults = document.getElementById('amitie-text-results')
+const amitieResults = document.getElementById('amitie-results')
 /** @type {HTMLInputElement} */// @ts-ignore
 const amitieName = document.getElementById('amitie-name')
+/** @type {HTMLDivElement} */// @ts-ignore
+const qualityField = document.getElementById('quality-field')
 /** @type {HTMLInputElement} */// @ts-ignore
 const amitiePlus1 = document.getElementById('amitie-plus1')
 /** @type {HTMLInputElement} */// @ts-ignore
@@ -71,7 +73,7 @@ function questionClick(event) {
       element.classList.remove('active')
       element.classList.remove('hide')
     })
-    toggleUpload(false)
+    toggleAmitieInfo(false)
   }
 }
 
@@ -101,9 +103,9 @@ function answerClick(event) {
 
   if (!isClose) {
     answer.classList.add('active')
-    toggleUpload(true)
+    toggleAmitieInfo(true)
   } else {
-    toggleUpload(false)
+    toggleAmitieInfo(false)
   }
 }
 
@@ -113,6 +115,8 @@ const amitieFile = document.getElementById('amitie-file')
 const amitieFileName = document.getElementById('amitie-file-name')
 /** @type {HTMLDivElement} */// @ts-ignore
 const amitiUploadField = document.getElementById('amitie-upload-field')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitieUploadResults = document.getElementById('amitie-upload-results')
 /** @type {HTMLSpanElement} */// @ts-ignore
 const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
 /** @type {HTMLDivElement} */// @ts-ignore
@@ -151,15 +155,20 @@ amitiUploadField.ondrop = (/** @type {DragEvent} */ event) => {
 }
 
 document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
-  event.preventDefault()
-  event.stopPropagation()
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const input = event.target
 
-  const { files } = event.clipboardData
+  if (input.tagName !== 'INPUT') {
+    event.preventDefault()
+    event.stopPropagation()
 
-  if (files.length) {
-    doAsync(() => prepareAmitieImage(files[0]))
-  } else {
-    window.alert('Не удалось найти файл изображения!')
+    const { files } = event.clipboardData
+
+    if (files.length) {
+      doAsync(() => prepareAmitieImage(files[0]))
+    } else {
+      window.alert('Не удалось найти файл изображения!')
+    }
   }
 })
 
@@ -197,18 +206,18 @@ navigator.permissions.query({ name: 'clipboard-read' }).then(permission => {
 timeSelect.onchange = () => updateGithubLink()
 
 /** @param {boolean} status  */
-function toggleUpload(status) {
+function toggleAmitieInfo(status) {
   /** @type {HTMLDivElement} */// @ts-ignore
-  const upload = document.getElementById('upload')
+  const amitieInfo = document.getElementById('amitie-info')
 
   if (status) {
     if (!amitieFile.files?.length) {
       timeSelect.value = ('0' + new Date().getHours()).slice(-2)
     }
     updateGithubLink()
-    upload.classList.remove('hide')
+    amitieInfo.classList.remove('hide')
   } else {
-    upload.classList.add('hide')
+    amitieInfo.classList.add('hide')
   }
 }
 
@@ -220,7 +229,7 @@ function handleAmitieFile() {
   } else {
     amitieFileName.textContent = ''
     recognizingTextLog.textContent = ''
-    amitieCanvas.classList.add('hide')
+    amitieUploadResults.classList.add('hide')
     timeFileField.classList.add('hide')
     amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
   }
@@ -239,12 +248,10 @@ async function prepareAmitieImage(file) {
   updateGithubLink()
   recognizingTextLog.textContent = ''
   amitieFileName.textContent = `Файл: ${file.name}`
-  amitieCanvas.classList.add('hide')
-  amitieTextResults.classList.add('hide')
-  amitiePlus3.classList.remove('hide')
-  amitieMinus3.classList.remove('hide')
-  amitiePlus2.classList.remove('hide')
-  amitieMinus2.classList.remove('hide')
+  amitieUploadResults.classList.remove('hide')
+  amitieUploadResults.classList.add('hide')
+  amitieResults.classList.add('hide')
+
 
   sendToGithub.classList.add('hide')
   image.src = URL.createObjectURL(file)
@@ -261,7 +268,7 @@ async function prepareAmitieImage(file) {
   amitieCanvas.width = image.width
   amitieCanvas.height = image.height
   amitieContext.drawImage(image, 0, 0)
-  amitieCanvas.classList.remove('hide')
+  amitieUploadResults.classList.remove('hide')
   await nextTick()
 
   const canvas = document.createElement('canvas')
@@ -564,10 +571,10 @@ async function prepareAmitieImage(file) {
       const rContext = rCanvas.getContext('2d')
 
       rCanvas.width = canvas.width
-      rCanvas.height = dataBlock.h + 2
+      rCanvas.height = dataBlock.h
       rContext.drawImage(canvas,
         0, dataBlock.y, canvas.width, dataBlock.h,
-        1, 0, canvas.width, dataBlock.h
+        0, 0, canvas.width, dataBlock.h
       )
 
       return scheduler.addJob('recognize', rCanvas)
@@ -611,21 +618,37 @@ async function prepareAmitieImage(file) {
     amitieMinus1.value = results.minusBlocks[0] || ''
     amitieMinus2.value = results.minusBlocks[1] || ''
     amitieMinus3.value = results.minusBlocks[2] || ''
-    if (results.plusBlocks.length) {
-      if (results.plusBlocks.length < 3) {
-        amitiePlus3.classList.add('hide')
-        amitieMinus3.classList.add('hide')
-      }
-      if (results.plusBlocks.length < 2) {
-        amitiePlus2.classList.add('hide')
-        amitieMinus2.classList.add('hide')
-      }
-    }
-    amitieTextResults.classList.remove('hide')
+    // @ts-ignore
+    document.querySelector(`#quality-field div[data-quality="${results.plusBlocks.length || 1}"]`).click()
+    amitieResults.classList.remove('hide')
 
     updateGithubLink()
 
     await scheduler.terminate()
+  }
+}
+
+qualityField.onclick = event => {
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const item = event.target
+
+  if (item.classList.contains('text-toggle-item')) {
+    const quality = Number(item.dataset.quality)
+
+    amitiePlus3.classList.remove('hide')
+    amitieMinus3.classList.remove('hide')
+    amitiePlus2.classList.remove('hide')
+    amitieMinus2.classList.remove('hide')
+    if (quality < 3) {
+      amitiePlus3.classList.add('hide')
+      amitieMinus3.classList.add('hide')
+    }
+    if (quality < 2) {
+      amitiePlus2.classList.add('hide')
+      amitieMinus2.classList.add('hide')
+    }
+
+    updateGithubLink()
   }
 }
 

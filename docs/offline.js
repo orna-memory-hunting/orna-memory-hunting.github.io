@@ -9,6 +9,8 @@ const appResources = [
   './index.js',
   './main.css',
   './main.js',
+  './lib/components.js',
+  './lib/github.js',
   './lib/utils.js',
   './lib/questions.js'
 ]
@@ -36,7 +38,7 @@ workerScope.addEventListener('activate', (event) => {
       if (isUpdate) {
         await workerScope.clients.matchAll().then((clients) => {
           clients.forEach((client) => {
-            client.postMessage({ name: 'force-refresh' })
+            client.postMessage({ name: 'force-refresh', buildNumber })
           })
         })
       }
@@ -63,17 +65,20 @@ workerScope.addEventListener('fetch', event => {
       }
     }
 
-    return caches.match(event.request, { cacheName: buildNumber }).then((response) => {
-      return response || fetch(event.request).then((response) => {
-        return caches.open(buildNumber).then((cache) => {
-          if (event.request.url.startsWith('http')) {
+    if (!event.request.url.startsWith('http') ||
+      event.request.url.startsWith('https://api.github.com')) {
+      return fetch(event.request)
+    } else {
+      return caches.match(event.request, { cacheName: buildNumber }).then((response) => {
+        return response || fetch(event.request).then((response) => {
+          return caches.open(buildNumber).then((cache) => {
             cache.put(event.request, response.clone())
-          }
 
-          return response
+            return response
+          })
         })
       })
-    })
+    }
   })())
 })
 
@@ -86,7 +91,7 @@ workerScope.addEventListener('message', (event) => {
             for (const key of keyList) {
               await caches.delete(key)
             }
-            event.source.postMessage({ name: 'force-refresh' })
+            event.source.postMessage({ name: 'force-refresh', buildNumber })
           })
         } else {
           event.source.postMessage({ name: 'pong', buildNumber })

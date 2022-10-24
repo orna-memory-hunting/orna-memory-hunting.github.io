@@ -33,7 +33,9 @@ async function registerServiceWorker() {
       if (event.data.name) {
         switch (event.data.name) {
           case 'force-refresh':
-            window.location.reload()
+            if (event.data.buildNumber !== buildNumber) {
+              window.location.reload()
+            }
             break
           case 'pong':
             console.log(`serviceWorker succeeded. buildNumber = ${event.data.buildNumber}`)

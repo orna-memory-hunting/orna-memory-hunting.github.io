@@ -57,6 +57,11 @@
   display: inline;
 }
 
+.amitie-info {
+  display       : flex;
+  flex-direction: column;
+}
+
 .amitie-upload-field {
   display       : flex;
   flex-direction: column;
@@ -80,8 +85,36 @@
   opacity: 1;
 }
 
+.amitie-file {
+  display: none;
+}
+
+.amitie-upload-results {
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+}
+
+.amitie-canvas {
+  max-width : 100%;
+  border    : 1px solid;
+  margin-top: 8px;
+}
+
+.recognizing-text-log {
+  white-space: pre;
+  text-align : center;
+  padding    : 6px;
+}
+
+.amitie-results {
+  display       : flex;
+  flex-direction: column;
+  row-gap       : 8px;
+  margin-top    : 8px;
+}
+
 .time-field {
-  margin     : 12px 0;
   display    : flex;
   align-items: baseline;
 }
@@ -96,38 +129,20 @@
   opacity  : 0.5;
 }
 
-.amitie-file {
-  display: none;
-}
-
-.amitie-results {
-  display       : flex;
-  flex-direction: column;
-  align-items   : center;
-}
-
-.amitie-canvas {
-  max-width : 100%;
-  border    : 1px solid;
-  margin-top: 4px;
-}
-
-.recognizing-text-log {
-  white-space: pre;
-  text-align : center;
-  padding    : 6px;
+.quality-field {
+  display    : flex;
+  column-gap : 8px;
+  align-items: baseline;
 }
 
 .amitie-text-results {
   display       : flex;
   flex-direction: column;
-  width         : 100%;
 }
 
 .amitie-text-results-label {
-  font-size    : 13px;
-  margin-bottom: 2px;
-  font-weight  : bold;
+  font-size  : 13px;
+  font-weight: bold;
 }
 
 .amitie-text-results-field {
