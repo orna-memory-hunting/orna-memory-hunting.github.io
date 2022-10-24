@@ -597,15 +597,16 @@ function updateGithubLink() {
     return false
   }
 
+  const a = encodeURIComponent('&')
   const p = encodeURIComponent('%')
   const h = encodeURIComponent('#')
   const n = encodeURIComponent('\n')
-  const title = results.plusBlocks[0].replace('%', p)
+  const title = results.plusBlocks[0].replace('%', p).replace('&', a)
   const plusBlocks = results.plusBlocks.reduce((prev, cur) => {
-    return prev + `- **${cur.replace('%', p)}**${n}`
+    return prev + `- **${cur.replace('%', p).replace('&', a)}**${n}`
   }, '')
   const minusBlocks = results.minusBlocks.reduce((prev, cur) => {
-    return prev + `- _${cur.replace('%', p)}_${n}`
+    return prev + `- _${cur.replace('%', p).replace('&', a)}_${n}`
   }, '')
   const time = new Date(new Date().setHours(Number(timeSelect.value)))
   const { timeUTC, timeMSK } = getTimeLabels(time)
@@ -618,7 +619,7 @@ function updateGithubLink() {
     `title=${title}` +
     `&labels=${labels}` +
     `&milestone=${milestone}` +
-    `&body=${h} ${results.name}${n}` +
+    `&body=${h} ${results.name.replace('&', a)}${n}` +
     `${h + h + h} Плюсы${n}${plusBlocks}` +
     `${h + h + h} Минусы${n}${minusBlocks}`
 }
