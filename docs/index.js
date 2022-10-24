@@ -76,20 +76,25 @@ async function loadAmitieList() {
   amitieListLoader.classList.remove('hide')
   amitieList.classList.add('hide')
 
-  const time = new Date(new Date().setUTCHours(utcHours))
+  const time = new Date(new Date().setUTCHours(utcHours || 0))
   const labels = `&labels=${getTimeLabels(time).timeUTC}`
-  const milestone = `&milestone=${await loadMilestone()}`
+  const milestoneId = await loadMilestone()
+  const milestone = `&milestone=${milestoneId}`
   const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
-  const issues = await (await fetch(apiURL)).json()
+  /** @type {Array} */
+  const issues = milestoneId ? await (await fetch(apiURL)).json() : []
   let issuesHTML = ''
 
+  if (issues.length) {
+    for (const issueRaw of issues) {
+      const issue = parseIssue(issueRaw)
 
-  for (const issueRaw of issues) {
-    const issue = parseIssue(issueRaw)
-
-    issuesHTML += `<div>${issue.answerLabel}</div>`
-    issuesHTML += `<div>${issue.title}</div>`
-    issuesHTML += `<div>${issue.body}</div>`
+      issuesHTML += `<div>${issue.answerLabel}</div>`
+      issuesHTML += `<div>${issue.title}</div>`
+      issuesHTML += `<div>${issue.body}</div>`
+    }
+  } else {
+    issuesHTML = '<div>Нет осколков</div>'
   }
 
   amitieList.innerHTML = issuesHTML
