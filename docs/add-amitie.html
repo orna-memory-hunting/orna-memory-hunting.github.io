@@ -95,24 +95,35 @@
           </span>
         </div>
         <div id="quality-field" class="text-toggle quality-field">
-          <span>Качество/количество бафов:</span>
+          <span>Качество/бафов:</span>
           <div data-quality="1" class="text-toggle-item active">Обычное/1</div>
           <div data-quality="2" class="text-toggle-item">Эпичное/2</div>
           <div data-quality="3" class="text-toggle-item">Орнатное/3</div>
         </div>
         <div class="amitie-text-results">
-          <span class="amitie-text-results-label">Название</span>
-          <input type="text" class="amitie-text-results-field" id="amitie-name">
-          <span class="amitie-text-results-label">Плюсы</span>
-          <input type="text" class="amitie-text-results-field" data-rid="0" id="amitie-plus1">
-          <input type="text" class="amitie-text-results-field hide" data-rid="1" id="amitie-plus2">
-          <input type="text" class="amitie-text-results-field hide" data-rid="2" id="amitie-plus3">
-          <span class="amitie-text-results-label">Минусы</span>
-          <input type="text" class="amitie-text-results-field" data-rid="0" id="amitie-minus1">
-          <input type="text" class="amitie-text-results-field hide" data-rid="1" id="amitie-minus2">
-          <input type="text" class="amitie-text-results-field hide" data-rid="2" id="amitie-minus3">
+          <div class="amitie-text-results-field">
+            <span class="amitie-text-results-label">Название</span>
+            <input type="text" id="amitie-name">
+          </div>
+          <div class="amitie-text-results-field">
+            <span class="amitie-text-results-label">Плюсы</span>
+            <input type="text" data-rid="0" id="amitie-plus1">
+          </div>
+          <input type="text" class="hide" data-rid="1" id="amitie-plus2">
+          <input type="text" class="hide" data-rid="2" id="amitie-plus3">
+          <div class="amitie-text-results-field">
+            <span class="amitie-text-results-label">Минусы</span>
+            <input type="text" data-rid="0" id="amitie-minus1">
+          </div>
+          <input type="text" class="hide" data-rid="1" id="amitie-minus2">
+          <input type="text" class="hide" data-rid="2" id="amitie-minus3">
         </div>
-        <div id="send-to-github" class="green-button hide">
+        <div id="additional-labels" class="text-multi-toggle additional-labels">
+          <span>Метки:</span>
+          <div class="text-multi-toggle-item" data-label="TOP"
+            title="Осколок с максимальным бафом, или удачным составом бафа и дебафа">ТОП</div>
+        </div>
+        <div id="send-to-github" class="green-button">
           <a id="send-to-github-link" class="astext" target="_blank" href="">Опубликовать</a>
         </div>
       </div>

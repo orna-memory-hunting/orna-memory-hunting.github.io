@@ -109,15 +109,15 @@
 .recognizing-text {
   display       : flex;
   flex-direction: column;
-  row-gap       : 8px;
-  margin-top    : 8px;
+  row-gap       : 12px;
+  margin-top    : 12px;
   width         : 100%;
   align-items   : center;
 }
 
 .recognizing-lang {
   display    : flex;
-  column-gap : 8px;
+  column-gap : 12px;
   align-items: baseline;
 }
 
@@ -134,8 +134,8 @@
 .amitie-results {
   display       : flex;
   flex-direction: column;
-  row-gap       : 8px;
-  margin-top    : 8px;
+  row-gap       : 12px;
+  margin-top    : 16px;
 }
 
 .time-field {
@@ -155,11 +155,19 @@
 
 .quality-field {
   display    : flex;
-  column-gap : 8px;
+  column-gap : 12px;
+  row-gap    : 6px;
   align-items: baseline;
+  flex-wrap  : wrap;
 }
 
 .amitie-text-results {
+  display       : flex;
+  flex-direction: column;
+  row-gap       : 8px;
+}
+
+.amitie-text-results-field {
   display       : flex;
   flex-direction: column;
 }
@@ -169,6 +177,10 @@
   font-weight: bold;
 }
 
-.amitie-text-results-field {
-  margin-bottom: 6px;
+.additional-labels {
+  display    : flex;
+  column-gap : 12px;
+  row-gap    : 6px;
+  align-items: baseline;
+  flex-wrap  : wrap;
 }

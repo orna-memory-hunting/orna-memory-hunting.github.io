@@ -19,26 +19,7 @@ const amitieCanvas = document.getElementById('amitie-canvas')
 const amitieContext = amitieCanvas.getContext('2d')
 /** @type {HTMLDivElement} */// @ts-ignore
 const amitieResults = document.getElementById('amitie-results')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitieName = document.getElementById('amitie-name')
-/** @type {HTMLDivElement} */// @ts-ignore
-const qualityField = document.getElementById('quality-field')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitiePlus1 = document.getElementById('amitie-plus1')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitiePlus2 = document.getElementById('amitie-plus2')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitiePlus3 = document.getElementById('amitie-plus3')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitieMinus1 = document.getElementById('amitie-minus1')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitieMinus2 = document.getElementById('amitie-minus2')
-/** @type {HTMLInputElement} */// @ts-ignore
-const amitieMinus3 = document.getElementById('amitie-minus3')
-/** @type {HTMLButtonElement} */// @ts-ignore
-const sendToGithub = document.getElementById('send-to-github')
-/** @type {HTMLLinkElement} */// @ts-ignore
-const sendToGithubLink = document.getElementById('send-to-github-link')
+
 
 questions.innerHTML = renderQuestionList()
 
@@ -238,7 +219,24 @@ function handleAmitieFile() {
   }
 }
 
-let results = { name: '', plusBlocks: [], minusBlocks: [] }
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingTextError = document.getElementById('recognizing-text-error')
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingTextLog = document.getElementById('recognizing-text-log')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieName = document.getElementById('amitie-name')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitiePlus1 = document.getElementById('amitie-plus1')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitiePlus2 = document.getElementById('amitie-plus2')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitiePlus3 = document.getElementById('amitie-plus3')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieMinus1 = document.getElementById('amitie-minus1')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieMinus2 = document.getElementById('amitie-minus2')
+/** @type {HTMLInputElement} */// @ts-ignore
+const amitieMinus3 = document.getElementById('amitie-minus3')
 let dataBlocks = []
 let originAmitieCanvas = document.createElement('canvas')
 
@@ -249,9 +247,15 @@ async function prepareAmitieImage(file) {
   const animationTime = 100
   const image = new window.Image()
 
-  results = { name: '', plusBlocks: [], minusBlocks: [] }
   dataBlocks = []
   originAmitieCanvas = document.createElement('canvas')
+  amitieName.value = ''
+  amitiePlus1.value = ''
+  amitiePlus2.value = ''
+  amitiePlus3.value = ''
+  amitieMinus1.value = ''
+  amitieMinus2.value = ''
+  amitieMinus3.value = ''
 
   updateGithubLink()
 
@@ -260,8 +264,9 @@ async function prepareAmitieImage(file) {
   amitieCanvasError.classList.add('hide')
   recognizingText.classList.add('hide')
   amitieResults.classList.add('hide')
+  recognizingTextError.classList.add('hide')
+  recognizingTextLog.classList.add('hide')
 
-  sendToGithub.classList.add('hide')
   image.src = URL.createObjectURL(file)
 
   await new Promise((resolve) => { image.onload = resolve })
@@ -559,10 +564,6 @@ async function prepareAmitieImage(file) {
 
 /** @type {HTMLDivElement} */// @ts-ignore
 const recognizingTextButton = document.getElementById('recognizing-text-button')
-/** @type {HTMLDivElement} */// @ts-ignore
-const recognizingTextError = document.getElementById('recognizing-text-error')
-/** @type {HTMLDivElement} */// @ts-ignore
-const recognizingTextLog = document.getElementById('recognizing-text-log')
 
 recognizingTextButton.onclick = () => doAsync(startRecognizingText)
 
@@ -635,23 +636,27 @@ async function startRecognizingText() {
       return prev
     }, [])
 
+    const results = { name: '', plusBlocks: [], minusBlocks: [], success: false }
+
     results.name = resultsTmp.shift()
     if (resultsTmp.length % 2 === 0) {
       results.plusBlocks = resultsTmp.slice(0, resultsTmp.length / 2)
       results.minusBlocks = resultsTmp.slice(resultsTmp.length / 2, resultsTmp.length)
     }
 
-    if (!(results.name &&
+    results.success = results.name &&
       results.plusBlocks.length > 0 &&
-      results.plusBlocks.length === results.minusBlocks.length)) {
+      results.plusBlocks.length === results.minusBlocks.length
+
+    if (results.success) {
+      recognizingTextLog.textContent = ''
+      recognizingTextLog.classList.add('hide')
+    } else {
       resultsTmp.unshift(results.name)
       recognizingTextLog.textContent = resultsTmp.join('\n').trim()
       recognizingTextError.classList.remove('hide')
-      results = { name: '', plusBlocks: [], minusBlocks: [] }
-    } else {
-      recognizingTextLog.textContent = ''
-      recognizingTextLog.classList.add('hide')
     }
+
     amitieName.value = results.name
     amitiePlus1.value = results.plusBlocks[0] || ''
     amitiePlus2.value = results.plusBlocks[1] || ''
@@ -670,6 +675,9 @@ async function startRecognizingText() {
   recognizingTextButton.classList.remove('hide')
   amitieResults.classList.remove('hide')
 }
+
+/** @type {HTMLDivElement} */// @ts-ignore
+const qualityField = document.getElementById('quality-field')
 
 qualityField.onclick = event => {
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -695,39 +703,56 @@ qualityField.onclick = event => {
   }
 }
 
+/** @type {HTMLDivElement} */// @ts-ignore
+const additionalLabels = document.getElementById('additional-labels')
+
+additionalLabels.onclick = event => {
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const item = event.target
+
+  if (item.classList.contains('text-multi-toggle-item')) {
+    updateGithubLink()
+  }
+}
+
+amitieName.onchange = updateGithubLink
+amitiePlus1.onchange = updateGithubLink
+amitiePlus2.onchange = updateGithubLink
+amitiePlus3.onchange = updateGithubLink
+amitieMinus1.onchange = updateGithubLink
+amitieMinus2.onchange = updateGithubLink
+amitieMinus3.onchange = updateGithubLink
+
+/** @type {HTMLLinkElement} */// @ts-ignore
+const sendToGithubLink = document.getElementById('send-to-github-link')
+
 function updateGithubLink() {
   const answer = getSelectedAnswer()
-  const available = results.name && answer.a
-
-  if (!available) {
-    sendToGithubLink.href = '#'
-
-    return false
-  }
-
-  const a = encodeURIComponent('&')
-  const p = encodeURIComponent('%')
-  const h = encodeURIComponent('#')
-  const n = encodeURIComponent('\n')
-  const title = results.plusBlocks[0].replace('%', p).replace('&', a)
-  const plusBlocks = results.plusBlocks.reduce((prev, cur) => {
-    return prev + `- **${cur.replace('%', p).replace('&', a)}**${n}`
-  }, '')
-  const minusBlocks = results.minusBlocks.reduce((prev, cur) => {
-    return prev + `- _${cur.replace('%', p).replace('&', a)}_${n}`
-  }, '')
+  const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const qualityElm = document.querySelector('.quality-field .active')
+  const quality = Number(qualityElm.dataset.quality)
+  const qualityLabel = { 2: ',x2 epic', 3: ',x3 ornate' }[quality] || ''
+  const plusBlocks = [amitiePlus1.value, amitiePlus2.value, amitiePlus3.value]
+    .slice(0, quality).reduce((prev, cur) => {
+      return `${prev}- **${cur || '?'}**\n`
+    }, '')
+  const minusBlocks = [amitieMinus1.value, amitieMinus2.value, amitieMinus3.value]
+    .slice(0, quality).reduce((prev, cur) => {
+      return `${prev}- _${cur || '?'}_\n`
+    }, '')
   const time = new Date(new Date().setHours(Number(timeSelect.value)))
   const { timeUTC, timeMSK } = getTimeLabels(time)
-  const labels = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa},${timeUTC},${timeMSK}`
+  const addLabels = Array.from(document.querySelectorAll('#additional-labels .active'))
+    .reduce((labels, /** @type {HTMLDivElement} */label) => `${labels},${label.dataset.label}`, '')
+  const labels = `${answerLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}`
   const milestone = getAmitieMilestone(time)
 
-
-  sendToGithub.classList.remove('hide')
   sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
-    `title=${title}` +
-    `&labels=${labels}` +
+    `title=${encodeURIComponent(amitiePlus1.value)}` +
+    `&labels=${encodeURIComponent(labels)}` +
     `&milestone=${milestone}` +
-    `&body=${h} ${results.name.replace('&', a)}${n}` +
-    `${h + h + h} Плюсы${n}${plusBlocks}` +
-    `${h + h + h} Минусы${n}${minusBlocks}`
+    `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
+    encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
+    encodeURIComponent(`### Минусы\n${minusBlocks}`)
 }
