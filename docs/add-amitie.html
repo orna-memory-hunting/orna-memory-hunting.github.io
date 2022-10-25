@@ -25,7 +25,7 @@
 <body class="body-font">
   <div class="nav-head">
     <div class="nav-title">Добавление осколока</div>
-    <div class="text-button"><a class="astext" href="/">✕</a></div>
+    <div class="text-icon-button"><a class="astext" href="/">✕</a></div>
   </div>
   <div class="main-content">
     <h4>Укажите вопрос и ответ воспоминания</h4>
@@ -40,7 +40,22 @@
       </div>
       <div id="amitie-upload-results" class="amitie-upload-results hide">
         <canvas id="amitie-canvas" class="amitie-canvas"></canvas>
-        <div id="recognizing-text-log" class="recognizing-text-log"></div>
+        <div id="amitie-canvas-error" class="amitie-canvas-error hide">
+          Не удалось разобрать скрин
+        </div>
+        <div id="recognizing-text" class="recognizing-text hide">
+          <div id="recognizing-lang" data-save-state="true" class="text-multi-toggle recognizing-lang">
+            <span>Язык:</span>
+            <div class="text-multi-toggle-item" data-state="1" data-lang="eng">eng</div>
+            <div class="text-multi-toggle-item" data-state="2" data-lang="rus">rus</div>
+            <div class="text-multi-toggle-item" data-state="3" data-lang="ukr">ukr</div>
+          </div>
+          <div id="recognizing-text-button" class="text-button">Распознать текст</div>
+          <div id="recognizing-text-error" class="recognizing-text-error hide">
+            Не удалось разобрать текст и состав бафов
+          </div>
+          <div id="recognizing-text-log" class="recognizing-text-log hide"></div>
+        </div>
       </div>
 
       <div id="amitie-results" class="amitie-results">

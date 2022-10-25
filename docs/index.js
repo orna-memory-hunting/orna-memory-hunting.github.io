@@ -94,7 +94,7 @@ async function loadAmitieList() {
       issuesHTML += `<div>${issue.body}</div>`
     }
   } else {
-    issuesHTML = '<div class="amitie-list-middle">Нет осколков</div>'
+    issuesHTML = '<div class="amitie-list-middle">Не разведано</div>'
   }
 
   amitieList.innerHTML = issuesHTML

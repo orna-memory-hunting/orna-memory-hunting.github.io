@@ -117,10 +117,12 @@ const amitieFileName = document.getElementById('amitie-file-name')
 const amitiUploadField = document.getElementById('amitie-upload-field')
 /** @type {HTMLDivElement} */// @ts-ignore
 const amitieUploadResults = document.getElementById('amitie-upload-results')
+/** @type {HTMLDivElement} */// @ts-ignore
+const amitieCanvasError = document.getElementById('amitie-canvas-error')
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingText = document.getElementById('recognizing-text')
 /** @type {HTMLSpanElement} */// @ts-ignore
 const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
-/** @type {HTMLDivElement} */// @ts-ignore
-const recognizingTextLog = document.getElementById('recognizing-text-log')
 
 amitiUploadField.onclick = () => {
   amitieFile.click()
@@ -228,14 +230,17 @@ function handleAmitieFile() {
     doAsync(() => prepareAmitieImage(amitieFile.files[0]))
   } else {
     amitieFileName.textContent = ''
-    recognizingTextLog.textContent = ''
     amitieUploadResults.classList.add('hide')
+    amitieCanvasError.classList.add('hide')
+    recognizingText.classList.add('hide')
     timeFileField.classList.add('hide')
     amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
   }
 }
 
 let results = { name: '', plusBlocks: [], minusBlocks: [] }
+let dataBlocks = []
+let originAmitieCanvas = document.createElement('canvas')
 
 /** @param {File} file */
 async function prepareAmitieImage(file) {
@@ -245,13 +250,16 @@ async function prepareAmitieImage(file) {
   const image = new window.Image()
 
   results = { name: '', plusBlocks: [], minusBlocks: [] }
-  updateGithubLink()
-  recognizingTextLog.textContent = ''
-  amitieFileName.textContent = `Файл: ${file.name}`
-  amitieUploadResults.classList.remove('hide')
-  amitieUploadResults.classList.add('hide')
-  amitieResults.classList.add('hide')
+  dataBlocks = []
+  originAmitieCanvas = document.createElement('canvas')
 
+  updateGithubLink()
+
+  amitieFileName.textContent = `Файл: ${file.name}`
+  amitieUploadResults.classList.add('hide')
+  amitieCanvasError.classList.add('hide')
+  recognizingText.classList.add('hide')
+  amitieResults.classList.add('hide')
 
   sendToGithub.classList.add('hide')
   image.src = URL.createObjectURL(file)
@@ -271,12 +279,10 @@ async function prepareAmitieImage(file) {
   amitieUploadResults.classList.remove('hide')
   await nextTick()
 
-  const canvas = document.createElement('canvas')
   /** @type {CanvasRenderingContext2D} */// @ts-ignore
-  const context = canvas.getContext('2d')
+  const originAmitieContext = originAmitieCanvas.getContext('2d')
   const leftShift = image.width / 9 ^ 0
   const rightShift = image.width - leftShift
-  let dataBlocks = []
   let currentBlock = 0
   let cBlockR = 0
   let cBlockG = 0
@@ -287,12 +293,12 @@ async function prepareAmitieImage(file) {
   const plusBlocks = []
   const minusBlocks = []
 
-  canvas.width = image.width
-  canvas.height = image.height
-  context.drawImage(image, 0, 0)
+  originAmitieCanvas.width = image.width
+  originAmitieCanvas.height = image.height
+  originAmitieContext.drawImage(image, 0, 0)
 
   for (let index = 0; index < image.height; index++) {
-    const imgData = context.getImageData(leftShift, index, rightShift, 1).data
+    const imgData = originAmitieContext.getImageData(leftShift, index, rightShift, 1).data
     let match = false
     let iDataIndex = 0
 
@@ -412,7 +418,7 @@ async function prepareAmitieImage(file) {
   if (firstBaffIndex && lastBaffIndex) {
     let isGreenButton = false
     const lastBlock = dataBlocks[dataBlocks.length - 1]
-    const imgData = context.getImageData(leftShift, lastBlock.y + lastBlock.h / 2, rightShift, 1).data
+    const imgData = originAmitieContext.getImageData(leftShift, lastBlock.y + lastBlock.h / 2, rightShift, 1).data
     let iDataIndex = 0
 
     while (iDataIndex < imgData.length) {
@@ -431,7 +437,7 @@ async function prepareAmitieImage(file) {
 
     for (let index = firstBaffIndex - 1; index > 0; index--) {
       const dataBlock = dataBlocks[index]
-      const imgData = context.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
+      const imgData = originAmitieContext.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
       let iDataIndex = 0
 
       while (iDataIndex < imgData.length) {
@@ -476,7 +482,7 @@ async function prepareAmitieImage(file) {
 
     for (let index = firstBaffIndex; index < lastBaffIndex + 1; index++) {
       const dataBlock = dataBlocks[index]
-      const imgData = context.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
+      const imgData = originAmitieContext.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
       let iDataIndex = 0
       let isRed = false
 
@@ -531,15 +537,41 @@ async function prepareAmitieImage(file) {
     }
 
     await nextAnimationFrame()
-    amitieCanvas.width = canvas.width
+    amitieCanvas.width = originAmitieCanvas.width
     amitieCanvas.height = dataBlocks[dataBlocks.length - 1].totalH
     for (const dataBlock of dataBlocks) {
-      amitieContext.drawImage(canvas,
-        0, dataBlock.y, canvas.width, dataBlock.h,
-        0, dataBlock.newY, canvas.width, dataBlock.h
+      amitieContext.drawImage(originAmitieCanvas,
+        0, dataBlock.y, originAmitieCanvas.width, dataBlock.h,
+        0, dataBlock.newY, originAmitieCanvas.width, dataBlock.h
       )
     }
+    await nextTick(animationTime)
   }
+
+  if (nameBlock && plusBlocks.length && minusBlocks.length) {
+    recognizingText.classList.remove('hide')
+  } else {
+    amitieCanvasError.classList.remove('hide')
+  }
+
+  amitieResults.classList.remove('hide')
+}
+
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingTextButton = document.getElementById('recognizing-text-button')
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingTextError = document.getElementById('recognizing-text-error')
+/** @type {HTMLDivElement} */// @ts-ignore
+const recognizingTextLog = document.getElementById('recognizing-text-log')
+
+recognizingTextButton.onclick = () => doAsync(startRecognizingText)
+
+async function startRecognizingText() {
+  recognizingTextLog.textContent = ''
+  recognizingTextButton.classList.add('hide')
+  amitieResults.classList.add('hide')
+  recognizingTextError.classList.add('hide')
+  recognizingTextLog.classList.remove('hide')
 
   if (dataBlocks.length) {
     let currentStep = 0
@@ -558,10 +590,16 @@ async function prepareAmitieImage(file) {
     const scheduler = Tesseract.createScheduler()
     const worker1 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
     const worker2 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
+    const langs = Array.from(document.querySelectorAll('.recognizing-lang .active'))
+      .reduce((langs, /** @type {HTMLDivElement} */lang) => {
+        langs.push(lang.dataset.lang)
+
+        return langs
+      }, []).join('+') || 'eng+rus+ukr'
 
     await Promise.all([worker1.load(), worker2.load()])
-    await Promise.all([worker1.loadLanguage('eng+rus+ukr'), worker2.loadLanguage('eng+rus+ukr')])
-    await Promise.all([worker1.initialize('eng+rus+ukr'), worker2.initialize('eng+rus+ukr')])
+    await Promise.all([worker1.loadLanguage(langs), worker2.loadLanguage(langs)])
+    await Promise.all([worker1.initialize(langs), worker2.initialize(langs)])
     scheduler.addWorker(worker1)
     scheduler.addWorker(worker2)
 
@@ -570,18 +608,17 @@ async function prepareAmitieImage(file) {
       /** @type {CanvasRenderingContext2D} */// @ts-ignore
       const rContext = rCanvas.getContext('2d')
 
-      rCanvas.width = canvas.width
+      rCanvas.width = originAmitieCanvas.width
       rCanvas.height = dataBlock.h
-      rContext.drawImage(canvas,
-        0, dataBlock.y, canvas.width, dataBlock.h,
-        0, 0, canvas.width, dataBlock.h
+      rContext.drawImage(originAmitieCanvas,
+        0, dataBlock.y, originAmitieCanvas.width, dataBlock.h,
+        0, 0, originAmitieCanvas.width, dataBlock.h
       )
 
       return scheduler.addJob('recognize', rCanvas)
         .then((/** @type {import('tesseract.js').RecognizeResult} */result) => (result.data.text || '').trim())
     }))
 
-    recognizingTextLog.textContent = ''
     resultsTmp = resultsTmp.reduce((prev, cur) => {
       if (cur) {
         if (prev.length > 0) {
@@ -607,9 +644,13 @@ async function prepareAmitieImage(file) {
     if (!(results.name &&
       results.plusBlocks.length > 0 &&
       results.plusBlocks.length === results.minusBlocks.length)) {
+      resultsTmp.unshift(results.name)
+      recognizingTextLog.textContent = resultsTmp.join('\n').trim()
+      recognizingTextError.classList.remove('hide')
       results = { name: '', plusBlocks: [], minusBlocks: [] }
-      recognizingTextLog.textContent = results.name + '\n' + resultsTmp.join('\n')
-      recognizingTextLog.textContent += '\n// Не удалось распознать осколок!'
+    } else {
+      recognizingTextLog.textContent = ''
+      recognizingTextLog.classList.add('hide')
     }
     amitieName.value = results.name
     amitiePlus1.value = results.plusBlocks[0] || ''
@@ -620,12 +661,14 @@ async function prepareAmitieImage(file) {
     amitieMinus3.value = results.minusBlocks[2] || ''
     // @ts-ignore
     document.querySelector(`#quality-field div[data-quality="${results.plusBlocks.length || 1}"]`).click()
-    amitieResults.classList.remove('hide')
 
     updateGithubLink()
 
     await scheduler.terminate()
   }
+
+  recognizingTextButton.classList.remove('hide')
+  amitieResults.classList.remove('hide')
 }
 
 qualityField.onclick = event => {

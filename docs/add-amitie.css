@@ -101,6 +101,30 @@
   margin-top: 8px;
 }
 
+.amitie-canvas-error {
+  margin: 12px;
+  color : #ef5350;
+}
+
+.recognizing-text {
+  display       : flex;
+  flex-direction: column;
+  row-gap       : 8px;
+  margin-top    : 8px;
+  width         : 100%;
+  align-items   : center;
+}
+
+.recognizing-lang {
+  display    : flex;
+  column-gap : 8px;
+  align-items: baseline;
+}
+
+.recognizing-text-error {
+  color: #ef5350;
+}
+
 .recognizing-text-log {
   white-space: pre;
   text-align : center;
