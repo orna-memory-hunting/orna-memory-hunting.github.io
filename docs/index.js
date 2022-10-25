@@ -23,6 +23,7 @@ doAsync(loadAmitieList)
 
 navTimeBack.onclick = () => changeUTCHours(false)
 navTimeForward.onclick = () => changeUTCHours(true)
+currentTime.onclick = () => { initTimeLap(); doAsync(loadAmitieList) }
 
 
 function initTimeLap() {

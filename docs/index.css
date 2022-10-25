@@ -5,7 +5,9 @@
 }
 
 .current-time {
-  font-size: 14px;
+  font-size : 14px;
+  width     : 36px;
+  text-align: center;
 }
 
 .amitie-list {
