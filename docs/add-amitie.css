@@ -109,7 +109,6 @@
 .recognizing-text {
   display       : flex;
   flex-direction: column;
-  row-gap       : 12px;
   margin-top    : 12px;
   width         : 100%;
   align-items   : center;

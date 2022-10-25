@@ -151,7 +151,8 @@ input[type=text] {
   justify-content : center;
 }
 
-.green-button a {
+.green-button a,
+.green-button span {
   display   : inline-block;
   padding   : 8px 16px;
   width     : 100%;
