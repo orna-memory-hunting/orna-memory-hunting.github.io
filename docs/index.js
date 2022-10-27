@@ -155,3 +155,30 @@ async function loadAmitieList() {
   amitieListLoader.classList.add('hide')
   amitieList.classList.remove('hide')
 }
+
+
+let xDownTouch = null
+let yDownTouch = null
+
+document.addEventListener('touchstart', (/** @type {TouchEvent} */evt) => {
+  xDownTouch = evt.touches[0].clientX
+  yDownTouch = evt.touches[0].clientY
+}, false)
+document.addEventListener('touchmove', (/** @type {TouchEvent} */evt) => {
+  if (!xDownTouch || !yDownTouch) return
+
+  const xUp = evt.touches[0].clientX
+  const yUp = evt.touches[0].clientY
+  const xDiff = xDownTouch - xUp
+  const yDiff = yDownTouch - yUp
+
+  if (Math.abs(xDiff) - Math.abs(yDiff) > 10) {
+    if (xDiff > 0) {
+      changeUTCHours(true)
+      xDownTouch = yDownTouch = null
+    } else {
+      changeUTCHours(false)
+      xDownTouch = yDownTouch = null
+    }
+  }
+}, false)
