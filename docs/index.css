@@ -4,10 +4,17 @@
   align-items: baseline;
 }
 
+.time-lap-text {
+  text-align : center;
+  white-space: nowrap;
+}
+
 .current-time {
-  font-size : 14px;
-  width     : 36px;
-  text-align: center;
+  font-size  : 14px;
+  width      : 36px;
+  text-align : center;
+  white-space: nowrap;
+  margin     : 0 8px;
 }
 
 .amitie-list {
