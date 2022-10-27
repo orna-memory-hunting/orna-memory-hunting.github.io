@@ -28,3 +28,56 @@
   justify-content: center;
   width          : 100%;
 }
+
+.question {
+  margin        : 6px 0 8px;
+  border-bottom : 1px solid #686262;
+  font-size     : 18px;
+  padding-bottom: 4px;
+}
+
+.answer {
+  margin     : 0 0 4px 16px;
+  display    : flex;
+  align-items: baseline;
+}
+
+.answer .text-button {
+  margin: 0 8px;
+}
+
+.amitie {
+  margin     : 0 0 12px 32px;
+  display    : flex;
+  align-items: baseline;
+  column-gap : 8px;
+  flex-wrap  : wrap;
+}
+
+.amitie-button {
+  flex-grow : 1;
+  text-align: left;
+}
+
+.amitie-button.blue {
+  color: #64b5f6;
+}
+
+.amitie-labels {
+  padding-top: 4px;
+  width      : 100%;
+  display    : flex;
+  column-gap : 4px;
+  row-gap    : 4px;
+}
+
+.amitie-label {
+  font-size    : 70%;
+  border       : 1px solid;
+  border-radius: 8px;
+  padding      : 1px 3px;
+}
+
+.lost-amitie {
+  color: #e57373;
+}

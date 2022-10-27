@@ -33,6 +33,7 @@ document.querySelectorAll('.answer').forEach((/** @type {HTMLDivElement} */ elem
   element.onclick = answerClick
 })
 
+
 /**
  * @param {Event} event
  */
@@ -41,13 +42,15 @@ function questionClick(event) {
   const qContent = event.currentTarget.parentElement
   const isClose = qContent.classList.contains('active')
 
-  // @ts-ignore
   document.querySelectorAll('.question-content').forEach((/** @type {HTMLDivElement} */ element) => {
     element.classList.remove('active')
     element.classList.remove('hide')
   })
   if (!isClose) {
     qContent.classList.add('active')
+    document.querySelectorAll('.question-content').forEach((/** @type {HTMLDivElement} */ element) => {
+      if (element !== qContent) element.classList.add('hide')
+    })
   } else {
     // @ts-ignore
     document.querySelectorAll('.answer').forEach((/** @type {HTMLDivElement} */ element) => {
@@ -758,4 +761,26 @@ function updateGithubLink() {
     `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
     encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
     encodeURIComponent(`### Минусы\n${minusBlocks}`)
+}
+
+const params = new URLSearchParams(window.location.hash.replace('#', ''))
+const pQ = parseInt(params.get('q'))
+const pA = parseInt(params.get('a'))
+
+if (!isNaN(pQ)) {
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const question = document.querySelector(`.question-content[data-qid="${pQ}"]`)
+
+  if (question) {
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const questionElm = question.querySelector('.question')
+
+    questionElm.click()
+    if (!isNaN(pA)) {
+      /** @type {HTMLDivElement} */// @ts-ignore
+      const answer = question.querySelector(`.answer[data-aid="${pA}"]`)
+
+      if (answer) answer.click()
+    }
+  }
 }

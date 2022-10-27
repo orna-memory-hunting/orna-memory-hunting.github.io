@@ -156,11 +156,11 @@ function getSelectedAnswer() {
   }
 }
 
-
+/** @typedef {{qid:number,aid:number,q:string,sq:string,a:string,sa:string,qLabel:string,aLabel:string}} AnswerData */
 /**
  * @param {string} question
  * @param {string} answer
- * @returns {object}
+ * @returns {AnswerData}
  */
 function getAnswerByLabels(question, answer) {
   const qid = Number(question) - 1

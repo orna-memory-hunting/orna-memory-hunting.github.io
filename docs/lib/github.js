@@ -29,9 +29,10 @@ export function getTimeLabels(time) {
 }
 /* eslint-ignore-nextlint */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
+/** @typedef {{url:string,title:string,labels:Labels,body:string,answer:import('./questions.js').AnswerData,answerLabel:string}} Issue */
 /**
  * @param {{html_url:string,title:string,labels:Labels,body:string }} issue
- * @returns {{url:string,title:string,labels:Labels,body:string,answer:object,answerLabel:string}}
+ * @returns {Issue}
  */
 export function parseIssue({ html_url, title, labels, body }) { // eslint-disable-line camelcase
   const issue = {
@@ -49,6 +50,7 @@ export function parseIssue({ html_url, title, labels, body }) { // eslint-disabl
 
       issue.answer = getAnswerByLabels(q, a)
       issue.answerLabel = name
+      continue
     } else if (name.startsWith('time ')) {
       continue
     }
