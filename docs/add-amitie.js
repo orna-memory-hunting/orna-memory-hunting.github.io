@@ -723,6 +723,19 @@ additionalLabels.onclick = event => {
   }
 }
 
+
+/** @type {HTMLDivElement} */// @ts-ignore
+const doubleField = document.getElementById('double-field')
+
+doubleField.onclick = event => {
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const item = event.target
+
+  if (item.classList.contains('text-toggle-item')) {
+    updateGithubLink()
+  }
+}
+
 amitieName.onchange = updateGithubLink
 amitiePlus1.onchange = updateGithubLink
 amitiePlus2.onchange = updateGithubLink
