@@ -262,6 +262,8 @@ async function prepareAmitieImage(file) {
   document.querySelectorAll('#additional-labels .active').forEach(item => {
     item.classList.remove('active')
   })
+  // @ts-ignore
+  document.querySelector('#double-field div[data-double="0"]').click()
 
   updateGithubLink()
 
@@ -736,7 +738,7 @@ function updateGithubLink() {
   const answer = getSelectedAnswer()
   const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
   /** @type {HTMLDivElement} */// @ts-ignore
-  const qualityElm = document.querySelector('.quality-field .active')
+  const qualityElm = document.querySelector('#quality-field .active')
   const quality = Number(qualityElm.dataset.quality)
   const qualityLabel = { 2: ',x2 epic', 3: ',x3 ornate' }[quality] || ''
   const plusBlocks = [amitiePlus1.value, amitiePlus2.value, amitiePlus3.value]
@@ -751,8 +753,14 @@ function updateGithubLink() {
   const { timeUTC, timeMSK } = getTimeLabels(time)
   const addLabels = Array.from(document.querySelectorAll('#additional-labels .active'))
     .reduce((labels, /** @type {HTMLDivElement} */label) => `${labels},${label.dataset.label}`, '')
-  const labels = `${answerLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}`
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const doubleElm = document.querySelector('#double-field .active')
+  const double = doubleElm ? Number(doubleElm.dataset.double) : 0
+  const doubleLabel = double ? `,double #${double}` : ''
+  const labels = `${answerLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
   const milestone = getAmitieMilestone(time)
+  const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
+    `\n<!-- &milestone=${milestone} -->`
 
   sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
     `title=${encodeURIComponent(amitiePlus1.value)}` +
@@ -760,7 +768,8 @@ function updateGithubLink() {
     `&milestone=${milestone}` +
     `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
     encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
-    encodeURIComponent(`### Минусы\n${minusBlocks}`)
+    encodeURIComponent(`### Минусы\n${minusBlocks}`) +
+    encodeURIComponent(hiddenInfo)
 }
 
 const params = new URLSearchParams(window.location.hash.replace('#', ''))

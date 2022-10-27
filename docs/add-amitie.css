@@ -176,7 +176,8 @@
   font-weight: bold;
 }
 
-.additional-labels {
+.additional-labels,
+.double-field {
   display    : flex;
   column-gap : 12px;
   row-gap    : 6px;
