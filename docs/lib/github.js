@@ -15,6 +15,29 @@ export function getAmitieMilestone(date) {
   return `${sDate} - ${eDate}`
 }
 /**
+ * @param {Date} [date]
+ * @returns {Promise<string>}
+ */
+export async function loadMilestoneId(date) {
+  const curMilestoneName = getAmitieMilestone(date)
+  let milestoneId = window.sessionStorage.getItem(`milestone_${curMilestoneName}`)
+
+  if (!milestoneId) {
+    const apiURL = `${ghAPI}/milestones?state=open`
+    const milestones = await (await fetch(apiURL)).json()
+
+    for (const { number, title } of milestones) {
+      if (curMilestoneName === title) {
+        milestoneId = number
+        window.sessionStorage.setItem(`milestone_${curMilestoneName}`, milestoneId)
+        break
+      }
+    }
+  }
+
+  return milestoneId
+}
+/**
  *
  * @param {Date} [time]
  * @returns {{timeUTC:string,timeMSK:string}}

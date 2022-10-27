@@ -1,6 +1,6 @@
 import { doAsync, nextTick, nextAnimationFrame } from './lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from './lib/questions.js'
-import { getAmitieMilestone, getTimeLabels } from './lib/github.js'
+import { ghAPI, loadMilestoneId, parseIssue, getAmitieMilestone, getTimeLabels } from './lib/github.js'
 
 /** @type {{Tesseract:import('tesseract.js')}} */
 const { Tesseract } = window
@@ -770,6 +770,81 @@ function updateGithubLink() {
     encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
     encodeURIComponent(`### Минусы\n${minusBlocks}`) +
     encodeURIComponent(hiddenInfo)
+
+  doAsync(checkDoubleAmitieList)
+}
+
+/** @type {HTMLDivElement} */// @ts-ignore
+const doubleAmitieList = document.getElementById('double-amitie-list')
+/** @type {HTMLDivElement} */// @ts-ignore
+const doubleAmitieResult = document.getElementById('double-amitie-result')
+let apiURLlastDouble = ''
+
+async function checkDoubleAmitieList() {
+  doubleAmitieResult.innerHTML = 'Загрузка...'
+
+  const answer = getSelectedAnswer()
+  const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
+  const time = new Date(new Date().setHours(Number(timeSelect.value)))
+  const { timeUTC, timeMSK } = getTimeLabels(time)
+  const labels = `&labels=${answerLabel},${timeUTC},${timeMSK}`
+  const milestoneId = await loadMilestoneId(time)
+  const milestone = `&milestone=${milestoneId}`
+  const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
+
+  if (apiURLlastDouble === apiURL) {
+    return
+  }
+  apiURLlastDouble = apiURL
+
+  /** @type {Array} */
+  const issues = milestoneId ? await (await fetch(apiURL)).json() : []
+  let html = ''
+  let maxDouble = 0
+
+  if (issues.length > 0) {
+    for (const issueRaw of issues) {
+      const issue = parseIssue(issueRaw)
+
+      html += `<div class="double-amitie"><a class="amitie-button blue text-button" target="_blank" href="${issue.url}">${issue.title}</a>`
+      if (issue.labels.length) {
+        html += '<div class="amitie-labels">'
+        for (const label of issue.labels) {
+          html += '<div class="amitie-label"' +
+            ` style="color:#${label.color};border-color:#${label.color};#` +
+            ` title="${label.description}">${label.name}</div>`
+          if (label.name.startsWith('double #')) {
+            const double = parseInt(label.name.replace('double #', ''))
+
+            if (!isNaN(double)) maxDouble = Math.max(maxDouble, double)
+            if (maxDouble > 5) maxDouble = 5
+          }
+        }
+        html += '</div>'
+      }
+      html += '</div>'
+    }
+    doubleAmitieList.innerHTML = html
+    doubleAmitieResult.classList.add('hide')
+    doubleAmitieList.classList.remove('hide')
+  } else {
+    doubleAmitieList.classList.add('hide')
+    doubleAmitieResult.classList.remove('hide')
+    doubleAmitieResult.innerHTML = 'Нет'
+  }
+
+  if (!maxDouble) {
+    // @ts-ignore
+    document.querySelector('#double-field div[data-double="0"]').click()
+  } else if (maxDouble < 5) {
+    // @ts-ignore
+    document.querySelector(`#double-field div[data-double="${maxDouble + 1}"]`).click()
+  } else {
+    // @ts-ignore
+    document.querySelector('#double-field div[data-double="1"]').click()
+  }
+
+  doubleAmitieList.innerHTML = html
 }
 
 const params = new URLSearchParams(window.location.hash.replace('#', ''))

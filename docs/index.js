@@ -1,5 +1,5 @@
 import { doAsync } from './lib/utils.js'
-import { ghAPI, getAmitieMilestone, getTimeLabels, parseIssue } from './lib/github.js'
+import { ghAPI, loadMilestoneId, getTimeLabels, parseIssue } from './lib/github.js'
 import { questionList, questionLabels, answerLabels } from './lib/questions.js'
 
 /** @type {HTMLDivElement} */// @ts-ignore
@@ -15,7 +15,6 @@ const amitieListLoader = document.getElementById('amitie-list-loader')
 /** @type {HTMLDivElement} */// @ts-ignore
 const amitieList = document.getElementById('amitie-list')
 let utcHours = 0
-let milestone = null
 
 initTimeLap()
 updateCurrentTime()
@@ -57,30 +56,13 @@ function updateCurrentTime() {
 }
 
 
-async function loadMilestone() {
-  if (!milestone) {
-    const apiURL = `${ghAPI}/milestones?state=open`
-    const milestones = await (await fetch(apiURL)).json()
-    const curMilestone = getAmitieMilestone()
-
-    for (const { number, title } of milestones) {
-      if (curMilestone === title) {
-        milestone = number
-        break
-      }
-    }
-  }
-
-  return milestone
-}
-
 async function loadAmitieList() {
   amitieListLoader.classList.remove('hide')
   amitieList.classList.add('hide')
 
   const time = new Date(new Date().setUTCHours(utcHours || 0))
   const labels = `&labels=${getTimeLabels(time).timeUTC}`
-  const milestoneId = await loadMilestone()
+  const milestoneId = await loadMilestoneId()
   const milestone = `&milestone=${milestoneId}`
   const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
   /** @type {Array} */

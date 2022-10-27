@@ -171,3 +171,27 @@ a.text-button {
 h4 {
   margin: 12px 0px 6px;
 }
+
+.amitie-button {
+  flex-grow : 1;
+  text-align: left;
+}
+
+.amitie-button.blue {
+  color: #64b5f6;
+}
+
+.amitie-labels {
+  padding-top: 4px;
+  width      : 100%;
+  display    : flex;
+  column-gap : 4px;
+  row-gap    : 4px;
+}
+
+.amitie-label {
+  font-size    : 70%;
+  border       : 1px solid;
+  border-radius: 8px;
+  padding      : 1px 3px;
+}
