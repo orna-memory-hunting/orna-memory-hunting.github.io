@@ -794,8 +794,6 @@ const doubleAmitieResult = document.getElementById('double-amitie-result')
 let apiURLlastDouble = ''
 
 async function checkDoubleAmitieList() {
-  doubleAmitieResult.innerHTML = 'Загрузка...'
-
   const answer = getSelectedAnswer()
   const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
   const time = new Date(new Date().setHours(Number(timeSelect.value)))
@@ -809,6 +807,7 @@ async function checkDoubleAmitieList() {
     return
   }
   apiURLlastDouble = apiURL
+  doubleAmitieResult.innerHTML = 'Загрузка...'
 
   /** @type {Array} */
   const issues = milestoneId ? await (await fetch(apiURL)).json() : []
