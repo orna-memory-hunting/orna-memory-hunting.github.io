@@ -256,6 +256,9 @@ async function prepareAmitieImage(file) {
   amitieMinus1.value = ''
   amitieMinus2.value = ''
   amitieMinus3.value = ''
+  document.querySelectorAll('#additional-labels .active').forEach(item => {
+    item.classList.remove('active')
+  })
 
   updateGithubLink()
 
