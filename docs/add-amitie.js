@@ -635,6 +635,9 @@ async function startRecognizingText() {
     resultsTmp = resultsTmp.reduce((prev, cur) => {
       if (cur) {
         if (prev.length > 0) {
+          if ((/^[А-ЯA-Z]+$/).test(cur)) {
+            cur = cur.toLowerCase()
+          }
           if ((/^[А-ЯA-Z]/).test(cur)) {
             prev.push(cur)
           } else {
