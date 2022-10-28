@@ -380,7 +380,7 @@ async function prepareAmitieImage(file) {
     const requiredH = Math.min(
       Math.max(prevBlock.h, dataBlock.h),
       Math.max(dataBlock.h, nextBlock.h)
-    ) * 2
+    ) * 1.9
 
 
     if (requiredH < prevSpace) {
@@ -401,6 +401,7 @@ async function prepareAmitieImage(file) {
       amitieContext.fillRect(0, dataBlock.y, image.width, dataBlock.h)
       await nextTick(animationTime)
     } else {
+      hasRedBlock = false
       await nextAnimationFrame()
       amitieContext.lineWidth = 0.5
       amitieContext.strokeStyle = '#fffe'
@@ -421,6 +422,7 @@ async function prepareAmitieImage(file) {
           await nextTick()
         }
       } else {
+        hasRedBlock = false
         firstBaffIndex = lastBaffIndex = 0
         await nextAnimationFrame()
         amitieContext.drawImage(image, 0, 0)
@@ -434,25 +436,6 @@ async function prepareAmitieImage(file) {
   await nextTick()
 
   if (firstBaffIndex && lastBaffIndex) {
-    let isGreenButton = false
-    const lastBlock = dataBlocks[dataBlocks.length - 1]
-    const imgData = originAmitieContext.getImageData(leftShift, lastBlock.y + lastBlock.h / 2, rightShift, 1).data
-    let iDataIndex = 0
-
-    while (iDataIndex < imgData.length) {
-      // imgData -> RGBA * len
-      const r = imgData[iDataIndex]
-      const g = imgData[iDataIndex + 1]
-      const b = imgData[iDataIndex + 2]
-      const match = r > lightColorBorder || g > lightColorBorder || b > lightColorBorder
-
-      if (match) {
-        isGreenButton = g > (r + b) / 2 + colorIntensityLimit / 2
-        if (isGreenButton) break
-      }
-      iDataIndex += 4
-    }
-
     for (let index = firstBaffIndex - 1; index > 0; index--) {
       const dataBlock = dataBlocks[index]
       const imgData = originAmitieContext.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
@@ -494,14 +477,14 @@ async function prepareAmitieImage(file) {
       await nextTick(animationTime)
     }
 
-    if (isGreenButton) {
-      firstBaffIndex++
-    }
+    let firstLineBlueOrRed = null
+    let existBlueLine = false
 
     for (let index = firstBaffIndex; index < lastBaffIndex + 1; index++) {
       const dataBlock = dataBlocks[index]
       const imgData = originAmitieContext.getImageData(leftShift, dataBlock.y + dataBlock.h / 2, rightShift, 1).data
       let iDataIndex = 0
+      let isBlue = false
       let isRed = false
 
       while (iDataIndex < imgData.length) {
@@ -513,6 +496,13 @@ async function prepareAmitieImage(file) {
 
         if (match) {
           isRed = r > (b + g) / 2 + colorIntensityLimit
+          isBlue = b > (r + g) / 2 + colorIntensityLimit
+          if (firstLineBlueOrRed === null) {
+            firstLineBlueOrRed = isRed || isBlue
+          }
+          if (!existBlueLine && isBlue) {
+            existBlueLine = true
+          }
           break
         }
 
@@ -534,6 +524,9 @@ async function prepareAmitieImage(file) {
       amitieContext.fillRect(0, dataBlock.y, image.width, dataBlock.h)
       await nextTick(animationTime)
     }
+    if (existBlueLine && firstLineBlueOrRed === false) {
+      plusBlocks.shift()
+    }
 
     dataBlocks = [
       ...(nameBlock ? [nameBlock] : []),
@@ -543,12 +536,12 @@ async function prepareAmitieImage(file) {
   }
 
   if (dataBlocks.length) {
-    dataBlocks[0].totalH = dataBlocks[0].h
     for (let index = 0; index < dataBlocks.length; index++) {
       const dataBlock = dataBlocks[index]
+      const space = Math.max(6, dataBlock.h / 2 ^ 0)
 
-      dataBlock.y -= 6
-      dataBlock.h += 12
+      dataBlock.y -= space
+      dataBlock.h += space * 2
 
       dataBlock.newY = index > 0 ? dataBlocks[index - 1].totalH : 0
       dataBlock.totalH = dataBlock.newY + dataBlock.h
