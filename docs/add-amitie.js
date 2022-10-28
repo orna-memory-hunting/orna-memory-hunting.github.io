@@ -20,7 +20,7 @@ const amitieCanvas = document.getElementById('amitie-canvas')
 const amitieContext = amitieCanvas.getContext('2d')
 /** @type {HTMLDivElement} */// @ts-ignore
 const amitieResults = document.getElementById('amitie-results')
-
+let recognizingInProgress = false
 
 questions.innerHTML = renderQuestionList()
 
@@ -110,6 +110,7 @@ const recognizingText = document.getElementById('recognizing-text')
 const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
 
 amitiUploadField.onclick = () => {
+  if (recognizingInProgress) return
   amitieFile.click()
 }
 
@@ -134,6 +135,7 @@ amitiUploadField.ondrop = (/** @type {DragEvent} */ event) => {
 
   const { files } = event.dataTransfer
 
+  if (recognizingInProgress) return
   if (files.length) {
     doAsync(() => prepareAmitieImage(files[0]))
   } else {
@@ -151,6 +153,7 @@ document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
 
     const { files } = event.clipboardData
 
+    if (recognizingInProgress) return
     if (files.length) {
       doAsync(() => prepareAmitieImage(files[0]))
     } else {
@@ -163,6 +166,7 @@ amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
   event.preventDefault()
   event.stopPropagation()
 
+  if (recognizingInProgress) return
   navigator.clipboard.read().then(clipboardItems => {
     if (clipboardItems.length) {
       const [clipboardItem] = clipboardItems
@@ -572,16 +576,21 @@ async function prepareAmitieImage(file) {
 }
 
 /** @type {HTMLDivElement} */// @ts-ignore
+const recognizingLang = document.getElementById('recognizing-lang')
+/** @type {HTMLDivElement} */// @ts-ignore
 const recognizingTextButton = document.getElementById('recognizing-text-button')
 
 recognizingTextButton.onclick = () => doAsync(startRecognizingText)
 
 async function startRecognizingText() {
+  recognizingInProgress = true
   recognizingTextLog.textContent = 'Загрузка Tesseract.js...'
+  recognizingLang.classList.add('hide')
   recognizingTextButton.classList.add('hide')
   amitieResults.classList.add('hide')
   recognizingTextError.classList.add('hide')
   recognizingTextLog.classList.remove('hide')
+  amitiUploadField.classList.add('disable')
 
   if (dataBlocks.length) {
     let currentStep = 0
@@ -680,9 +689,12 @@ async function startRecognizingText() {
     updateGithubLink()
 
     await scheduler.terminate()
+    recognizingInProgress = false
+    amitiUploadField.classList.remove('disable')
   }
 
   recognizingTextButton.classList.remove('hide')
+  recognizingLang.classList.remove('hide')
   amitieResults.classList.remove('hide')
 }
 
@@ -751,6 +763,9 @@ const sendToGithubLink = document.getElementById('send-to-github-link')
 
 function updateGithubLink() {
   const answer = getSelectedAnswer()
+
+  if (!answer) return
+
   const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
   /** @type {HTMLDivElement} */// @ts-ignore
   const qualityElm = document.querySelector('#quality-field .active')

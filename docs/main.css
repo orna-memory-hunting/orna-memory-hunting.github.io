@@ -61,6 +61,11 @@ input[type=text] {
   display: none !important;
 }
 
+.disable {
+  opacity: 0.1 !important;
+  cursor : inherit !important;
+}
+
 .astext {
   color          : #f5f1e8;
   text-decoration: none;
@@ -92,11 +97,10 @@ a.text-button {
 }
 
 .text-button:hover {
-  cursor          : pointer;
-  color           : #fffdf8;
-  border-style    : solid;
-  border-color    : #f5f1e8;
-  background-color: #504949;
+  cursor      : pointer;
+  color       : #fffdf8;
+  border-style: solid;
+  border-color: #f5f1e8;
 }
 
 .text-icon-button {
@@ -111,11 +115,10 @@ a.text-button {
 }
 
 .text-icon-button:hover {
-  cursor          : pointer;
-  color           : #fffdf8;
-  border-style    : solid;
-  border-color    : #f5f1e8;
-  background-color: #504949;
+  cursor      : pointer;
+  color       : #fffdf8;
+  border-style: solid;
+  border-color: #f5f1e8;
 }
 
 .text-toggle-item,
@@ -134,11 +137,10 @@ a.text-button {
 
 .text-toggle-item:hover,
 .text-multi-toggle-item:hover {
-  cursor          : pointer;
-  color           : #fffdf8;
-  border-style    : solid;
-  border-color    : #f5f1e8;
-  background-color: #504949;
+  cursor      : pointer;
+  color       : #fffdf8;
+  border-style: solid;
+  border-color: #f5f1e8;
 }
 
 .text-toggle-item.active {
