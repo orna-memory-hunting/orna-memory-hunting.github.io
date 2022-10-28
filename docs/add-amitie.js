@@ -5,6 +5,7 @@ import { ghAPI, loadMilestoneId, parseIssue, getAmitieMilestone, getTimeLabels }
 /** @type {{Tesseract:import('tesseract.js')}} */
 const { Tesseract } = window
 const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@3.0.2/tesseract-core.wasm.js'
+const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@3.0.3/dist/worker.min.js'
 /** @type {HTMLDivElement} */// @ts-ignore
 const questions = document.getElementById('questions')
 /** @type {HTMLInputElement} */// @ts-ignore
@@ -576,7 +577,7 @@ const recognizingTextButton = document.getElementById('recognizing-text-button')
 recognizingTextButton.onclick = () => doAsync(startRecognizingText)
 
 async function startRecognizingText() {
-  recognizingTextLog.textContent = ''
+  recognizingTextLog.textContent = 'Загрузка Tesseract.js...'
   recognizingTextButton.classList.add('hide')
   amitieResults.classList.add('hide')
   recognizingTextError.classList.add('hide')
@@ -597,8 +598,9 @@ async function startRecognizingText() {
       }
     }
     const scheduler = Tesseract.createScheduler()
-    const worker1 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
-    const worker2 = Tesseract.createWorker({ corePath: tesseractCore, logger: logRecognizingText })
+    const workerOption = { corePath: tesseractCore, workerPath: tesseractWorker, logger: logRecognizingText }
+    const worker1 = Tesseract.createWorker(workerOption)
+    const worker2 = Tesseract.createWorker(workerOption)
     const langs = Array.from(document.querySelectorAll('.recognizing-lang .active'))
       .reduce((langs, /** @type {HTMLDivElement} */lang) => {
         langs.push(lang.dataset.lang)
