@@ -50,22 +50,31 @@ export function getTimeLabels(time) {
     timeMSK: `time ${('0' + (tm.getUTCHours() + 3) % 24).slice(-2)}h MSK`
   }
 }
-/* eslint-ignore-nextlint */
+/** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
-/** @typedef {{url:string,title:string,labels:Labels,body:string,answer:import('./questions.js').AnswerData,answerLabel:string}} Issue */
+/** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie}} Issue */
 /**
- * @param {{html_url:string,title:string,labels:Labels,body:string }} issue
+ * @param {{number:number,html_url:string,title:string,labels:Labels,milestone:{title:string},body:string }} issue
  * @returns {Issue}
  */
-export function parseIssue({ html_url, title, labels, body }) { // eslint-disable-line camelcase
+export function parseIssue({ number, html_url, title, labels, milestone, body }) { // eslint-disable-line camelcase
   const issue = {
-    url: html_url, // eslint-disable-line camelcase
+    url: `/amitie/#issue=${number}`,
+    urlGH: html_url, // eslint-disable-line camelcase
     title,
     labels: [],
+    milestone: (milestone || { title: '' }).title,
+    time: null,
     body,
     answer: null,
-    answerLabel: ''
+    answerLabel: '',
+    amitie: {
+      name: title,
+      plusBlocks: [title],
+      minusBlocks: ['?']
+    }
   }
+  const bodyList = body.split('### ')
 
   for (const { name, description, color } of labels) {
     if (name.startsWith('q.')) {
@@ -75,9 +84,39 @@ export function parseIssue({ html_url, title, labels, body }) { // eslint-disabl
       issue.answerLabel = name
       continue
     } else if (name.startsWith('time ')) {
+      if (name.endsWith('UTC')) {
+        const utcHours = parseInt(name.replace('time ', '').replace('h UTC', ''))
+        const time = new Date()
+
+        if (!isNaN(utcHours)) {
+          time.setUTCHours(utcHours)
+          issue.time = time
+        }
+      }
       continue
     }
     issue.labels.push({ name, description, color })
+  }
+
+  if (bodyList.length > 2) {
+    if ((/# [А-ЯA-Z]/).test(bodyList[0])) {
+      issue.amitie.name = bodyList.shift()
+      issue.amitie.name = issue.amitie.name
+        .replace('# ', '').trim()
+    }
+  }
+  if (bodyList.length > 1) {
+    const plusBlocks = bodyList[0].split('\n').map(i => i.trim())
+      .filter(i => i.startsWith('- **'))
+      .map(i => i.replace(/^- \*\*/, '').replace(/\*\*$/, ''))
+    const minusBlocks = bodyList[1].split('\n').map(i => i.trim())
+      .filter(i => i.startsWith('- _'))
+      .map(i => i.replace(/^- _/, '').replace(/_$/, ''))
+
+    if (plusBlocks.length && plusBlocks.length === minusBlocks.length) {
+      issue.amitie.plusBlocks = plusBlocks
+      issue.amitie.minusBlocks = minusBlocks
+    }
   }
 
   return issue

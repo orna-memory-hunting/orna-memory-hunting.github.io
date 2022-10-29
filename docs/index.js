@@ -102,7 +102,7 @@ async function loadAmitieList() {
           if (amities) {
             qExistsHTML += `<div class="answer">${answerLabels[aid]}. ${answer}</div>`
             for (const amitie of amities) {
-              qExistsHTML += `<div class="amitie"><a class="amitie-button blue text-button" target="_blank" href="${amitie.url}">${amitie.title}</a>`
+              qExistsHTML += `<div class="amitie"><a class="amitie-button amitie-blue text-button" target="_self" href="${amitie.url}">${amitie.title}</a>`
               if (amitie.labels.length) {
                 qExistsHTML += '<div class="amitie-labels">'
                 for (const label of amitie.labels) {

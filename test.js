@@ -4,6 +4,18 @@ import fastifyCaching from '@fastify/caching'
 import { resolve } from 'path'
 import { readFile } from 'fs/promises'
 
+async function replaceResponse(req, reply) {
+  const { dir, page } = req.params
+  const filePath = `./docs${dir ? `/${dir}` : ''}/${page || 'index'}.html`
+  const file = (await readFile(filePath, 'utf-8'))
+    .replace(/---\n---\n/, '')
+    .replace(/Memory Hunting - Orna/, 'Memory Hunting - Orna (DEV)')
+
+  reply.type('text/html')
+
+  return file
+}
+
 const buildNumber = new Date().toISOString()
 const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debug' : 'error' } })
   .register(fastifyCaching)
@@ -11,24 +23,10 @@ const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debu
     root: resolve('docs'),
     prefix: '/'
   })
-  .get('/', async (req, reply) => {
-    const index = (await readFile('./docs/index.html', 'utf-8'))
-      .replace(/---\n---\n/, '')
-      .replace(/Memory Hunting - Orna/, 'Memory Hunting - Orna (DEV)')
-
-    reply.type('text/html')
-
-    return index
-  })
-  .get('/add-amitie.html', async (req, reply) => {
-    const index = (await readFile('./docs/add-amitie.html', 'utf-8'))
-      .replace(/---\n---\n/, '')
-      .replace(/Memory Hunting - Orna/, 'Memory Hunting - Orna (DEV)')
-
-    reply.type('text/html')
-
-    return index
-  })
+  .get('/', replaceResponse)
+  .get('/:page.html', replaceResponse)
+  .get('/:dir/', replaceResponse)
+  .get('/:dir/:page.html', replaceResponse)
   .get('/version.js', async (req, reply) => {
     const version = (await readFile('./docs/version.js', 'utf-8'))
       .replace(/---\n---\n/, '')

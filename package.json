@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@nodutilus/project-config": "latest",
+    "octokit": "2.0.10",
     "tesseract.js": "3.0.2"
   },
   "engines": {

@@ -82,6 +82,10 @@ input[type=text] {
 
 }
 
+.flex-grow {
+  flex-grow: 1;
+}
+
 .text-button {
   background-color: #403939;
   user-select     : none;
@@ -182,8 +186,12 @@ h4 {
   text-align: left;
 }
 
-.amitie-button.blue {
+.amitie-blue {
   color: #64b5f6;
+}
+
+.amitie-red {
+  color: #ff8a65;
 }
 
 .amitie-labels {

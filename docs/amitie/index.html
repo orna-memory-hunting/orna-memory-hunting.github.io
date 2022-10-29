@@ -1,0 +1,50 @@
+---
+---
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Loading... / Memory Hunting - Orna</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Шрифты / иконки Material -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+  <link href="/main.css" rel="stylesheet">
+  <link href="./amitie.css" rel="stylesheet">
+  <!-- Иконка сайта -->
+  <link type="image/png" rel="icon" href="/img/x128-memory-end-app.png">
+  <!-- Настройки приложения -->
+  <link rel="manifest" href="/orna-memory-hunting.webmanifest">
+  <meta name="theme-color" content="#362e2b">
+</head>
+
+<body class="body-font">
+  <div class="nav-head">
+    <div id="amitie-name" class="nav-title flex-grow">Loading...</div>
+    <div class="text-icon-button"><a class="astext" href="/">✕</a></div>
+  </div>
+  <div class="main-content">
+    <h4 class="amitie-head">Плюсы</h4>
+    <div id="plus-blocks" class="amitie-blocks amitie-blue">...</div>
+    <h4 class="amitie-head">Минусы</h4>
+    <div id="minus-blocks" class="amitie-blocks amitie-red">...</div>
+    <h4 class="amitie-head">Метки</h4>
+    <div id="labels-blocks" class="labels-blocks">-</div>
+    <h4 class="amitie-head">Вопрос и ответ</h4>
+    <div id="question-block">...</div>
+    <h4 class="amitie-head">Время ответа</h4>
+    <div id="time-block">...</div>
+    <h4 class="amitie-head">Период поимки</h4>
+    <div id="period-block">...</div>
+  </div>
+</body>
+
+<script type="module" src="https://cdn.skypack.dev/octokit"></script>
+<script type="module" src="/main.js"></script>
+<script type="module" src="./amitie.js"></script>
+
+</html>

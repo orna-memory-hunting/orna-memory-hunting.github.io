@@ -1,0 +1,12 @@
+.amitie-head {
+  opacity: .8;
+}
+
+.amitie-blocks div:before {
+  content: '-';
+  margin : 0 6px;
+}
+
+.answer {
+  margin-left: 16px;
+}

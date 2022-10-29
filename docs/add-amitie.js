@@ -831,7 +831,7 @@ async function checkDoubleAmitieList() {
     for (const issueRaw of issues) {
       const issue = parseIssue(issueRaw)
 
-      html += `<div class="double-amitie"><a class="amitie-button blue text-button" target="_blank" href="${issue.url}">${issue.title}</a>`
+      html += `<div class="double-amitie"><a class="amitie-button amitie-blue text-button" target="_blank" href="${issue.url}">${issue.title}</a>`
       if (issue.labels.length) {
         html += '<div class="amitie-labels">'
         for (const label of issue.labels) {
