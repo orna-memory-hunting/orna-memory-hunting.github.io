@@ -137,7 +137,7 @@ amitiUploadField.ondrop = (/** @type {DragEvent} */ event) => {
 
   if (recognizingInProgress) return
   if (files.length) {
-    doAsync(() => prepareAmitieImage(files[0]))
+    doAsync(() => prepareAmitieImage(files[0], true))
   } else {
     window.alert('Не удалось найти файл изображения!')
   }
@@ -216,7 +216,7 @@ amitieFile.addEventListener('change', handleAmitieFile)
 
 function handleAmitieFile() {
   if (amitieFile.files?.length) {
-    doAsync(() => prepareAmitieImage(amitieFile.files[0]))
+    doAsync(() => prepareAmitieImage(amitieFile.files[0], true))
   } else {
     amitieFileName.textContent = ''
     amitieUploadResults.classList.add('hide')
@@ -248,8 +248,11 @@ const amitieMinus3 = document.getElementById('amitie-minus3')
 let dataBlocks = []
 let originAmitieCanvas = document.createElement('canvas')
 
-/** @param {File} file */
-async function prepareAmitieImage(file) {
+/**
+ * @param {File} file
+ * @param {boolean} timeByFile
+ */
+async function prepareAmitieImage(file, timeByFile = false) {
   const lightColorBorder = 116
   const colorIntensityLimit = 24
   const animationTime = 100
@@ -284,11 +287,16 @@ async function prepareAmitieImage(file) {
 
   await new Promise((resolve) => { image.onload = resolve })
 
-  const lDate = new Date(file.lastModified)
+  if (timeByFile) {
+    const lDate = new Date(file.lastModified)
 
-  timeSelect.value = ('0' + lDate.getHours()).slice(-2)
-  timeFile.textContent = lDate.toLocaleString()
-  timeFileField.classList.remove('hide')
+    timeSelect.value = ('0' + lDate.getHours()).slice(-2)
+    timeFile.textContent = lDate.toLocaleString()
+    timeFileField.classList.remove('hide')
+  } else {
+    timeFile.textContent = ''
+    timeFileField.classList.add('hide')
+  }
 
   await nextAnimationFrame()
   amitieCanvas.width = image.width
