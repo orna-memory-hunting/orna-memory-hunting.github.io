@@ -1,6 +1,6 @@
-import { doAsync } from './lib/utils.js'
-import { ghAPI, loadMilestoneId, getTimeLabels, parseIssue } from './lib/github.js'
-import { questionList, questionLabels, answerLabels } from './lib/questions.js'
+import { doAsync } from '../lib/utils.js'
+import { ghAPI, loadMilestoneId, getTimeLabels, parseIssue } from '../lib/github.js'
+import { questionList, questionLabels, answerLabels } from '../lib/questions.js'
 
 /** @type {HTMLDivElement} */// @ts-ignore
 const currentTime = document.getElementById('current-time')
@@ -112,7 +112,7 @@ async function loadAmitieList() {
         qExistsHTML += `<div class="question">${questionLabels[qid]}. ${question.q}</div>`
         for (let aid = 0; aid < question.a.length; aid++) {
           const answer = question.a[aid]
-          /** @type {Array<import('./lib/github').Issue>} */
+          /** @type {Array<import('../lib/github').Issue>} */
           const amities = answerMap[aid]
 
           if (amities) {
@@ -133,14 +133,14 @@ async function loadAmitieList() {
             if (amities.length < answerMap.len) {
               qExistsHTML += '<div class="amitie">' +
                 '<div class="lost-amitie">Не разведано!</div>' +
-                `<a class="text-button" target="_self" href="./add-amitie.html#q=${qid}&a=${aid}">+</a>` +
+                `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}">+</a>` +
                 '</div>'
             }
           } else {
             qExistsHTML += `<div class="answer">${answerLabels[aid]}. ${answer}</div>` +
               '<div class="amitie">' +
               '<div class="lost-amitie">Не разведано!</div>' +
-              `<a class="text-button" target="_self" href="./add-amitie.html#q=${qid}&a=${aid}">+</a>` +
+              `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}">+</a>` +
               '</div>'
           }
         }
@@ -148,7 +148,7 @@ async function loadAmitieList() {
         qNotExistsHTML += `<div class="question">${questionLabels[qid]}. ${question.q}</div>` +
           '<div class="answer">' +
           '<div>Не разведано</div>' +
-          `<a class="text-button" target="_self" href="./add-amitie.html#q=${qid}">+</a>` +
+          `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}">+</a>` +
           '</div>'
       }
     }
@@ -160,7 +160,7 @@ async function loadAmitieList() {
       qNotExistsHTML += `<div class="question">${questionLabels[qid]}. ${question.q}</div>` +
         '<div class="answer">' +
         '<div>Не разведано</div>' +
-        `<a class="text-button" target="_self" href="./add-amitie.html#q=${qid}">+</a>` +
+        `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}">+</a>` +
         '</div>'
     }
     html = qNotExistsHTML

@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises'
 
 async function replaceResponse(req, reply) {
   const { dir, page } = req.params
-  const filePath = `./docs${dir ? `/${dir}` : ''}/${page || 'index'}.html`
+  const filePath = `./docs${dir ? `/${dir}` : ''}${page ? `/${page}` : ''}/index.html`
   const file = (await readFile(filePath, 'utf-8'))
     .replace(/---\n---\n/, '')
     .replace(/Memory Hunting - Orna/, 'Memory Hunting - Orna (DEV)')
@@ -24,9 +24,8 @@ const app = fastify({ logger: { level: process.env.DEBUG_MODE === 'true' ? 'debu
     prefix: '/'
   })
   .get('/', replaceResponse)
-  .get('/:page.html', replaceResponse)
-  .get('/:dir/', replaceResponse)
-  .get('/:dir/:page.html', replaceResponse)
+  .get('/:page/', replaceResponse)
+  .get('/:dir/:page/', replaceResponse)
   .get('/version.js', async (req, reply) => {
     const version = (await readFile('./docs/version.js', 'utf-8'))
       .replace(/---\n---\n/, '')

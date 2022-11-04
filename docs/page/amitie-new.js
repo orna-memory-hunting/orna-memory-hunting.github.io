@@ -1,6 +1,6 @@
-import { doAsync, nextTick, nextAnimationFrame } from './lib/utils.js'
-import { renderQuestionList, getSelectedAnswer } from './lib/questions.js'
-import { ghAPI, loadMilestoneId, parseIssue, getAmitieMilestone, getTimeLabels } from './lib/github.js'
+import { doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
+import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
+import { ghAPI, loadMilestoneId, parseIssue, getAmitieMilestone, getTimeLabels } from '../lib/github.js'
 
 /** @type {{Tesseract:import('tesseract.js')}} */
 const { Tesseract } = window

@@ -89,6 +89,10 @@
   display: none;
 }
 
+.amitie-file-from-clipboard {
+  white-space: nowrap;
+}
+
 .amitie-upload-results {
   display       : flex;
   flex-direction: column;

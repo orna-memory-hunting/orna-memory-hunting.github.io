@@ -2,17 +2,20 @@
 import { buildNumber } from './version.js'
 
 const appResources = [
-  './add-amitie.css',
-  './add-amitie.html',
-  './add-amitie.js',
-  './index.css',
-  './index.js',
-  './main.css',
-  './main.js',
-  './lib/components.js',
-  './lib/github.js',
-  './lib/utils.js',
-  './lib/questions.js'
+  '/amitie/',
+  '/amitie/new/',
+  '/page/_common_.css',
+  '/page/_common_.js',
+  '/page/amitie-new.css',
+  '/page/amitie-new.js',
+  '/page/amitie.css',
+  '/page/amitie.js',
+  '/page/index.css',
+  '/page/index.js',
+  '/lib/components.js',
+  '/lib/github.js',
+  '/lib/questions.js',
+  '/lib/utils.js'
 ]
 /** @type {ServiceWorkerGlobalScope} */// @ts-ignore
 const workerScope = self
