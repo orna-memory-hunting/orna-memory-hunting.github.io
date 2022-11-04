@@ -41,6 +41,12 @@ input[type=text] {
   padding    : 4px;
 }
 
+.nav-title-action {
+  display    : flex;
+  column-gap : 16px;
+  align-items: center;
+}
+
 .main-content {
   margin        : 0 12px;
   flex-grow     : 1;
@@ -81,6 +87,8 @@ input[type=text] {
   text-align      : center;
   font-size       : 120%;
   z-index         : 1;
+  padding         : 12px;
+  box-sizing      : border-box;
 }
 
 .astext {
@@ -133,6 +141,10 @@ a.text-button {
   border       : 1px solid transparent;
   text-align   : center;
   white-space  : nowrap;
+}
+
+.icon-18 {
+  font-size: 18px;
 }
 
 .text-icon-button:hover {

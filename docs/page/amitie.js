@@ -10,6 +10,7 @@ const issueNumber = parseInt(params.get('issue'))
 if (isNaN(issueNumber)) {
   window.location.pathname = '/'
 }
+document.getElementById('copy-link').setAttribute('title', window.location.href)
 
 /** @type {HTMLDivElement} */// @ts-ignore
 const plusBlocks = document.getElementById('plus-blocks')
@@ -36,6 +37,7 @@ doAsync(async () => {
 
   document.title = `${issue.amitie.name} / Memory Hunting - Orna`
   document.getElementById('amitie-name').textContent = issue.amitie.name
+  document.getElementById('copy-card').setAttribute('title', issue.miniСard)
   for (const plus of issue.amitie.plusBlocks) {
     html += `<div>${escapeHTML(plus)}</div>`
   }
