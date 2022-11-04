@@ -60,6 +60,7 @@ function questionClick(event) {
     })
     toggleAmitieInfo(false)
   }
+  updateParams()
 }
 
 /**
@@ -85,13 +86,13 @@ function answerClick(event) {
       element.classList.remove('hide')
     }
   })
-
   if (!isClose) {
     answer.classList.add('active')
     toggleAmitieInfo(true)
   } else {
     toggleAmitieInfo(false)
   }
+  updateParams()
 }
 
 /** @type {HTMLInputElement} */// @ts-ignore
@@ -194,7 +195,7 @@ navigator.permissions.query({ name: 'clipboard-read' }).then(permission => {
   }
 })
 
-timeSelect.onchange = () => updateGithubLink()
+timeSelect.onchange = () => { updateParams(); updateGithubLink() }
 
 /** @param {boolean} status  */
 function toggleAmitieInfo(status) {
@@ -202,8 +203,9 @@ function toggleAmitieInfo(status) {
   const amitieInfo = document.getElementById('amitie-info')
 
   if (status) {
-    if (!amitieFile.files?.length) {
+    if (!timeSelect.getAttribute('first-load-ready')) {
       timeSelect.value = ('0' + new Date().getHours()).slice(-2)
+      timeSelect.setAttribute('first-load-ready', 'true')
     }
     updateGithubLink()
     amitieInfo.classList.remove('hide')
@@ -829,6 +831,7 @@ async function checkDoubleAmitieList() {
   }
   apiURLlastDouble = apiURL
   doubleAmitieResult.innerHTML = 'Загрузка...'
+  doubleAmitieList.classList.add('hide')
 
   /** @type {Array} */
   const issues = milestoneId ? await (await fetch(apiURL)).json() : []
@@ -883,6 +886,8 @@ async function checkDoubleAmitieList() {
 const params = new URLSearchParams(window.location.hash.replace('#', ''))
 const pQ = parseInt(params.get('q'))
 const pA = parseInt(params.get('a'))
+const pT = parseInt(params.get('t'))
+let canUpdateParams = false
 
 if (!isNaN(pQ)) {
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -899,5 +904,39 @@ if (!isNaN(pQ)) {
 
       if (answer) answer.click()
     }
+  }
+}
+if (!isNaN(pT)) {
+  timeSelect.value = ('0' + new Date(new Date().setUTCHours(pT)).getHours()).slice(-2)
+}
+canUpdateParams = true
+
+function updateParams() {
+  if (canUpdateParams) {
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const question = document.querySelector('.question-content.active')
+    const q = question ? parseInt(question.dataset.qid) : NaN
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const answer = document.querySelector('.question-content.active .answer.active')
+    const a = answer ? parseInt(answer.dataset.aid) : NaN
+    const t = parseInt(timeSelect.value)
+
+    if (isNaN(q)) {
+      params.delete('q')
+    } else {
+      params.set('q', q + '')
+    }
+    if (isNaN(a)) {
+      params.delete('a')
+    } else {
+      params.set('a', a + '')
+    }
+    if (isNaN(t)) {
+      params.delete('t')
+    } else {
+      params.set('t', new Date(new Date().setHours(t)).getUTCHours() + '')
+    }
+
+    window.history.replaceState(null, '', `${window.location.pathname}#${params.toString()}`)
   }
 }

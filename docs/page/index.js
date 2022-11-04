@@ -77,6 +77,7 @@ async function loadAmitieList() {
   amitieList.classList.add('hide')
 
   const time = new Date(new Date().setUTCHours(utcHours || 0))
+  const pT = time.getUTCHours()
   const labels = `&labels=${getTimeLabels(time).timeUTC}`
   const milestoneId = await loadMilestoneId()
   const milestone = `&milestone=${milestoneId}`
@@ -133,14 +134,14 @@ async function loadAmitieList() {
             if (amities.length < answerMap.len) {
               qExistsHTML += '<div class="amitie">' +
                 '<div class="lost-amitie">Не разведано!</div>' +
-                `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}">+</a>` +
+                `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}&t=${pT}">+</a>` +
                 '</div>'
             }
           } else {
             qExistsHTML += `<div class="answer">${answerLabels[aid]}. ${answer}</div>` +
               '<div class="amitie">' +
               '<div class="lost-amitie">Не разведано!</div>' +
-              `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}">+</a>` +
+              `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}&t=${pT}">+</a>` +
               '</div>'
           }
         }
@@ -148,7 +149,7 @@ async function loadAmitieList() {
         qNotExistsHTML += `<div class="question">${questionLabels[qid]}. ${question.q}</div>` +
           '<div class="answer">' +
           '<div>Не разведано</div>' +
-          `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}">+</a>` +
+          `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&t=${pT}">+</a>` +
           '</div>'
       }
     }
@@ -160,7 +161,7 @@ async function loadAmitieList() {
       qNotExistsHTML += `<div class="question">${questionLabels[qid]}. ${question.q}</div>` +
         '<div class="answer">' +
         '<div>Не разведано</div>' +
-        `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}">+</a>` +
+        `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&t=${pT}">+</a>` +
         '</div>'
     }
     html = qNotExistsHTML
