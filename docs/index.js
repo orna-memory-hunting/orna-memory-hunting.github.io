@@ -23,7 +23,7 @@ doAsync(loadAmitieList)
 
 navTimeBack.onclick = () => changeUTCHours(false)
 navTimeForward.onclick = () => changeUTCHours(true)
-currentTime.onclick = () => { initTimeLap(); doAsync(loadAmitieList) }
+currentTime.onclick = () => { setCurrentUTCHours(); doAsync(loadAmitieList) }
 
 
 function initTimeLap() {
@@ -32,6 +32,17 @@ function initTimeLap() {
   const dt = isNaN(utcHoursParam) ? new Date() : new Date(new Date().setUTCHours(utcHoursParam))
   const hr = ('0' + dt.getHours()).slice(-2)
 
+  utcHours = dt.getUTCHours()
+  timeLapText.textContent = `${hr}:00 - ${hr}:59`
+}
+
+function setCurrentUTCHours() {
+  const dt = new Date()
+  const hr = ('0' + dt.getHours()).slice(-2)
+  const params = new URLSearchParams(window.location.hash.replace('#', ''))
+
+  params.delete('utcHours')
+  window.history.replaceState(null, '', `/#${params.toString()}`)
   utcHours = dt.getUTCHours()
   timeLapText.textContent = `${hr}:00 - ${hr}:59`
 }
