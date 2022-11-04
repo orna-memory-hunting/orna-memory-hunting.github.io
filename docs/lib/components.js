@@ -11,6 +11,7 @@ function textToggleClick(event) {
   }
 }
 
+
 /** @param {Event} event */
 function textMultiToggleClick(event) {
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -34,11 +35,24 @@ function textMultiToggleClick(event) {
   }
 }
 
+
+function closeOrBack() {
+  if (document.referrer && new URL(document.referrer).host === window.location.host) {
+    window.history.back()
+  } else {
+    // @ts-ignore
+    window.location = '/'
+  }
+}
+
+
 export function initComponents() {
   /** @type {Array<HTMLDivElement>} */// @ts-ignore
   const textToggles = document.querySelectorAll('.text-toggle')
   /** @type {Array<HTMLDivElement>} */// @ts-ignore
   const textMultiToggles = document.querySelectorAll('.text-multi-toggle')
+  /** @type {Array<HTMLDivElement>} */// @ts-ignore
+  const closeButtons = document.querySelectorAll('.close-button')
 
   if (textToggles) {
     textToggles.forEach(elm => elm.addEventListener('click', textToggleClick))
@@ -58,5 +72,8 @@ export function initComponents() {
           })
       }
     })
+  }
+  if (closeButtons) {
+    closeButtons.forEach(elm => elm.addEventListener('click', closeOrBack))
   }
 }
