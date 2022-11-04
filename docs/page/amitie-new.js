@@ -1,6 +1,7 @@
 import { doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
 import { ghAPI, loadMilestoneId, parseIssue, getAmitieMilestone, getTimeLabels } from '../lib/github.js'
+import { renderAmitieRow } from '../lib/amitie.js'
 
 /** @type {{Tesseract:import('tesseract.js')}} */
 const { Tesseract } = window
@@ -842,13 +843,10 @@ async function checkDoubleAmitieList() {
     for (const issueRaw of issues) {
       const issue = parseIssue(issueRaw)
 
-      html += `<div class="double-amitie"><a class="amitie-button amitie-blue text-button" target="_blank" href="${issue.url}">${issue.title}</a>`
+      html += renderAmitieRow(issue)
+
       if (issue.labels.length) {
-        html += '<div class="amitie-labels">'
         for (const label of issue.labels) {
-          html += '<div class="amitie-label"' +
-            ` style="color:#${label.color};border-color:#${label.color};#` +
-            ` title="${label.description}">${label.name}</div>`
           if (label.name.startsWith('double #')) {
             const double = parseInt(label.name.replace('double #', ''))
 
@@ -856,9 +854,7 @@ async function checkDoubleAmitieList() {
             if (maxDouble > 5) maxDouble = 5
           }
         }
-        html += '</div>'
       }
-      html += '</div>'
     }
     doubleAmitieList.innerHTML = html
     doubleAmitieResult.classList.add('hide')
@@ -908,6 +904,7 @@ if (!isNaN(pQ)) {
 }
 if (!isNaN(pT)) {
   timeSelect.value = ('0' + new Date(new Date().setUTCHours(pT)).getHours()).slice(-2)
+  timeSelect.setAttribute('first-load-ready', 'true')
 }
 canUpdateParams = true
 

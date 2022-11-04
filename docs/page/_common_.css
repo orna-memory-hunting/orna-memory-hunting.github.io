@@ -66,6 +66,23 @@ input[type=text] {
   cursor : inherit !important;
 }
 
+.popup {
+  position        : absolute;
+  top             : 0;
+  left            : 0;
+  height          : 100%;
+  width           : 100%;
+  display         : flex;
+  align-items     : center;
+  justify-content : center;
+  background-color: #362e2b;
+  opacity         : .95;
+  white-space     : pre-wrap;
+  text-align      : center;
+  font-size       : 120%;
+  z-index         : 1;
+}
+
 .astext {
   color          : #f5f1e8;
   text-decoration: none;
@@ -181,6 +198,13 @@ h4 {
   margin: 12px 0px 6px;
 }
 
+.amitie-row {
+  display    : flex;
+  align-items: baseline;
+  column-gap : 8px;
+  flex-wrap  : wrap;
+}
+
 .amitie-button {
   flex-grow : 1;
   text-align: left;
@@ -194,16 +218,27 @@ h4 {
   color: #ff8a65;
 }
 
+.amitie-actions {
+  padding-top    : 4px;
+  width          : 100%;
+  display        : flex;
+  justify-content: space-between;
+  align-items    : baseline;
+}
+
+.amitie-actions .text-button {
+  padding  : 2px;
+  font-size: 75%;
+}
+
 .amitie-labels {
-  padding-top: 4px;
-  width      : 100%;
-  display    : flex;
-  column-gap : 4px;
-  row-gap    : 4px;
+  display   : flex;
+  column-gap: 4px;
+  row-gap   : 4px;
 }
 
 .amitie-label {
-  font-size    : 70%;
+  font-size    : 80%;
   border       : 1px solid;
   border-radius: 8px;
   padding      : 1px 3px;

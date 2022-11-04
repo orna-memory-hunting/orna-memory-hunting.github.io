@@ -55,9 +55,37 @@ async function registerServiceWorker() {
 }
 
 
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function escapeHTML(text) {
+  return text
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+
+/** @param {string} text */
+function popup(text) {
+  const div = document.createElement('div')
+
+  div.classList.add('popup')
+  div.textContent = text
+  document.body.append(div)
+
+  setTimeout(() => {
+    div.remove()
+  }, 1000)
+}
+
+
 export {
   doAsync,
   nextTick,
   nextAnimationFrame,
-  registerServiceWorker
+  registerServiceWorker,
+  escapeHTML,
+  popup
 }

@@ -52,12 +52,8 @@
   margin: 0 8px;
 }
 
-.amitie {
-  margin     : 0 0 12px 32px;
-  display    : flex;
-  align-items: baseline;
-  column-gap : 8px;
-  flex-wrap  : wrap;
+.amitie-row {
+  margin: 0 0 12px 32px;
 }
 
 .lost-amitie {

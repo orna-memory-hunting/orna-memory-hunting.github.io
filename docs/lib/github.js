@@ -52,7 +52,7 @@ export function getTimeLabels(time) {
 }
 /** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
-/** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie}} Issue */
+/** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
 /**
  * @param {{number:number,html_url:string,title:string,labels:Labels,milestone:{title:string},body:string }} issue
  * @returns {Issue}
@@ -72,7 +72,8 @@ export function parseIssue({ number, html_url, title, labels, milestone, body })
       name: title,
       plusBlocks: [title],
       minusBlocks: ['?']
-    }
+    },
+    miniСard: ''
   }
   const bodyList = body.split('### ')
 
@@ -118,6 +119,11 @@ export function parseIssue({ number, html_url, title, labels, milestone, body })
       issue.amitie.minusBlocks = minusBlocks
     }
   }
+
+  issue.miniСard = `${issue.amitie.name}\n` +
+    `${window.location.origin}${issue.url}\n` +
+    `+ ${issue.amitie.plusBlocks.join('\n+')}\n` +
+    `- ${issue.amitie.minusBlocks.join('\n-')}\n`
 
   return issue
 }

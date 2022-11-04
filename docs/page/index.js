@@ -1,6 +1,7 @@
 import { doAsync } from '../lib/utils.js'
 import { ghAPI, loadMilestoneId, getTimeLabels, parseIssue } from '../lib/github.js'
 import { questionList, questionLabels, answerLabels } from '../lib/questions.js'
+import { renderAmitieRow } from '../lib/amitie.js'
 
 /** @type {HTMLDivElement} */// @ts-ignore
 const currentTime = document.getElementById('current-time')
@@ -119,27 +120,17 @@ async function loadAmitieList() {
           if (amities) {
             qExistsHTML += `<div class="answer">${answerLabels[aid]}. ${answer}</div>`
             for (const amitie of amities) {
-              qExistsHTML += `<div class="amitie"><a class="amitie-button amitie-blue text-button" target="_self" href="${amitie.url}">${amitie.title}</a>`
-              if (amitie.labels.length) {
-                qExistsHTML += '<div class="amitie-labels">'
-                for (const label of amitie.labels) {
-                  qExistsHTML += '<div class="amitie-label"' +
-                    ` style="color:#${label.color};border-color:#${label.color};#` +
-                    ` title="${label.description}">${label.name}</div>`
-                }
-                qExistsHTML += '</div>'
-              }
-              qExistsHTML += '</div>'
+              qExistsHTML += renderAmitieRow(amitie)
             }
             if (amities.length < answerMap.len) {
-              qExistsHTML += '<div class="amitie">' +
+              qExistsHTML += '<div class="amitie-row">' +
                 '<div class="lost-amitie">Не разведано!</div>' +
                 `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}&t=${pT}">+</a>` +
                 '</div>'
             }
           } else {
             qExistsHTML += `<div class="answer">${answerLabels[aid]}. ${answer}</div>` +
-              '<div class="amitie">' +
+              '<div class="amitie-row">' +
               '<div class="lost-amitie">Не разведано!</div>' +
               `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}&t=${pT}">+</a>` +
               '</div>'

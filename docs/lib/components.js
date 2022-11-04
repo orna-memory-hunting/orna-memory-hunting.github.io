@@ -1,3 +1,5 @@
+import { popup } from './utils.js'
+
 /** @param {Event} event */
 function textToggleClick(event) {
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -38,10 +40,36 @@ function textMultiToggleClick(event) {
 
 function closeOrBack() {
   if (document.referrer && new URL(document.referrer).host === window.location.host) {
-    window.history.back()
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      window.close()
+    }
   } else {
     // @ts-ignore
     window.location = '/'
+  }
+}
+
+
+/** @param {Event} event */
+function copyButton(event) {
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const elm = event.target
+  const title = elm.getAttribute('title')
+
+  if (elm.classList.contains('copy-button')) {
+    try {
+      navigator.clipboard.writeText(title)
+        .then(() => {
+          popup(`Скопировано\n\n${title}`)
+        })
+        .catch(err => window.alert(err))
+    } catch (error) {
+      window.alert(error)
+    }
+    event.stopPropagation()
+    event.preventDefault()
   }
 }
 
@@ -76,4 +104,5 @@ export function initComponents() {
   if (closeButtons) {
     closeButtons.forEach(elm => elm.addEventListener('click', closeOrBack))
   }
+  document.addEventListener('click', copyButton)
 }

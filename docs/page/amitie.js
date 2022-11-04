@@ -1,5 +1,5 @@
 import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
-import { doAsync } from '../lib/utils.js'
+import { doAsync, escapeHTML } from '../lib/utils.js'
 import { parseIssue } from '../lib/github.js'
 
 const octokit = new Octokit()
@@ -37,12 +37,12 @@ doAsync(async () => {
   document.title = `${issue.amitie.name} / Memory Hunting - Orna`
   document.getElementById('amitie-name').textContent = issue.amitie.name
   for (const plus of issue.amitie.plusBlocks) {
-    html += `<div>${plus}</div>`
+    html += `<div>${escapeHTML(plus)}</div>`
   }
   plusBlocks.innerHTML = html
   html = ''
   for (const minus of issue.amitie.minusBlocks) {
-    html += `<div>${minus}</div>`
+    html += `<div>${escapeHTML(minus)}</div>`
   }
   minusBlocks.innerHTML = html
 
@@ -52,7 +52,7 @@ doAsync(async () => {
     for (const label of issue.labels) {
       html += '<div class="amitie-label"' +
         ` style="color:#${label.color};border-color:#${label.color};#` +
-        ` title="${label.description}">${label.name}</div>`
+        ` title="${escapeHTML(label.description)}">${escapeHTML(label.name)}</div>`
     }
     html += '</div>'
   }
@@ -72,5 +72,5 @@ doAsync(async () => {
 
   timeBlock.innerHTML = `<div>${timeLocal}</div><div>${time}</div>`
 
-  periodBlock.innerHTML = `<div>${issue.milestone}</div>`
+  periodBlock.innerHTML = `<div>${escapeHTML(issue.milestone)}</div>`
 })
