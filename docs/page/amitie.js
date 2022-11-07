@@ -54,7 +54,7 @@ safeExecute(() => {
       html += '<div class="amitie-labels">'
       for (const label of issue.labels) {
         html += '<div class="amitie-label"' +
-          ` style="color:#${label.color};border-color:#${label.color};#` +
+          ` style="color:#${label.color};border-color:#${label.color};"` +
           ` title="${escapeHTML(label.description)}">${escapeHTML(label.name)}</div>`
       }
       html += '</div>'
