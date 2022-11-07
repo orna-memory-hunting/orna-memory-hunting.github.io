@@ -218,7 +218,7 @@ function toggleAmitieInfo(status) {
 amitieFile.addEventListener('change', handleAmitieFile)
 
 function handleAmitieFile() {
-  if (amitieFile.files?.length) {
+  if (amitieFile.files && amitieFile.files.length) {
     doAsync(() => prepareAmitieImage(amitieFile.files[0], true))
   } else {
     amitieFileName.textContent = ''
