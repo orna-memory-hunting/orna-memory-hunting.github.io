@@ -1,8 +1,61 @@
 import { buildNumber } from '../version.js'
 
+/** @type {Array<Error>}  */
+const errors = []
+let errorElm = null
+
+/** @param {Error} error */
+function showError(error) {
+  errors.push(error)
+
+  const stack = errors.reduce((text, err) => {
+    return (text += `${err instanceof Error ? err.stack : err}\n\n`)
+  }, '')
+
+  if (!errorElm) {
+    errorElm = document.createElement('div')
+    errorElm.classList.add('fatal-error')
+    errorElm.onclick = (/** @type {Event} */event) => {
+      /** @type {HTMLDivElement} */// @ts-ignore
+      const elm = event.target
+
+      if (elm.classList.contains('error-button')) {
+        errorElm.querySelector('.error-details').classList.toggle('hide')
+      }
+    }
+    document.body.prepend(errorElm)
+  }
+  errorElm.innerHTML = '<div class="error-button">' +
+    'В приложении возникла критическая ошибка! Нажмите для просмотра сведений' +
+    `</div><div class="error-details hide">${stack}` +
+    `<a target="_blank" href="${'https://github.com/orna-memory-hunting/project/issues/new?' +
+    `title=${encodeURIComponent(errors[0].message || errors[0] + '')}` +
+    `&labels=${encodeURIComponent('bug report')}` +
+    '&assignees=IgorNovozhilov' +
+    `&body=${encodeURIComponent(stack)}`}" ` +
+    'class="report-bug">Сообщить об ошибке</a></div>'
+  console.error(error)
+}
+
+
+/** @param {()=> any} fn */
+function safeExecute(fn) {
+  let result = null
+
+  try {
+    result = fn()
+  } catch (error) {
+    showError(error)
+  }
+  if (result instanceof Promise) {
+    result.catch(showError)
+  }
+}
+
+
 /** @param {()=> Promise} fn */
 function doAsync(fn) {
-  fn().catch(console.error)
+  fn().catch(showError)
 }
 
 
@@ -82,6 +135,7 @@ function popup(text) {
 
 
 export {
+  safeExecute,
   doAsync,
   nextTick,
   nextAnimationFrame,

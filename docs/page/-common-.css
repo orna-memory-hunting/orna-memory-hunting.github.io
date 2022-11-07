@@ -255,3 +255,29 @@ h4 {
   border-radius: 8px;
   padding      : 1px 3px;
 }
+
+.fatal-error {
+  background-color: #fff0f0;
+  color           : #ff1e1f;
+  text-align      : center;
+  padding         : 4px;
+}
+
+.error-button {
+  cursor         : pointer;
+  user-select    : none;
+  text-decoration: underline;
+}
+
+.error-details {
+  white-space: pre-wrap;
+  text-align : left;
+  padding    : 8px;
+}
+
+.report-bug {
+  color     : #ff1e1f;
+  width     : 100%;
+  display   : inline-block;
+  text-align: center;
+}
