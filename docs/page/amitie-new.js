@@ -769,46 +769,50 @@ amitieMinus3.onchange = updateGithubLink
 const sendToGithubLink = document.getElementById('send-to-github-link')
 
 function updateGithubLink() {
-  const answer = getSelectedAnswer()
+  try {
+    const answer = getSelectedAnswer()
 
-  if (!answer) return
+    if (!answer) return
 
-  const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const qualityElm = document.querySelector('#quality-field .active')
-  const quality = Number(qualityElm.dataset.quality)
-  const qualityLabel = { 2: ',x2 epic', 3: ',x3 ornate' }[quality] || ''
-  const plusBlocks = [amitiePlus1.value, amitiePlus2.value, amitiePlus3.value]
-    .slice(0, quality).reduce((prev, cur) => {
-      return `${prev}- **${cur || '?'}**\n`
-    }, '')
-  const minusBlocks = [amitieMinus1.value, amitieMinus2.value, amitieMinus3.value]
-    .slice(0, quality).reduce((prev, cur) => {
-      return `${prev}- _${cur || '?'}_\n`
-    }, '')
-  const time = new Date(new Date().setHours(Number(timeSelect.value)))
-  const { timeUTC, timeMSK } = getTimeLabels(time)
-  const addLabels = Array.from(document.querySelectorAll('#additional-labels .active'))
-    .reduce((labels, /** @type {HTMLDivElement} */label) => `${labels},${label.dataset.label}`, '')
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const doubleElm = document.querySelector('#double-field .active')
-  const double = doubleElm ? Number(doubleElm.dataset.double) : 0
-  const doubleLabel = double ? `,double #${double}` : ''
-  const labels = `${answerLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
-  const milestone = getAmitieMilestone(time)
-  const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
-    `\n<!-- &milestone=${milestone} -->`
+    const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const qualityElm = document.querySelector('#quality-field .active')
+    const quality = Number(qualityElm.dataset.quality)
+    const qualityLabel = { 2: ',x2 epic', 3: ',x3 ornate' }[quality] || ''
+    const plusBlocks = [amitiePlus1.value, amitiePlus2.value, amitiePlus3.value]
+      .slice(0, quality).reduce((prev, cur) => {
+        return `${prev}- **${cur || '?'}**\n`
+      }, '')
+    const minusBlocks = [amitieMinus1.value, amitieMinus2.value, amitieMinus3.value]
+      .slice(0, quality).reduce((prev, cur) => {
+        return `${prev}- _${cur || '?'}_\n`
+      }, '')
+    const time = new Date(new Date().setHours(Number(timeSelect.value)))
+    const { timeUTC, timeMSK } = getTimeLabels(time)
+    const addLabels = Array.from(document.querySelectorAll('#additional-labels .active'))
+      .reduce((labels, /** @type {HTMLDivElement} */label) => `${labels},${label.dataset.label}`, '')
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const doubleElm = document.querySelector('#double-field .active')
+    const double = doubleElm ? Number(doubleElm.dataset.double) : 0
+    const doubleLabel = double ? `,double #${double}` : ''
+    const labels = `${answerLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
+    const milestone = getAmitieMilestone(time)
+    const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
+      `\n<!-- &milestone=${milestone} -->`
 
-  sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
-    `title=${encodeURIComponent(amitiePlus1.value)}` +
-    `&labels=${encodeURIComponent(labels)}` +
-    `&milestone=${milestone}` +
-    `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
-    encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
-    encodeURIComponent(`### Минусы\n${minusBlocks}`) +
-    encodeURIComponent(hiddenInfo)
+    sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
+      `title=${encodeURIComponent(amitiePlus1.value)}` +
+      `&labels=${encodeURIComponent(labels)}` +
+      `&milestone=${milestone}` +
+      `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
+      encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
+      encodeURIComponent(`### Минусы\n${minusBlocks}`) +
+      encodeURIComponent(hiddenInfo)
 
-  doAsync(checkDoubleAmitieList)
+    doAsync(checkDoubleAmitieList)
+  } catch (error) {
+    window.alert(error)
+  }
 }
 
 /** @type {HTMLDivElement} */// @ts-ignore
