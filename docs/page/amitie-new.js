@@ -770,7 +770,7 @@ safeExecute(() => {
   const sendToGithubLink = document.getElementById('send-to-github-link')
 
   function updateGithubLink() {
-    try {
+    safeExecute(() => {
       const answer = getSelectedAnswer()
 
       if (!answer) return
@@ -811,9 +811,7 @@ safeExecute(() => {
         encodeURIComponent(hiddenInfo)
 
       doAsync(checkDoubleAmitieList)
-    } catch (error) {
-      window.alert(`${error}\n${error.stack}`)
-    }
+    })
   }
 
   /** @type {HTMLDivElement} */// @ts-ignore
