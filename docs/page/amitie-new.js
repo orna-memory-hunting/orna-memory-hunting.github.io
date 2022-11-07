@@ -208,8 +208,8 @@ function toggleAmitieInfo(status) {
       timeSelect.value = ('0' + new Date().getHours()).slice(-2)
       timeSelect.setAttribute('first-load-ready', 'true')
     }
-    updateGithubLink()
     amitieInfo.classList.remove('hide')
+    updateGithubLink()
   } else {
     amitieInfo.classList.add('hide')
   }
