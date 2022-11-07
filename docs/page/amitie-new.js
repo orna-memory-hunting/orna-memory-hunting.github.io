@@ -170,32 +170,30 @@ safeExecute(() => {
     event.stopPropagation()
 
     if (recognizingInProgress) return
-    navigator.clipboard.read().then(clipboardItems => {
-      if (clipboardItems.length) {
-        const [clipboardItem] = clipboardItems
+    safeExecute(async () => {
+      await navigator.clipboard.read().then(clipboardItems => {
+        if (clipboardItems.length) {
+          const [clipboardItem] = clipboardItems
 
-        if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
-          clipboardItem.getType(clipboardItem.types[0]).then(data => {
-            const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
+          if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
+            clipboardItem.getType(clipboardItem.types[0]).then(data => {
+              const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
 
-            doAsync(() => prepareAmitieImage(file))
-          })
+              doAsync(() => prepareAmitieImage(file))
+            })
+          } else {
+            window.alert('Не удалось найти файл изображения!')
+          }
         } else {
           window.alert('Не удалось найти файл изображения!')
         }
-      } else {
-        window.alert('Не удалось найти файл изображения!')
-      }
+      })
     })
   }
-
-  // @ts-ignore
-  navigator.permissions.query({ name: 'clipboard-read' }).then(permission => {
-    if (permission.state === 'denied') {
-      amitieFileFromClipboard.classList.remove('aslink')
-      amitieFileFromClipboard.onclick = null
-    }
-  })
+  if (!('navigator' in window && 'clipboard' in navigator)) {
+    amitieFileFromClipboard.classList.remove('aslink')
+    amitieFileFromClipboard.onclick = null
+  }
 
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }
 

@@ -9,7 +9,7 @@ function showError(error) {
   errors.push(error)
 
   const stack = errors.reduce((text, err) => {
-    return (text += `${err instanceof Error ? err.stack : err}\n\n`)
+    return (text += `${err instanceof Error ? `${err}\n${err.stack}` : err}\n\n`)
   }, '')
 
   if (!errorElm) {
