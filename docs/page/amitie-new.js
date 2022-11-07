@@ -811,7 +811,7 @@ function updateGithubLink() {
 
     doAsync(checkDoubleAmitieList)
   } catch (error) {
-    window.alert(error)
+    window.alert(error.stack || error)
   }
 }
 
