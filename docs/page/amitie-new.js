@@ -773,7 +773,6 @@ safeExecute(() => {
 
       if (!answer) return
 
-      const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
       /** @type {HTMLDivElement} */// @ts-ignore
       const qualityElm = document.querySelector('#quality-field .active')
       const quality = Number(qualityElm.dataset.quality)
@@ -794,7 +793,7 @@ safeExecute(() => {
       const doubleElm = document.querySelector('#double-field .active')
       const double = doubleElm ? Number(doubleElm.dataset.double) : 0
       const doubleLabel = double ? `,double #${double}` : ''
-      const labels = `${answerLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
+      const labels = `${answer.label},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
       const milestone = getAmitieMilestone(time)
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
@@ -820,10 +819,9 @@ safeExecute(() => {
 
   async function checkDoubleAmitieList() {
     const answer = getSelectedAnswer()
-    const answerLabel = `q.${answer.qLabel}-${answer.aLabel} / ${answer.sq} - ${answer.sa}`
     const time = new Date(new Date().setHours(Number(timeSelect.value)))
     const { timeUTC, timeMSK } = getTimeLabels(time)
-    const labels = `&labels=${answerLabel},${timeUTC},${timeMSK}`
+    const labels = `&labels=${answer.label},${timeUTC},${timeMSK}`
     const milestoneId = await loadMilestoneId(time)
     const milestone = `&milestone=${milestoneId}`
     const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`

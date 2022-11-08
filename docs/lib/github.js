@@ -52,7 +52,7 @@ export function getTimeLabels(time) {
 }
 /** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
-/** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
+/** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,timeUTC:string,timeMSK:string,timeLocal:string,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
 /**
  * @param {{number:number,html_url:string,title:string,labels:Labels,milestone:{title:string},body:string }} issue
  * @returns {Issue}
@@ -65,6 +65,9 @@ export function parseIssue({ number, html_url, title, labels, milestone, body })
     labels: [],
     milestone: (milestone || { title: '' }).title,
     time: null,
+    timeUTC: '',
+    timeMSK: '',
+    timeLocal: '',
     body,
     answer: null,
     answerLabel: '',
@@ -93,6 +96,10 @@ export function parseIssue({ number, html_url, title, labels, milestone, body })
           time.setUTCHours(utcHours)
           issue.time = time
         }
+
+        issue.timeUTC = `${('0' + issue.time.getUTCHours()).slice(-2)}ч. utc`
+        issue.timeMSK = `${('0' + (issue.time.getUTCHours() + 3) % 24).slice(-2)}ч. msk`
+        issue.timeLocal = `${('0' + (issue.time.getHours()) % 24).slice(-2)}ч. местное`
       }
       continue
     }
@@ -122,8 +129,11 @@ export function parseIssue({ number, html_url, title, labels, milestone, body })
 
   issue.miniСard = `${issue.amitie.name}\n` +
     `${window.location.origin}${issue.url}\n` +
+    `${issue.timeUTC}, ${issue.timeMSK}, ${issue.milestone}\n` +
+    `${issue.answer.code} ${issue.answer.textShort}\n` +
     `+ ${issue.amitie.plusBlocks.join('\n+')}\n` +
-    `- ${issue.amitie.minusBlocks.join('\n-')}\n`
+    `- ${issue.amitie.minusBlocks.join('\n-')}\n` +
+    '#поделисьосколком'
 
   return issue
 }

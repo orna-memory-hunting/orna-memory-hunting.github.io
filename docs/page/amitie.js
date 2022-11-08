@@ -61,19 +61,11 @@ safeExecute(() => {
     }
     labelsBlocks.innerHTML = html
 
-    const time = issue.time
-      ? `${('0' + issue.time.getUTCHours()).slice(-2)}ч. utc` +
-      ` / ${('0' + (issue.time.getUTCHours() + 3) % 24).slice(-2)}ч. msk`
-      : ''
-    const timeLocal = issue.time
-      ? `${('0' + (issue.time.getHours()) % 24).slice(-2)}ч. местное`
-      : ''
-
     questionBlock.innerHTML =
       `<div class="question">${issue.answer.qLabel}. ${issue.answer.q}</div>` +
       `<div class="answer">${issue.answer.aLabel}. ${issue.answer.a}</div>`
 
-    timeBlock.innerHTML = `<div>${timeLocal}</div><div>${time}</div>`
+    timeBlock.innerHTML = `<div>${issue.timeLocal}</div><div>${issue.timeUTC} / ${issue.timeMSK}</div>`
 
     periodBlock.innerHTML = `<div>${escapeHTML(issue.milestone)}</div>`
   })
