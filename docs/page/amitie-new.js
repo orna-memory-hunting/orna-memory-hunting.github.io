@@ -820,8 +820,8 @@ safeExecute(() => {
   async function checkDoubleAmitieList() {
     const answer = getSelectedAnswer()
     const time = new Date(new Date().setHours(Number(timeSelect.value)))
-    const { timeUTC, timeMSK } = getTimeLabels(time.getUTCHours())
-    const labels = `&labels=${answer.label},${timeUTC},${timeMSK}`
+    const { timeUTC } = getTimeLabels(time.getUTCHours())
+    const labels = `&labels=${answer.label},${timeUTC}`
     const milestoneId = await getMilestoneNumber(time)
     const milestone = `&milestone=${milestoneId}`
     const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
