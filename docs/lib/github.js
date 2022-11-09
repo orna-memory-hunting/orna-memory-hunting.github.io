@@ -61,7 +61,7 @@ function getTimeLabels(utcHours) {
 
 /** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
-/** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,timeUTC:string,timeMSK:string,timeLocal:string,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
+/** @typedef {{url:string,title:string,labels:Labels,milestone:string,utcHours:number,timeUTC:string,timeMSK:string,timeLocal:string,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
 /**
  * @param {{number:number,html_url:string,title:string,labels:Labels,milestone:{title:string},body:string }} issue
  * @returns {Issue}
@@ -73,7 +73,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     title,
     labels: [],
     milestone: (milestone || { title: '' }).title,
-    time: null,
+    utcHours: NaN,
     timeUTC: '',
     timeMSK: '',
     timeLocal: '',
@@ -98,17 +98,13 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
       continue
     } else if (name.startsWith('time ')) {
       if (name.endsWith('UTC')) {
-        const utcHours = parseInt(name.replace('time ', '').replace('h UTC', ''))
-        const time = new Date()
+        const timeLocal = new Date()
 
-        if (!isNaN(utcHours)) {
-          time.setUTCHours(utcHours)
-          issue.time = time
-        }
-
-        issue.timeUTC = `${('0' + issue.time.getUTCHours()).slice(-2)}ч. utc`
-        issue.timeMSK = `${('0' + (issue.time.getUTCHours() + 3) % 24).slice(-2)}ч. msk`
-        issue.timeLocal = `${('0' + (issue.time.getHours()) % 24).slice(-2)}ч. местное`
+        issue.utcHours = parseInt(name.replace('time ', '').replace('h UTC', ''))
+        issue.timeUTC = `${('0' + issue.utcHours).slice(-2)}ч. utc`
+        issue.timeMSK = `${('0' + (issue.utcHours + 3) % 24).slice(-2)}ч. msk`
+        timeLocal.setUTCHours(issue.utcHours)
+        issue.timeLocal = `${('0' + (timeLocal.getHours()) % 24).slice(-2)}ч. местное`
       }
       continue
     }
@@ -147,10 +143,65 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
   return issue
 }
 
+/**
+ * @typedef GetIssuesMapOpts
+ * @property {"open" | "closed" | "all"} state
+ * @property {string} milestone
+ */
+/**
+ * @param {GetIssuesMapOpts} options
+ * @returns {Promise<object>}
+ */
+async function getIssuesMap(options) {
+  const issuesMap = {}
+  const perPage = 100
+  let page = 1
+
+  while (true) {
+    const issuesRaw = (await octokit.rest.issues.listForRepo({
+      ...repo,
+      ...options,
+      per_page: perPage,
+      page
+    })).data
+
+    for (const issueRaw of issuesRaw) {
+      // @ts-ignore
+      const issue = parseIssue(issueRaw)
+
+      if (!(issue.utcHours in issuesMap)) {
+        issuesMap[issue.utcHours] = {}
+      }
+
+      const questionMap = issuesMap[issue.utcHours]
+
+      if (!(issue.answer.qid in questionMap)) {
+        questionMap[issue.answer.qid] = { len: 0 }
+      }
+
+      const answerMap = questionMap[issue.answer.qid]
+
+      if (!(issue.answer.aid in answerMap)) {
+        answerMap[issue.answer.aid] = []
+      }
+      answerMap[issue.answer.aid].push(issue)
+      answerMap.len = Math.max(answerMap.len, answerMap[issue.answer.aid].length)
+    }
+
+    if (issuesRaw.length < perPage) {
+      break
+    }
+    page++
+  }
+
+  return issuesMap
+}
+
 
 export {
   getMilestone,
   getMilestoneNumber,
   getTimeLabels,
-  parseIssue
+  parseIssue,
+  getIssuesMap
 }
