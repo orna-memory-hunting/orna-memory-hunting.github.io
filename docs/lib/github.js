@@ -48,15 +48,13 @@ async function getMilestoneNumber(date) {
 
 /**
  *
- * @param {Date} [time]
+ * @param {number} utcHours
  * @returns {{timeUTC:string,timeMSK:string}}
  */
-function getTimeLabels(time) {
-  const tm = time ? new Date(time) : new Date()
-
+function getTimeLabels(utcHours) {
   return {
-    timeUTC: `time ${('0' + tm.getUTCHours()).slice(-2)}h UTC`,
-    timeMSK: `time ${('0' + (tm.getUTCHours() + 3) % 24).slice(-2)}h MSK`
+    timeUTC: `time ${('0' + utcHours).slice(-2)}h UTC`,
+    timeMSK: `time ${('0' + (utcHours + 3) % 24).slice(-2)}h MSK`
   }
 }
 

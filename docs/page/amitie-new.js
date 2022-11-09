@@ -786,7 +786,7 @@ safeExecute(() => {
           return `${prev}- _${cur || '?'}_\n`
         }, '')
       const time = new Date(new Date().setHours(Number(timeSelect.value)))
-      const { timeUTC, timeMSK } = getTimeLabels(time)
+      const { timeUTC, timeMSK } = getTimeLabels(time.getUTCHours())
       const addLabels = Array.from(document.querySelectorAll('#additional-labels .active'))
         .reduce((labels, /** @type {HTMLDivElement} */label) => `${labels},${label.dataset.label}`, '')
       /** @type {HTMLDivElement} */// @ts-ignore
@@ -820,7 +820,7 @@ safeExecute(() => {
   async function checkDoubleAmitieList() {
     const answer = getSelectedAnswer()
     const time = new Date(new Date().setHours(Number(timeSelect.value)))
-    const { timeUTC, timeMSK } = getTimeLabels(time)
+    const { timeUTC, timeMSK } = getTimeLabels(time.getUTCHours())
     const labels = `&labels=${answer.label},${timeUTC},${timeMSK}`
     const milestoneId = await getMilestoneNumber(time)
     const milestone = `&milestone=${milestoneId}`
