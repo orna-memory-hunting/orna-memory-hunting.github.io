@@ -1,6 +1,6 @@
 import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { safeExecute } from '../lib/utils.js'
-import { parseIssue, loadMilestoneId } from '../lib/github.js'
+import { parseIssue, getMilestoneNumber } from '../lib/github.js'
 
 safeExecute(async () => {
   // TODO
@@ -17,7 +17,7 @@ async function loadSummaryTable() {
       owner: 'orna-memory-hunting',
       repo: 'storage',
       state: 'open',
-      milestone: await loadMilestoneId(),
+      milestone: await getMilestoneNumber(),
       per_page: 100,
       page
     })).data

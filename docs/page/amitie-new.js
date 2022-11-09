@@ -1,6 +1,6 @@
 import { safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
-import { ghAPI, loadMilestoneId, parseIssue, getAmitieMilestone, getTimeLabels } from '../lib/github.js'
+import { ghAPI, getMilestoneNumber, parseIssue, getMilestone, getTimeLabels } from '../lib/github.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
 safeExecute(() => {
@@ -794,7 +794,7 @@ safeExecute(() => {
       const double = doubleElm ? Number(doubleElm.dataset.double) : 0
       const doubleLabel = double ? `,double #${double}` : ''
       const labels = `${answer.label},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
-      const milestone = getAmitieMilestone(time)
+      const milestone = getMilestone(time)
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
 
@@ -822,7 +822,7 @@ safeExecute(() => {
     const time = new Date(new Date().setHours(Number(timeSelect.value)))
     const { timeUTC, timeMSK } = getTimeLabels(time)
     const labels = `&labels=${answer.label},${timeUTC},${timeMSK}`
-    const milestoneId = await loadMilestoneId(time)
+    const milestoneId = await getMilestoneNumber(time)
     const milestone = `&milestone=${milestoneId}`
     const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
 

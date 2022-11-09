@@ -1,5 +1,5 @@
 import { safeExecute, doAsync } from '../lib/utils.js'
-import { ghAPI, loadMilestoneId, getTimeLabels, parseIssue } from '../lib/github.js'
+import { ghAPI, getMilestoneNumber, getTimeLabels, parseIssue } from '../lib/github.js'
 import { questionList, questionLabels, answerLabels } from '../lib/questions.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
@@ -81,7 +81,7 @@ safeExecute(() => {
     const time = new Date(new Date().setUTCHours(utcHours || 0))
     const pT = time.getUTCHours()
     const labels = `&labels=${getTimeLabels(time).timeUTC}`
-    const milestoneId = await loadMilestoneId()
+    const milestoneId = await getMilestoneNumber()
     const milestone = `&milestone=${milestoneId}`
     const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
     const data = milestoneId ? await fetch(apiURL) : null

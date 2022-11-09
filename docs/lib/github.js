@@ -1,11 +1,16 @@
+import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { getAnswerByLabels } from './questions.js'
 
+export const octokit = new Octokit()
 export const ghAPI = 'https://api.github.com/repos/orna-memory-hunting/storage'
+
+const repo = { owner: 'orna-memory-hunting', repo: 'storage' }
+
 /**
  * @param {Date} [date]
  * @returns {string}
  */
-export function getAmitieMilestone(date) {
+function getMilestone(date) {
   const dt = date ? new Date(date) : new Date()
   const sWeek = new Date(dt.setUTCDate(dt.getUTCDate() - dt.getUTCDay() + 1))
   const eWeek = new Date(dt.setUTCDate(dt.getUTCDate() + (7 - dt.getUTCDay())))
@@ -14,21 +19,23 @@ export function getAmitieMilestone(date) {
 
   return `${sDate} - ${eDate}`
 }
+
+
 /**
  * @param {Date} [date]
  * @returns {Promise<string>}
  */
-export async function loadMilestoneId(date) {
-  const curMilestoneName = getAmitieMilestone(date)
+async function getMilestoneNumber(date) {
+  const curMilestoneName = getMilestone(date)
   let milestoneId = window.sessionStorage.getItem(`milestone_${curMilestoneName}`)
 
   if (!milestoneId) {
-    const apiURL = `${ghAPI}/milestones?state=open`
-    const milestones = await (await fetch(apiURL)).json()
+    const milestones = (await octokit.rest.issues
+      .listMilestones({ state: 'open', ...repo })).data
 
     for (const { number, title } of milestones) {
       if (curMilestoneName === title) {
-        milestoneId = number
+        milestoneId = number + ''
         window.sessionStorage.setItem(`milestone_${curMilestoneName}`, milestoneId)
         break
       }
@@ -37,12 +44,14 @@ export async function loadMilestoneId(date) {
 
   return milestoneId
 }
+
+
 /**
  *
  * @param {Date} [time]
  * @returns {{timeUTC:string,timeMSK:string}}
  */
-export function getTimeLabels(time) {
+function getTimeLabels(time) {
   const tm = time ? new Date(time) : new Date()
 
   return {
@@ -50,6 +59,8 @@ export function getTimeLabels(time) {
     timeMSK: `time ${('0' + (tm.getUTCHours() + 3) % 24).slice(-2)}h MSK`
   }
 }
+
+
 /** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
 /** @typedef {{url:string,title:string,labels:Labels,milestone:string,time:Date,timeUTC:string,timeMSK:string,timeLocal:string,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
@@ -57,7 +68,7 @@ export function getTimeLabels(time) {
  * @param {{number:number,html_url:string,title:string,labels:Labels,milestone:{title:string},body:string }} issue
  * @returns {Issue}
  */
-export function parseIssue({ number, html_url, title, labels, milestone, body }) { // eslint-disable-line camelcase
+function parseIssue({ number, html_url, title, labels, milestone, body }) { // eslint-disable-line camelcase
   const issue = {
     url: `/amitie/#issue=${number}`,
     urlGH: html_url, // eslint-disable-line camelcase
@@ -136,4 +147,12 @@ export function parseIssue({ number, html_url, title, labels, milestone, body })
     '#поделисьосколком'
 
   return issue
+}
+
+
+export {
+  getMilestone,
+  getMilestoneNumber,
+  getTimeLabels,
+  parseIssue
 }
