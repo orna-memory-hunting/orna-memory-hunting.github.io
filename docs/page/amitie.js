@@ -25,6 +25,8 @@ safeExecute(() => {
   const timeBlock = document.getElementById('time-block')
   /** @type {HTMLDivElement} */// @ts-ignore
   const periodBlock = document.getElementById('period-block')
+  /** @type {HTMLLinkElement} */// @ts-ignore
+  const openOnGitHub = document.getElementById('open-on-github')
 
   doAsync(async () => {
     const issue = await getIssue(issueNumber)
@@ -33,6 +35,8 @@ safeExecute(() => {
     document.title = `${issue.amitie.name} / Memory Hunting - Orna`
     document.getElementById('amitie-name').textContent = issue.amitie.name
     document.getElementById('copy-card').setAttribute('title', issue.miniСard)
+    openOnGitHub.href = issue.urlGH
+    openOnGitHub.classList.remove('hide')
     if (issue.broken) {
       amitieBroken.classList.remove('hide')
     }

@@ -24,6 +24,14 @@ input[type=text] {
   padding      : 4px;
 }
 
+a {
+  color: #7986cb;
+}
+
+a:hover {
+  color: #c5cae9;
+}
+
 .nav-head {
   display        : flex;
   justify-content: space-between;
