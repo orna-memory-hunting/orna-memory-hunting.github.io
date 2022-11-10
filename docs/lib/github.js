@@ -22,7 +22,7 @@ function getMilestone(date) {
 
 /**
  * @param {Date} [date]
- * @returns {Promise<string>}
+ * @returns {Promise<number>}
  */
 async function getMilestoneNumber(date) {
   const curMilestoneName = getMilestone(date)
@@ -41,7 +41,7 @@ async function getMilestoneNumber(date) {
     }
   }
 
-  return milestoneId
+  return parseInt(milestoneId)
 }
 
 
@@ -181,7 +181,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
 /**
  * @typedef IssuesOpts
  * @property {"open" | "closed" | "all"} [state="open"]
- * @property {string} [milestone="<current week>"]
+ * @property {number} [milestone="<current week>"]
  * @property {Array<string>} [labels]
  */
 /* eslint-disable jsdoc/valid-types */
@@ -194,7 +194,7 @@ async function getIssuesOpts(options) {
   return {
     ...repo,
     state: options.state || 'open',
-    milestone: options.milestone || await getMilestoneNumber(),
+    milestone: String(options.milestone || await getMilestoneNumber()),
     labels: (options.labels || []).join(',') || undefined
   }
 }
