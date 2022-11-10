@@ -1,6 +1,6 @@
 import { safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
-import { ghAPI, getMilestoneNumber, parseIssue, getMilestone, getTimeLabels } from '../lib/github.js'
+import { getIssuesList, getMilestoneNumber, getMilestone, getTimeLabels } from '../lib/github.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
 safeExecute(() => {
@@ -815,33 +815,28 @@ safeExecute(() => {
   const doubleAmitieList = document.getElementById('double-amitie-list')
   /** @type {HTMLDivElement} */// @ts-ignore
   const doubleAmitieResult = document.getElementById('double-amitie-result')
-  let apiURLlastDouble = ''
+  let lastDoubleProps = ''
 
   async function checkDoubleAmitieList() {
     const answer = getSelectedAnswer()
     const time = new Date(new Date().setHours(Number(timeSelect.value)))
+    const milestone = await getMilestoneNumber(time)
     const { timeUTC } = getTimeLabels(time.getUTCHours())
-    const labels = `&labels=${answer.label},${timeUTC}`
-    const milestoneId = await getMilestoneNumber(time)
-    const milestone = `&milestone=${milestoneId}`
-    const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
+    const doubleProps = `${milestone}/${timeUTC}/${answer.label}`
 
-    if (apiURLlastDouble === apiURL) {
+    if (lastDoubleProps === doubleProps) {
       return
     }
-    apiURLlastDouble = apiURL
+    lastDoubleProps = doubleProps
     doubleAmitieResult.innerHTML = 'Загрузка...'
     doubleAmitieList.classList.add('hide')
 
-    /** @type {Array} */
-    const issues = milestoneId ? await (await fetch(apiURL)).json() : []
+    const issues = await getIssuesList({ milestone, labels: [answer.label, timeUTC] })
     let html = ''
     let maxDouble = 0
 
     if (issues.length > 0) {
-      for (const issueRaw of issues) {
-        const issue = parseIssue(issueRaw)
-
+      for (const issue of issues) {
         html += renderAmitieRow(issue)
 
         if (issue.labels.length) {

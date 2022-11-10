@@ -2,7 +2,6 @@ import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { getAnswerByLabels } from './questions.js'
 
 export const octokit = new Octokit()
-export const ghAPI = 'https://api.github.com/repos/orna-memory-hunting/storage'
 
 const repo = { owner: 'orna-memory-hunting', repo: 'storage' }
 
@@ -143,27 +142,97 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
   return issue
 }
 
+
 /**
- * @typedef GetIssuesMapOpts
- * @property {"open" | "closed" | "all"} state
- * @property {string} milestone
+ * @typedef IssuesOpts
+ * @property {"open" | "closed" | "all"} [state="open"]
+ * @property {string} [milestone="<current week>"]
+ * @property {Array<string>} [labels]
  */
+/* eslint-disable jsdoc/valid-types */
 /**
- * @param {GetIssuesMapOpts} options
+ * @param {IssuesOpts} [options]
+ * @returns {Promise<import('@octokit/plugin-rest-endpoint-methods').RestEndpointMethodTypes['issues']['listForRepo']['parameters']>}
+ */
+/* eslint-enable jsdoc/valid-types */
+async function getIssuesOpts(options) {
+  return {
+    ...repo,
+    state: options.state || 'open',
+    milestone: options.milestone || await getMilestoneNumber(),
+    labels: (options.labels || []).join(',') || undefined
+  }
+}
+
+
+/**
+ * @param {IssuesOpts} [options]
+ * @returns {Promise<Array<Issue>>}
+ */
+async function getIssuesList(options = {}) {
+  const restOptions = await getIssuesOpts(options)
+  const issuesList = []
+  const perPage = 100
+  let page = 1
+
+  while (true) {
+    const response = await octokit.rest.issues.listForRepo({
+      ...restOptions,
+      per_page: perPage,
+      page
+    })
+
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify({
+        status: response.status,
+        url: response.url,
+        json: response
+      }, null, '  '))
+    }
+
+    const issuesRaw = response.data
+
+    for (const issueRaw of issuesRaw) {
+      // @ts-ignore
+      issuesList.push(parseIssue(issueRaw))
+    }
+
+    if (issuesRaw.length < perPage) {
+      break
+    }
+    page++
+  }
+
+  return issuesList
+}
+
+
+/**
+ * @param {IssuesOpts} [options]
  * @returns {Promise<object>}
  */
-async function getIssuesMap(options) {
+async function getIssuesMap(options = {}) {
+  const restOptions = await getIssuesOpts(options)
   const issuesMap = {}
   const perPage = 100
   let page = 1
 
   while (true) {
-    const issuesRaw = (await octokit.rest.issues.listForRepo({
-      ...repo,
-      ...options,
+    const response = await octokit.rest.issues.listForRepo({
+      ...restOptions,
       per_page: perPage,
       page
-    })).data
+    })
+
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify({
+        status: response.status,
+        url: response.url,
+        json: response
+      }, null, '  '))
+    }
+
+    const issuesRaw = response.data
 
     for (const issueRaw of issuesRaw) {
       // @ts-ignore
@@ -203,5 +272,6 @@ export {
   getMilestoneNumber,
   getTimeLabels,
   parseIssue,
+  getIssuesList,
   getIssuesMap
 }

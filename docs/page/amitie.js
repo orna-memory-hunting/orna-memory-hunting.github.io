@@ -1,9 +1,7 @@
-import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { safeExecute, doAsync, escapeHTML } from '../lib/utils.js'
-import { parseIssue } from '../lib/github.js'
+import { octokit, parseIssue } from '../lib/github.js'
 
 safeExecute(() => {
-  const octokit = new Octokit()
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
   const issueNumber = parseInt(params.get('issue'))
 

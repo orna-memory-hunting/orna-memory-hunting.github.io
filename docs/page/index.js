@@ -1,5 +1,5 @@
 import { safeExecute, doAsync } from '../lib/utils.js'
-import { ghAPI, getMilestoneNumber, getTimeLabels, parseIssue } from '../lib/github.js'
+import { getIssuesMap, getTimeLabels } from '../lib/github.js'
 import { questionList, questionLabels, answerLabels } from '../lib/questions.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
@@ -78,42 +78,13 @@ safeExecute(() => {
     amitieListLoader.classList.remove('hide')
     amitieList.classList.add('hide')
 
-    const labels = `&labels=${getTimeLabels(utcHours).timeUTC}`
-    const milestoneId = await getMilestoneNumber()
-    const milestone = `&milestone=${milestoneId}`
-    const apiURL = `${ghAPI}/issues?state=open${labels}${milestone}`
-    const data = milestoneId ? await fetch(apiURL) : null
-    /** @type {Array} */
-    const issues = milestoneId ? await data.json() : []
-    const questionMap = {}
+    const { timeUTC } = getTimeLabels(utcHours)
+    const questionMap = (await getIssuesMap({ labels: [timeUTC] }))[utcHours]
     let qExistsHTML = ''
     let qNotExistsHTML = ''
     let html = ''
 
-    if (data.status !== 200) {
-      throw new Error(JSON.stringify({
-        status: data.status,
-        url: data.url,
-        json: issues
-      }, null, '  '))
-    }
-
-    if (issues.length) {
-      for (const issueRaw of issues) {
-        const issue = parseIssue(issueRaw)
-
-        if (!(issue.answer.qid in questionMap)) {
-          questionMap[issue.answer.qid] = { len: 0 }
-        }
-
-        const answerMap = questionMap[issue.answer.qid]
-
-        if (!(issue.answer.aid in answerMap)) {
-          answerMap[issue.answer.aid] = []
-        }
-        answerMap[issue.answer.aid].push(issue)
-        answerMap.len = Math.max(answerMap.len, answerMap[issue.answer.aid].length)
-      }
+    if (questionMap) {
       for (let qid = 0; qid < questionList.length; qid++) {
         const question = questionList[qid]
         const answerMap = questionMap[qid]
