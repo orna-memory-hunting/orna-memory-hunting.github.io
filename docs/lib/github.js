@@ -1,9 +1,9 @@
 import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { getAnswerByLabels } from './questions.js'
 
-export const octokit = new Octokit()
-
+const octokit = new Octokit()
 const repo = { owner: 'orna-memory-hunting', repo: 'storage' }
+
 
 /**
  * @param {Date} [date]
@@ -60,11 +60,31 @@ function getTimeLabels(utcHours) {
 
 /** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
-/** @typedef {{url:string,title:string,labels:Labels,milestone:string,utcHours:number,timeUTC:string,timeMSK:string,timeLocal:string,body:string,answer:import('./questions.js').AnswerData,answerLabel:string,amitie:Amitie,miniСard:string}} Issue */
 /**
- * @param {{number:number,html_url:string,title:string,labels:Labels,milestone:{title:string},body:string }} issue
+ * @typedef Issue
+ * @property {string} url
+ * @property {string} urlGH
+ * @property {string} title
+ * @property {Labels} labels
+ * @property {string} milestone
+ * @property {number} utcHours
+ * @property {string} timeUTC
+ * @property {string} timeMSK
+ * @property {string} timeLocal
+ * @property {string} body
+ * @property {import('./questions.js').AnswerData} answer
+ * @property {string} answerLabel
+ * @property {Amitie} amitie
+ * @property {string} miniСard
+ * @property {boolean} broken
+ */
+/* eslint-disable jsdoc/valid-types */
+/**
+ *
+ * @param {import('@octokit/plugin-rest-endpoint-methods').RestEndpointMethodTypes['issues']['get']['response']['data']} issue
  * @returns {Issue}
  */
+/* eslint-enable jsdoc/valid-types */
 function parseIssue({ number, html_url, title, labels, milestone, body }) { // eslint-disable-line camelcase
   const issue = {
     url: `/amitie/#issue=${number}`,
@@ -72,7 +92,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     title,
     labels: [],
     milestone: (milestone || { title: '' }).title,
-    utcHours: NaN,
+    utcHours: null,
     timeUTC: '',
     timeMSK: '',
     timeLocal: '',
@@ -84,11 +104,16 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
       plusBlocks: [title],
       minusBlocks: ['?']
     },
-    miniСard: ''
+    miniСard: '',
+    broken: false
   }
   const bodyList = body.split('### ')
 
-  for (const { name, description, color } of labels) {
+  for (const label of labels) {
+    if (typeof label !== 'object') break
+
+    const { name, description, color } = label
+
     if (name.startsWith('q.')) {
       const [q, a] = name.replace(/q.(\d)-([А-Я]).*/, '$1-$2').split('-')
 
@@ -106,6 +131,8 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
         issue.timeLocal = `${('0' + (timeLocal.getHours()) % 24).slice(-2)}ч. местное`
       }
       continue
+    } else if (name === 'NOT FOUND') {
+      issue.broken = true
     }
     issue.labels.push({ name, description, color })
   }
@@ -128,8 +155,16 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     if (plusBlocks.length && plusBlocks.length === minusBlocks.length) {
       issue.amitie.plusBlocks = plusBlocks
       issue.amitie.minusBlocks = minusBlocks
+    } else {
+      issue.broken = true
     }
+  } else {
+    issue.broken = true
   }
+
+  issue.broken = issue.broken ||
+    issue.utcHours === null ||
+    issue.answer === null
 
   issue.miniСard = `${issue.amitie.name}\n` +
     `+ ${issue.amitie.plusBlocks.join('\n+')}\n` +
@@ -193,8 +228,11 @@ async function getIssuesList(options = {}) {
     const issuesRaw = response.data
 
     for (const issueRaw of issuesRaw) {
-      // @ts-ignore
-      issuesList.push(parseIssue(issueRaw))
+      const issue = parseIssue(issueRaw)
+
+      if (!issue.broken) {
+        issuesList.push(issue)
+      }
     }
 
     if (issuesRaw.length < perPage) {
@@ -235,8 +273,11 @@ async function getIssuesMap(options = {}) {
     const issuesRaw = response.data
 
     for (const issueRaw of issuesRaw) {
-      // @ts-ignore
       const issue = parseIssue(issueRaw)
+
+      if (issue.broken) {
+        continue
+      }
 
       if (!(issue.utcHours in issuesMap)) {
         issuesMap[issue.utcHours] = {}
@@ -267,11 +308,25 @@ async function getIssuesMap(options = {}) {
 }
 
 
+/**
+ * @param {number} number
+ * @returns {Promise<Issue>}
+ */
+async function getIssue(number) {
+  const issueRaw = await octokit.rest.issues.get({
+    ...repo,
+    issue_number: number
+  })
+
+  return parseIssue(issueRaw.data)
+}
+
+
 export {
   getMilestone,
   getMilestoneNumber,
   getTimeLabels,
-  parseIssue,
   getIssuesList,
-  getIssuesMap
+  getIssuesMap,
+  getIssue
 }

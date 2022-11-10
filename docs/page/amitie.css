@@ -1,3 +1,9 @@
+.amitie-broken {
+  color    : #ef5350;
+  margin   : 12px 0px 6px;
+  font-size: 110%;
+}
+
 .amitie-head {
   opacity: .8;
 }

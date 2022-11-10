@@ -1,5 +1,5 @@
 import { safeExecute, doAsync, escapeHTML } from '../lib/utils.js'
-import { octokit, parseIssue } from '../lib/github.js'
+import { getIssue } from '../lib/github.js'
 
 safeExecute(() => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
@@ -11,6 +11,8 @@ safeExecute(() => {
   }
   document.getElementById('copy-link').setAttribute('title', window.location.href)
 
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const amitieBroken = document.getElementById('amitie-broken')
   /** @type {HTMLDivElement} */// @ts-ignore
   const plusBlocks = document.getElementById('plus-blocks')
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -25,18 +27,15 @@ safeExecute(() => {
   const periodBlock = document.getElementById('period-block')
 
   doAsync(async () => {
-    const issueRaw = await octokit.rest.issues.get({
-      owner: 'orna-memory-hunting',
-      repo: 'storage',
-      issue_number: issueNumber
-    })
-    // @ts-ignore
-    const issue = parseIssue(issueRaw.data)
+    const issue = await getIssue(issueNumber)
     let html = ''
 
     document.title = `${issue.amitie.name} / Memory Hunting - Orna`
     document.getElementById('amitie-name').textContent = issue.amitie.name
     document.getElementById('copy-card').setAttribute('title', issue.miniСard)
+    if (issue.broken) {
+      amitieBroken.classList.remove('hide')
+    }
     for (const plus of issue.amitie.plusBlocks) {
       html += `<div>${escapeHTML(plus)}</div>`
     }
