@@ -225,7 +225,7 @@ h4 {
   flex-wrap  : wrap;
 }
 
-.amitie-button {
+.amitie-title {
   flex-grow : 1;
   text-align: left;
 }
@@ -244,6 +244,7 @@ h4 {
   display        : flex;
   justify-content: space-between;
   align-items    : baseline;
+  column-gap     : 4px;
 }
 
 .amitie-actions .text-button {
@@ -255,6 +256,7 @@ h4 {
   display   : flex;
   column-gap: 4px;
   row-gap   : 4px;
+  flex-wrap : wrap;
 }
 
 .amitie-label {
@@ -262,6 +264,13 @@ h4 {
   border       : 1px solid;
   border-radius: 8px;
   padding      : 1px 3px;
+  white-space  : nowrap;
+}
+
+.amitie-buttons {
+  display   : flex;
+  column-gap: 4px;
+  row-gap   : 4px;
 }
 
 .fatal-error {
