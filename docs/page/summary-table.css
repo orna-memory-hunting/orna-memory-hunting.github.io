@@ -1,5 +1,12 @@
+.main-content {
+  text-overflow: ellipsis;
+  overflow-x   : scroll;
+}
+
 .summary-table {
   display              : grid;
   grid-template-columns: repeat(24, max-content);
-  overflow-x           : scroll;
+  gap                  : 6px;
+  padding              : 8px 0;
+
 }
