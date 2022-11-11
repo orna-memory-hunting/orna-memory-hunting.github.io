@@ -52,6 +52,9 @@ safeExecute(() => {
   /** @param {boolean} forward */
   function changeUTCHours(forward) {
     forward ? utcHours++ : utcHours--
+    utcHours = utcHours % 24
+    utcHours = utcHours < 0 ? 23 : utcHours
+
 
     const dt = new Date(new Date().setUTCHours(utcHours))
     const hr = ('0' + dt.getHours()).slice(-2)
