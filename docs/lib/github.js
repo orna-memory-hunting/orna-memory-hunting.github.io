@@ -9,7 +9,7 @@ const repo = { owner: 'orna-memory-hunting', repo: 'storage' }
  * @param {Date} [date]
  * @returns {string}
  */
-function getMilestone(date) {
+function getMilestoneTitle(date) {
   const dt = date ? new Date(date) : new Date()
   const sWeek = new Date(dt.setUTCDate(dt.getUTCDate() - dt.getUTCDay() + 1))
   const eWeek = new Date(dt.setUTCDate(dt.getUTCDate() + (7 - dt.getUTCDay())))
@@ -25,7 +25,7 @@ function getMilestone(date) {
  * @returns {Promise<number>}
  */
 async function getMilestoneNumber(date) {
-  const curMilestoneName = getMilestone(date)
+  const curMilestoneName = getMilestoneTitle(date)
   let milestoneId = window.sessionStorage.getItem(`milestone_${curMilestoneName}`)
 
   if (!milestoneId) {
@@ -42,6 +42,19 @@ async function getMilestoneNumber(date) {
   }
 
   return parseInt(milestoneId)
+}
+
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @param {number} number
+ * @returns {Promise<import('@octokit/plugin-rest-endpoint-methods').RestEndpointMethodTypes["issues"]["getMilestone"]["response"]>}
+ */
+/* eslint-enable jsdoc/valid-types */
+async function getMilestone(number) {
+  return await octokit.rest.issues.getMilestone({
+    ...repo,
+    milestone_number: number
+  })
 }
 
 
@@ -323,8 +336,9 @@ async function getIssue(number) {
 
 
 export {
-  getMilestone,
+  getMilestoneTitle,
   getMilestoneNumber,
+  getMilestone,
   getTimeLabels,
   getIssuesList,
   getIssuesMap,

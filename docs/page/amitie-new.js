@@ -1,6 +1,6 @@
 import { safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
-import { getIssuesList, getMilestoneNumber, getMilestone, getTimeLabels } from '../lib/github.js'
+import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
 safeExecute(() => {
@@ -794,7 +794,7 @@ safeExecute(() => {
       const double = doubleElm ? Number(doubleElm.dataset.double) : 0
       const doubleLabel = double ? `,double #${double}` : ''
       const labels = `${answer.label},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
-      const milestone = getMilestone(time)
+      const milestone = getMilestoneTitle(time)
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
 

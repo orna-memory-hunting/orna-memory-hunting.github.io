@@ -4,6 +4,7 @@ body {
   flex-direction: column;
   min-height    : 100%;
   flex-grow     : 1;
+  min-width     : min-content;
 }
 
 .body-font {
@@ -33,26 +34,34 @@ a:hover {
 }
 
 .nav-head {
-  display        : flex;
-  justify-content: space-between;
-  align-items    : center;
-  padding        : 4px;
-  border-bottom  : 1px solid #403c3b;
-  min-height     : 32px;
-  flex-wrap      : wrap;
-  column-gap     : 8px;
+  display         : flex;
+  justify-content : space-between;
+  align-items     : center;
+  padding         : 4px;
+  border-bottom   : 1px solid #403c3b;
+  min-height      : 32px;
+  flex-wrap       : wrap;
+  column-gap      : 8px;
+  background-color: #362e2b;
+  position        : sticky;
+  top             : 0;
+  z-index         : 100;
 }
 
 .nav-title {
   font-size  : 20px;
   font-weight: bold;
   padding    : 4px;
+  position   : sticky;
+  left       : 4px;
 }
 
 .nav-title-action {
   display    : flex;
   column-gap : 16px;
   align-items: center;
+  position   : sticky;
+  right      : 4px;
 }
 
 .main-content {
@@ -236,6 +245,10 @@ h4 {
 
 .amitie-red {
   color: #ff8a65;
+}
+
+.lost-amitie {
+  color: #e57373;
 }
 
 .amitie-actions {

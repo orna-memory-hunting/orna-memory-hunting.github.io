@@ -1,12 +1,136 @@
-.main-content {
-  text-overflow: ellipsis;
-  overflow-x   : scroll;
-}
-
 .summary-table {
   display              : grid;
-  grid-template-columns: repeat(24, max-content);
-  gap                  : 6px;
-  padding              : 8px 0;
+  grid-template-columns: repeat(24, 1fr);
+  margin               : 8px 0;
+  min-width            : min-content;
+  gap                  : 1px;
+}
 
+.summary-table>* {
+  box-shadow: 0 0 0 1px #c2bfbf;
+  padding   : 4px 6px;
+  width     : calc(5.8vw);
+  z-index   : 2;
+}
+
+.summary-table>*.skipped {
+  box-shadow: 0 0 0 1px #565151;
+  z-index   : 1;
+}
+
+@media screen and (max-width: 4900px) {
+  .summary-table>* {
+    width: calc(6.2vw);
+  }
+}
+
+@media screen and (max-width: 4600px) {
+  .summary-table>* {
+    width: calc(6.6vw);
+  }
+}
+
+@media screen and (max-width: 4300px) {
+  .summary-table>* {
+    width: calc(7.1vw);
+  }
+}
+
+@media screen and (max-width: 4000px) {
+  .summary-table>* {
+    width: calc(7.6vw - 2px);
+  }
+}
+
+@media screen and (max-width: 3700px) {
+  .summary-table>* {
+    width: calc(8.3vw - 4px);
+  }
+}
+
+@media screen and (max-width: 3400px) {
+  .summary-table>* {
+    width: calc(9vw - 6px);
+  }
+}
+
+@media screen and (max-width: 3100px) {
+  .summary-table>* {
+    width: calc(10vw - 8px);
+  }
+}
+
+@media screen and (max-width: 2800px) {
+  .summary-table>* {
+    width: calc(11.1vw - 10px);
+  }
+}
+
+@media screen and (max-width: 2500px) {
+  .summary-table>* {
+    width: calc(12.5vw - 12px);
+  }
+}
+
+@media screen and (max-width: 2200px) {
+  .summary-table>* {
+    width: calc(14.2vw - 14px);
+  }
+}
+
+@media screen and (max-width: 1900px) {
+  .summary-table>* {
+    width: calc(16.6vw - 16px);
+  }
+}
+
+@media screen and (max-width: 1600px) {
+  .summary-table>* {
+    width: calc(20vw - 18px);
+  }
+}
+
+@media screen and (max-width: 1300px) {
+  .summary-table>* {
+    width: calc(25vw - 20px);
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .summary-table>* {
+    width: calc(33.3vw - 22px);
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .summary-table>* {
+    width: calc(50vw - 24px);
+  }
+}
+
+.summary-head {
+  text-align: center;
+  font-size : 120%;
+}
+
+.summary-question {
+  font-size  : 120%;
+  white-space: nowrap;
+}
+
+.summary-answer {
+  display       : flex;
+  flex-direction: column;
+  gap           : 4px;
+}
+
+.summary-answer-title {
+  border-bottom : 1px solid #686262;
+  padding-bottom: 2px;
+  margin-bottom : 2px;
+  white-space   : nowrap;
+}
+
+.skipped {
+  opacity: .5;
 }
