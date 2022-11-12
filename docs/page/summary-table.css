@@ -1,9 +1,20 @@
 .summary-table {
   display              : grid;
   grid-template-columns: repeat(24, 1fr);
-  margin               : 8px 0;
   min-width            : min-content;
   gap                  : 1px;
+}
+
+.summary-table:first-child {
+  padding-top     : 8px;
+  position        : sticky;
+  top             : 42px;
+  background-color: #362e2b;
+  z-index         : 50;
+}
+
+.summary-table:last-child {
+  margin-bottom: 8px;
 }
 
 .summary-table>* {

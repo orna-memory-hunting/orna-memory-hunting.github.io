@@ -3,7 +3,10 @@ import { getMilestone, getMilestoneTitle, getIssuesMap } from '../lib/github.js'
 import { questionList, questionLabels, answerLabels } from '../lib/questions.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
+/** @type {HTMLDivElement} */// @ts-ignore
 const summaryTableName = document.getElementById('summary-table-name')
+/** @type {HTMLDivElement} */// @ts-ignore
+const summaryTableHead = document.getElementById('summary-table-head')
 /** @type {HTMLDivElement} */// @ts-ignore
 const summaryTable = document.getElementById('summary-table')
 
@@ -20,6 +23,7 @@ async function loadSummaryTable(milestone) {
   summaryTableName.textContent = `Период: ${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
 
   const issuesMap = await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' })
+  let htmlHead = ''
   let html = ''
   let colid = 0
   let maxQLen = 0
@@ -37,9 +41,9 @@ async function loadSummaryTable(milestone) {
 
     const hours = ('0' + utcHours).slice(-2)
     const gridColumn = `grid-column:${++colid};`
-    let rowid = 0
+    let rowid = 1
 
-    html += `<div class="summary-head" style="${gridColumn}grid-row:${++rowid};">` +
+    htmlHead += `<div class="summary-head" style="${gridColumn}grid-row:1;">` +
       `${hours}:00 - ${hours}:59</div>`
 
     for (let qid = 0; qid < questionList.length; qid++) {
@@ -71,5 +75,6 @@ async function loadSummaryTable(milestone) {
     }
   }
 
+  summaryTableHead.innerHTML = htmlHead
   summaryTable.innerHTML = html
 }
