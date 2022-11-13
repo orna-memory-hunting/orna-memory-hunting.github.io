@@ -36,10 +36,11 @@ async function loadSummaryTable(milestone) {
 
   for (let utcHours = 0; utcHours < 24; utcHours++) {
     const hoursMap = issuesMap[utcHours]
+    const dt = new Date()
 
     if (!hoursMap) continue
 
-    const hours = ('0' + utcHours).slice(-2)
+    const hours = ('0' + (utcHours + dt.getHours() - dt.getUTCHours())).slice(-2)
     const gridColumn = `grid-column:${++colid};`
     let rowid = 1
 
