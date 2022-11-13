@@ -11,8 +11,12 @@ const repo = { owner: 'orna-memory-hunting', repo: 'storage' }
  */
 function getMilestoneTitle(date) {
   const dt = date ? new Date(date) : new Date()
-  const sWeek = new Date(dt.setUTCDate(dt.getUTCDate() - dt.getUTCDay() + 1))
-  const eWeek = new Date(dt.setUTCDate(dt.getUTCDate() + (7 - dt.getUTCDay())))
+  let day = dt.getUTCDay() - 1
+
+  if (day < 0) day = 6
+
+  const sWeek = new Date(dt.setUTCDate(dt.getUTCDate() - day))
+  const eWeek = new Date(dt.setUTCDate(dt.getUTCDate() + 6))
   const sDate = sWeek.toJSON().replace(/.*\d\d(\d\d)(-\d\d-\d\d).*/, '$1$2').split('-').reverse().join('.')
   const eDate = eWeek.toJSON().replace(/.*\d\d(\d\d)(-\d\d-\d\d).*/, '$1$2').split('-').reverse().join('.')
 

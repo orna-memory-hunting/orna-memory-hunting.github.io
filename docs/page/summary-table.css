@@ -1,3 +1,7 @@
+.main-content {
+  margin: 0 1px;
+}
+
 .summary-table {
   display              : grid;
   grid-template-columns: repeat(24, 1fr);
@@ -6,22 +10,19 @@
 }
 
 .summary-table:first-child {
-  padding-top     : 8px;
+  padding-top     : 1px;
   position        : sticky;
-  top             : 42px;
+  top             : 41px;
   background-color: #362e2b;
   z-index         : 50;
-}
-
-.summary-table:last-child {
-  margin-bottom: 8px;
 }
 
 .summary-table>* {
   box-shadow: 0 0 0 1px #c2bfbf;
   padding   : 4px 6px;
-  width     : calc(5.8vw);
+  width     : 5.8vw;
   z-index   : 2;
+  box-sizing: border-box;
 }
 
 .summary-table>*.skipped {
@@ -31,91 +32,91 @@
 
 @media screen and (max-width: 4900px) {
   .summary-table>* {
-    width: calc(6.2vw);
+    width: 6.2vw;
   }
 }
 
 @media screen and (max-width: 4600px) {
   .summary-table>* {
-    width: calc(6.6vw);
+    width: 6.6vw;
   }
 }
 
 @media screen and (max-width: 4300px) {
   .summary-table>* {
-    width: calc(7.1vw);
+    width: 7.1vw;
   }
 }
 
 @media screen and (max-width: 4000px) {
   .summary-table>* {
-    width: calc(7.6vw - 2px);
+    width: 7.6vw;
   }
 }
 
 @media screen and (max-width: 3700px) {
   .summary-table>* {
-    width: calc(8.3vw - 4px);
+    width: 8.3vw;
   }
 }
 
 @media screen and (max-width: 3400px) {
   .summary-table>* {
-    width: calc(9vw - 6px);
+    width: 9vw;
   }
 }
 
 @media screen and (max-width: 3100px) {
   .summary-table>* {
-    width: calc(10vw - 8px);
+    width: 10vw;
   }
 }
 
 @media screen and (max-width: 2800px) {
   .summary-table>* {
-    width: calc(11.1vw - 10px);
+    width: 11.1vw;
   }
 }
 
 @media screen and (max-width: 2500px) {
   .summary-table>* {
-    width: calc(12.5vw - 12px);
+    width: 12.5vw;
   }
 }
 
 @media screen and (max-width: 2200px) {
   .summary-table>* {
-    width: calc(14.2vw - 14px);
+    width: 14.2vw;
   }
 }
 
 @media screen and (max-width: 1900px) {
   .summary-table>* {
-    width: calc(16.6vw - 16px);
+    width: 16.6vw;
   }
 }
 
 @media screen and (max-width: 1600px) {
   .summary-table>* {
-    width: calc(20vw - 18px);
+    width: 20vw;
   }
 }
 
 @media screen and (max-width: 1300px) {
   .summary-table>* {
-    width: calc(25vw - 20px);
+    width: 25vw;
   }
 }
 
 @media screen and (max-width: 1000px) {
   .summary-table>* {
-    width: calc(33.3vw - 22px);
+    width: 33.3vw;
   }
 }
 
 @media screen and (max-width: 700px) {
   .summary-table>* {
-    width: calc(50vw - 24px);
+    width: 50vw;
   }
 }
 
