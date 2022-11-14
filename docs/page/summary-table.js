@@ -9,26 +9,47 @@ const summaryTableName = document.getElementById('summary-table-name')
 const summaryTableHead = document.getElementById('summary-table-head')
 /** @type {HTMLDivElement} */// @ts-ignore
 const summaryTable = document.getElementById('summary-table')
+/** @type {HTMLInputElement} */// @ts-ignore
+const summaryTableSearch = document.getElementById('summary-table-search')
+let milestone = null
 
 safeExecute(async () => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
-  const milestone = parseInt(params.get('milestone'))
 
-  // TODO
-  await loadSummaryTable(isNaN(milestone) ? null : milestone)
+  milestone = parseInt(params.get('milestone'))
+  milestone = isNaN(milestone) ? null : milestone
+
+  await loadSummaryTable()
 })
 
-/** @param {number} milestone */
-async function loadSummaryTable(milestone) {
-  summaryTableName.textContent = `Период: ${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
+let searchString = null
+let searchTimerId = null
 
-  const issuesMap = await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' }).catch(err => {
-    return err.message === 'milestone not found' ? false : err
-  })
+summaryTableSearch.onkeyup = () => {
+  const searchStringCur = summaryTableSearch.value.length > 1 ? summaryTableSearch.value : null
+
+  if (searchString !== searchStringCur) {
+    searchString = searchStringCur
+    if (searchTimerId) {
+      clearTimeout(searchTimerId)
+    }
+    searchTimerId = setTimeout(() => safeExecute(loadSummaryTable), 300)
+  }
+}
+
+
+let issuesMap = null
+
+async function loadSummaryTable() {
   let htmlHead = ''
   let html = ''
   let colid = 0
   let maxQLen = 0
+
+  summaryTableName.textContent = `Период: ${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
+  issuesMap = issuesMap || await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' }).catch(err => {
+    return err.message === 'milestone not found' ? false : err
+  })
 
   if (issuesMap === false) {
     summaryTable.innerHTML = '<div class="summary-table-middle">На этой неделе разведку не проводим</div>'
@@ -42,45 +63,77 @@ async function loadSummaryTable(milestone) {
     maxQLen = Math.max(maxQLen, hoursMap.len)
   }
 
-  for (let utcHours = 0; utcHours < 24; utcHours++) {
+  for (let hours = 0; hours < 24; hours++) {
+    const utcHours = new Date(new Date().setHours(hours)).getUTCHours()
     const hoursMap = issuesMap[utcHours]
-    const dt = new Date()
 
     if (!hoursMap) continue
 
-    const hours = ('0' + (utcHours + dt.getHours() - dt.getUTCHours())).slice(-2)
-    const gridColumn = `grid-column:${++colid};`
+    const hoursTxt = ('0' + hours).slice(-2)
+    const gridColumn = `grid-column:${colid + 1};`
     let rowid = 1
-
-    htmlHead += `<div class="summary-head" style="${gridColumn}grid-row:1;">` +
-      `${hours}:00 - ${hours}:59</div>`
+    const htmlHeadTime = `<div class="summary-head" style="${gridColumn}grid-row:1;">` +
+      `${hoursTxt}:00 - ${hoursTxt}:59</div>`
+    let htmlTime = '<div>'
+    let hasTime = false
 
     for (let qid = 0; qid < questionList.length; qid++) {
       const questionMap = hoursMap ? hoursMap[qid] : null
       const question = questionList[qid]
+      let htmlQuestion = ''
+      let hasQuestion = false
 
-      html += `<div class="summary-question ${questionMap ? '' : 'skipped'}" style="${gridColumn}grid-row:${++rowid};">` +
+      if (!questionMap) continue
+
+      htmlQuestion += '<div class="summary-question-container">' +
+        `<div class="summary-question ${questionMap ? '' : 'skipped'}" style="${gridColumn}grid-row:${++rowid};">` +
         `${questionLabels[qid]}. ${question.sq || question.q}</div>`
 
       for (let aid = 0; aid < question.a.length; aid++) {
         const answerMap = questionMap ? questionMap[aid] : []
-
-        html += `<div class="summary-answer ${questionMap ? '' : 'skipped'}" style="${gridColumn}grid-row:${++rowid};">` +
+        let htmlAnswer = `<div class="summary-answer ${questionMap ? '' : 'skipped'}" style="${gridColumn}grid-row:${++rowid};">` +
           `<div class="summary-answer-title">- ${answerLabels[aid]}. ${question.sa ? question.sa[aid] : question.a[aid]}</div>`
+        let hasAnswer = false
 
         if (answerMap) {
           for (const amitie of answerMap) {
-            html += renderAmitieRow(amitie)
+            if (searchString) {
+              if (amitie.title.toLowerCase().includes(searchString.toLowerCase())) {
+                htmlAnswer += renderAmitieRow(amitie)
+                hasAnswer = true
+              }
+            } else {
+              htmlAnswer += renderAmitieRow(amitie)
+            }
           }
         } else {
-          html += '<div class="amitie-row">' +
-            '<div class="lost-amitie">Не разведано!</div>' +
-            `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}&t=${utcHours}">+</a>` +
-            '</div>'
+          if (!searchString) {
+            htmlAnswer += '<div class="amitie-row">' +
+              '<div class="lost-amitie">Не разведано!</div>' +
+              `<a class="text-button" target="_self" href="/amitie/new/#q=${qid}&a=${aid}&t=${utcHours}">+</a>` +
+              '</div>'
+          }
         }
 
-        html += '</div>'
+        htmlAnswer += '</div>'
+        if (!searchString || hasAnswer) {
+          htmlQuestion += htmlAnswer
+          hasQuestion = true
+        }
       }
+      htmlQuestion += '</div>'
+
+      if (!searchString || hasQuestion) {
+        htmlTime += htmlQuestion
+        hasTime = true
+      }
+    }
+    htmlTime += '</div>'
+
+    if (!searchString || hasTime) {
+      htmlHead += htmlHeadTime
+      html += htmlTime
+      ++colid
     }
   }
 
