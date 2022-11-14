@@ -22,11 +22,19 @@ safeExecute(async () => {
 async function loadSummaryTable(milestone) {
   summaryTableName.textContent = `Период: ${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
 
-  const issuesMap = await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' })
+  const issuesMap = await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' }).catch(err => {
+    return err.message === 'milestone not found' ? false : err
+  })
   let htmlHead = ''
   let html = ''
   let colid = 0
   let maxQLen = 0
+
+  if (issuesMap === false) {
+    summaryTable.innerHTML = '<div class="summary-table-middle">На этой неделе разведку не проводим</div>'
+
+    return
+  }
 
   for (const key in issuesMap) {
     const hoursMap = issuesMap[key]

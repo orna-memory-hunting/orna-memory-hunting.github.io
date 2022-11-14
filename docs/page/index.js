@@ -82,7 +82,9 @@ safeExecute(() => {
     amitieList.classList.add('hide')
 
     const { timeUTC } = getTimeLabels(utcHours)
-    const questionMap = (await getIssuesMap({ labels: [timeUTC] }))[utcHours]
+    const questionMap = (await getIssuesMap({ labels: [timeUTC] }).catch(err => {
+      return err.message === 'milestone not found' ? { [utcHours]: false } : err
+    }))[utcHours]
     let qExistsHTML = ''
     let qNotExistsHTML = ''
     let html = ''
@@ -127,6 +129,8 @@ safeExecute(() => {
         }
       }
       html = qExistsHTML + qNotExistsHTML
+    } else if (questionMap === false) {
+      html = '<div class="amitie-list-middle">На этой неделе разведку не проводим</div>'
     } else {
       for (let qid = 0; qid < questionList.length; qid++) {
         const question = questionList[qid]

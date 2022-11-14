@@ -45,6 +45,10 @@ async function getMilestoneNumber(date) {
     }
   }
 
+  if (!date && !milestoneId) {
+    throw Error('milestone not found')
+  }
+
   return parseInt(milestoneId)
 }
 

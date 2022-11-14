@@ -146,3 +146,14 @@
 .skipped {
   opacity: .5;
 }
+
+.summary-table-middle {
+  grid-column    : 1 / 25;
+  grid-row       : 1;
+  width          : auto;
+  box-shadow     : none;
+  align-items    : center;
+  justify-content: center;
+  display        : flex;
+  padding-top    : calc(50vh - 66px);
+}
