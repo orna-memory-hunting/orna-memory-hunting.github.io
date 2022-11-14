@@ -98,7 +98,29 @@ async function loadSummaryTable() {
         if (answerMap) {
           for (const amitie of answerMap) {
             if (searchString) {
-              if (amitie.title.toLowerCase().includes(searchString.toLowerCase())) {
+              const title = amitie.title.toLowerCase()
+              const sVals = searchString.toLowerCase().split(' ')
+              let matched = true
+
+              for (let val of sVals) {
+                if (val.startsWith(':')) {
+                  matched = false
+                  val = val.slice(1)
+                  for (const label of amitie.labels) {
+                    if (label.name.toLowerCase().includes(val)) {
+                      matched = true
+                      break
+                    }
+                  }
+                } else {
+                  matched = title.includes(val)
+                }
+                if (!matched) {
+                  break
+                }
+              }
+
+              if (matched) {
                 htmlAnswer += renderAmitieRow(amitie)
                 hasAnswer = true
               }
