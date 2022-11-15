@@ -181,8 +181,8 @@
 }
 
 .additional-labels,
-.double-field,
-.double-amitie-list {
+.clone-field,
+.clone-amitie-list {
   display    : flex;
   column-gap : 12px;
   row-gap    : 6px;
@@ -190,14 +190,14 @@
   flex-wrap  : wrap;
 }
 
-.double-amitie-list-items {
+.clone-amitie-list-items {
   width         : 100%;
   display       : flex;
   flex-direction: column;
   row-gap       : 8px;
 }
 
-.double-amitie {
+.clone-amitie {
   display    : flex;
   align-items: baseline;
   column-gap : 8px;

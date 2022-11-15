@@ -273,7 +273,7 @@ safeExecute(() => {
       item.classList.remove('active')
     })
     // @ts-ignore
-    document.querySelector('#double-field div[data-double="0"]').click()
+    document.querySelector('#clone-field div[data-clone="0"]').click()
 
     updateGithubLink()
 
@@ -745,9 +745,9 @@ safeExecute(() => {
 
 
   /** @type {HTMLDivElement} */// @ts-ignore
-  const doubleField = document.getElementById('double-field')
+  const cloneField = document.getElementById('clone-field')
 
-  doubleField.onclick = event => {
+  cloneField.onclick = event => {
     /** @type {HTMLDivElement} */// @ts-ignore
     const item = event.target
 
@@ -790,10 +790,10 @@ safeExecute(() => {
       const addLabels = Array.from(document.querySelectorAll('#additional-labels .active'))
         .reduce((labels, /** @type {HTMLDivElement} */label) => `${labels},${label.dataset.label}`, '')
       /** @type {HTMLDivElement} */// @ts-ignore
-      const doubleElm = document.querySelector('#double-field .active')
-      const double = doubleElm ? Number(doubleElm.dataset.double) : 0
-      const doubleLabel = double ? `,double #${double}` : ''
-      const labels = `${answer.label},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${doubleLabel}`
+      const cloneElm = document.querySelector('#clone-field .active')
+      const clone = cloneElm ? Number(cloneElm.dataset.clone) : 0
+      const cloneLabel = clone ? `,clone #${clone}` : ''
+      const labels = `${answer.label},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${cloneLabel}`
       const milestone = getMilestoneTitle(time)
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
@@ -807,33 +807,42 @@ safeExecute(() => {
         encodeURIComponent(`### Минусы\n${minusBlocks}`) +
         encodeURIComponent(hiddenInfo)
 
-      doAsync(checkDoubleAmitieList)
+      doAsync(checkCloneAmitieList)
     })
   }
 
   /** @type {HTMLDivElement} */// @ts-ignore
-  const doubleAmitieList = document.getElementById('double-amitie-list')
+  const cloneAmitieList = document.getElementById('clone-amitie-list')
   /** @type {HTMLDivElement} */// @ts-ignore
-  const doubleAmitieResult = document.getElementById('double-amitie-result')
-  let lastDoubleProps = ''
+  const cloneAmitieResult = document.getElementById('clone-amitie-result')
+  let lastCloneProps = ''
 
-  async function checkDoubleAmitieList() {
+  async function checkCloneAmitieList() {
     const answer = getSelectedAnswer()
     const time = new Date(new Date().setHours(Number(timeSelect.value)))
-    const milestone = await getMilestoneNumber(time)
     const { timeUTC } = getTimeLabels(time.getUTCHours())
-    const doubleProps = `${milestone}/${timeUTC}/${answer.label}`
+    const milestone = await getMilestoneNumber(time).catch(err => {
+      return err.message === 'milestone not found' ? false : err
+    })
+    const cloneProps = `${milestone}/${timeUTC}/${answer.label}`
 
-    if (lastDoubleProps === doubleProps) {
+    if (milestone === false) {
+      cloneAmitieList.classList.add('hide')
+      cloneAmitieResult.classList.remove('hide')
+      cloneAmitieResult.innerHTML = 'На этой неделе разведку не проводим'
+
       return
     }
-    lastDoubleProps = doubleProps
-    doubleAmitieResult.innerHTML = 'Загрузка...'
-    doubleAmitieList.classList.add('hide')
+    if (lastCloneProps === cloneProps) {
+      return
+    }
+    lastCloneProps = cloneProps
+    cloneAmitieResult.innerHTML = 'Загрузка...'
+    cloneAmitieList.classList.add('hide')
 
     const issues = await getIssuesList({ milestone, labels: [answer.label, timeUTC] })
     let html = ''
-    let maxDouble = 0
+    let maxClone = 0
 
     if (issues.length > 0) {
       for (const issue of issues) {
@@ -841,36 +850,36 @@ safeExecute(() => {
 
         if (issue.labels.length) {
           for (const label of issue.labels) {
-            if (label.name.startsWith('double #')) {
-              const double = parseInt(label.name.replace('double #', ''))
+            if (label.name.startsWith('clone #')) {
+              const clone = parseInt(label.name.replace('clone #', ''))
 
-              if (!isNaN(double)) maxDouble = Math.max(maxDouble, double)
-              if (maxDouble > 5) maxDouble = 5
+              if (!isNaN(clone)) maxClone = Math.max(maxClone, clone)
+              if (maxClone > 5) maxClone = 5
             }
           }
         }
       }
-      doubleAmitieList.innerHTML = html
-      doubleAmitieResult.classList.add('hide')
-      doubleAmitieList.classList.remove('hide')
+      cloneAmitieList.innerHTML = html
+      cloneAmitieResult.classList.add('hide')
+      cloneAmitieList.classList.remove('hide')
     } else {
-      doubleAmitieList.classList.add('hide')
-      doubleAmitieResult.classList.remove('hide')
-      doubleAmitieResult.innerHTML = 'Нет'
+      cloneAmitieList.classList.add('hide')
+      cloneAmitieResult.classList.remove('hide')
+      cloneAmitieResult.innerHTML = 'Нет'
     }
 
-    if (!maxDouble) {
+    if (!maxClone) {
       // @ts-ignore
-      document.querySelector('#double-field div[data-double="0"]').click()
-    } else if (maxDouble < 5) {
+      document.querySelector('#clone-field div[data-clone="0"]').click()
+    } else if (maxClone < 5) {
       // @ts-ignore
-      document.querySelector(`#double-field div[data-double="${maxDouble + 1}"]`).click()
+      document.querySelector(`#clone-field div[data-clone="${maxClone + 1}"]`).click()
     } else {
       // @ts-ignore
-      document.querySelector('#double-field div[data-double="1"]').click()
+      document.querySelector('#clone-field div[data-clone="1"]').click()
     }
 
-    doubleAmitieList.innerHTML = html
+    cloneAmitieList.innerHTML = html
   }
 
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
