@@ -1,7 +1,6 @@
-.time-lap {
-  display    : flex;
-  gap        : 4px;
-  align-items: baseline;
+.time-lap-text {
+  text-align : center;
+  white-space: nowrap;
 }
 
 .time-lap-button {

@@ -9,6 +9,8 @@ safeExecute(() => {
   /** @type {HTMLDivElement} */// @ts-ignore
   const navTimeBack = document.getElementById('nav-time-back')
   /** @type {HTMLDivElement} */// @ts-ignore
+  const timeLapText = document.getElementById('time-lap-text')
+  /** @type {HTMLDivElement} */// @ts-ignore
   const navTimeForward = document.getElementById('nav-time-forward')
   /** @type {HTMLDivElement} */// @ts-ignore
   const amitieListLoader = document.getElementById('amitie-list-loader')
@@ -33,6 +35,7 @@ safeExecute(() => {
     const hr = ('0' + dt.getHours()).slice(-2)
 
     utcHours = dt.getUTCHours()
+    timeLapText.textContent = `${hr}:00 - ${hr}:59`
     navTimeBack.textContent = `<- ${hr}:00`
     navTimeForward.textContent = `${hr}:59 ->`
   }
@@ -45,6 +48,7 @@ safeExecute(() => {
     params.delete('utcHours')
     window.history.replaceState(null, '', `/#${params.toString()}`)
     utcHours = dt.getUTCHours()
+    timeLapText.textContent = `${hr}:00 - ${hr}:59`
     navTimeBack.textContent = `<- ${hr}:00`
     navTimeForward.textContent = `${hr}:59 ->`
   }
@@ -62,6 +66,7 @@ safeExecute(() => {
 
     params.set('utcHours', utcHours + '')
     window.history.replaceState(null, '', `/#${params.toString()}`)
+    timeLapText.textContent = `${hr}:00 - ${hr}:59`
     navTimeBack.textContent = `<- ${hr}:00`
     navTimeForward.textContent = `${hr}:59 ->`
     doAsync(loadAmitieList)
