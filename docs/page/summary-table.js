@@ -12,6 +12,7 @@ const summaryTable = document.getElementById('summary-table')
 /** @type {HTMLInputElement} */// @ts-ignore
 const summaryTableSearch = document.getElementById('summary-table-search')
 let milestone = null
+let issuesMap = null
 
 safeExecute(async () => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
@@ -36,9 +37,6 @@ summaryTableSearch.onkeyup = () => {
     searchTimerId = setTimeout(() => safeExecute(loadSummaryTable), 300)
   }
 }
-
-
-let issuesMap = null
 
 async function loadSummaryTable() {
   let htmlHead = ''
