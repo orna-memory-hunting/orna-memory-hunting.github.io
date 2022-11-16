@@ -4,9 +4,21 @@
   align-items: baseline;
 }
 
-.time-lap-text {
+.time-lap-button {
+  position   : fixed;
+  bottom     : 0;
   text-align : center;
   white-space: nowrap;
+  padding    : 2px 4px;
+  margin     : 22px;
+}
+
+.time-lap-button-l {
+  margin-left: -112px;
+}
+
+.time-lap-button-r {
+  margin-right: -112px;
 }
 
 .current-time {
@@ -29,10 +41,18 @@
   display        : flex;
 }
 
-.add-amitie-block {
-  display        : flex;
-  justify-content: center;
-  width          : 100%;
+.sticky-footer {
+  margin-top: 68px;
+}
+
+.add-amitie-button {
+  position     : fixed;
+  bottom       : 0;
+  height       : 44px;
+  width        : 44px;
+  border-radius: 22px;
+  align-items  : center;
+  font-size    : 22px;
 }
 
 .question {

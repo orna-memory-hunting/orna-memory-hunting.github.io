@@ -24,13 +24,8 @@
 
 <body class="body-font">
   <div class="nav-head">
-    <div class="nav-title">Разведка</div>
+    <div class="nav-title flex-grow">Разведка</div>
     <div id="current-time" class="current-time text-button">00:00</div>
-    <div class="time-lap">
-      <div id="nav-time-back" class="text-icon-button">&#60;-</div>
-      <div id="time-lap-text" class="time-lap-text">00:00 - 00:59</div>
-      <div id="nav-time-forward" class="text-icon-button">-&#62;</div>
-    </div>
   </div>
 
   <div class="main-content">
@@ -38,12 +33,12 @@
     <div id="amitie-list" class="amitie-list hide"></div>
   </div>
 
-  <div class="footer">
-    <div class="add-amitie-block">
-      <div class="green-button">
-        <a class="astext" target="_self" href="/amitie/new/">Добавить осколок</a>
-      </div>
+  <div class="sticky-footer sticky-footer-center">
+    <div id="nav-time-back" class="green-button time-lap-button time-lap-button-l">&#60;- 00:00</div>
+    <div class="green-button add-amitie-button">
+      <a class="astext" target="_self" href="/amitie/new/">+</a>
     </div>
+    <div id="nav-time-forward" class="green-button time-lap-button time-lap-button-r">00:59 -&#62;</div>
   </div>
 
 </body>

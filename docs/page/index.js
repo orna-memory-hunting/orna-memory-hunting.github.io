@@ -7,8 +7,6 @@ safeExecute(() => {
   /** @type {HTMLDivElement} */// @ts-ignore
   const currentTime = document.getElementById('current-time')
   /** @type {HTMLDivElement} */// @ts-ignore
-  const timeLapText = document.getElementById('time-lap-text')
-  /** @type {HTMLDivElement} */// @ts-ignore
   const navTimeBack = document.getElementById('nav-time-back')
   /** @type {HTMLDivElement} */// @ts-ignore
   const navTimeForward = document.getElementById('nav-time-forward')
@@ -35,7 +33,8 @@ safeExecute(() => {
     const hr = ('0' + dt.getHours()).slice(-2)
 
     utcHours = dt.getUTCHours()
-    timeLapText.textContent = `${hr}:00 - ${hr}:59`
+    navTimeBack.textContent = `<- ${hr}:00`
+    navTimeForward.textContent = `${hr}:59 ->`
   }
 
   function setCurrentUTCHours() {
@@ -46,7 +45,8 @@ safeExecute(() => {
     params.delete('utcHours')
     window.history.replaceState(null, '', `/#${params.toString()}`)
     utcHours = dt.getUTCHours()
-    timeLapText.textContent = `${hr}:00 - ${hr}:59`
+    navTimeBack.textContent = `<- ${hr}:00`
+    navTimeForward.textContent = `${hr}:59 ->`
   }
 
   /** @param {boolean} forward */
@@ -62,7 +62,8 @@ safeExecute(() => {
 
     params.set('utcHours', utcHours + '')
     window.history.replaceState(null, '', `/#${params.toString()}`)
-    timeLapText.textContent = `${hr}:00 - ${hr}:59`
+    navTimeBack.textContent = `<- ${hr}:00`
+    navTimeForward.textContent = `${hr}:59 ->`
     doAsync(loadAmitieList)
   }
 
