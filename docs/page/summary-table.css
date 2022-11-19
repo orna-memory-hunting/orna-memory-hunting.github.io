@@ -12,7 +12,7 @@
 .summary-table:first-child {
   padding-top     : 1px;
   position        : sticky;
-  top             : 42px;
+  top             : 39px;
   background-color: #362e2b;
   z-index         : 50;
 }
@@ -21,7 +21,6 @@
   box-shadow: 0 0 0 1px #c2bfbf;
   width     : 5.8vw;
   z-index   : 2;
-  box-sizing: border-box;
 }
 
 .summary-table>*.skipped {
@@ -116,6 +115,12 @@
 @media screen and (max-width: 700px) {
   .summary-table>* {
     width: 50vw;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .summary-table>* {
+    width: 100vw;
   }
 }
 

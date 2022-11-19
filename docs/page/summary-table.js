@@ -44,7 +44,7 @@ async function loadSummaryTable() {
   let colid = 0
   let maxQLen = 0
 
-  summaryTableName.textContent = `Период: ${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
+  summaryTableName.textContent = `: ${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
   issuesMap = issuesMap || await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' }).catch(err => {
     return err.message === 'milestone not found' ? false : err
   })

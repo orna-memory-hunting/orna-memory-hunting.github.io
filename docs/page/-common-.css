@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html,
 body {
   display       : flex;
@@ -37,11 +41,10 @@ a:hover {
   display         : flex;
   justify-content : space-between;
   align-items     : center;
-  padding         : 4px 8px;
+  padding         : 4px 0;
   border-bottom   : 1px solid #403c3b;
   min-height      : 32px;
   flex-wrap       : wrap;
-  column-gap      : 8px;
   background-color: #362e2b;
   position        : sticky;
   top             : 0;
@@ -51,9 +54,61 @@ a:hover {
 .nav-title {
   font-size  : 20px;
   font-weight: bold;
-  padding    : 4px;
   position   : sticky;
-  left       : 4px;
+  left       : 0;
+  display    : flex;
+  align-items: center;
+  height     : 30px;
+}
+
+.menu-button {
+  user-select    : none;
+  text-align     : center;
+  height         : 30px;
+  padding-left   : 10px;
+  column-gap     : 10px;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  white-space    : nowrap;
+}
+
+.menu-list {
+  position        : absolute;
+  top             : 0;
+  background-color: #362e2b;
+  padding-bottom  : 2px;
+  box-shadow      : 2px 2px 2px 1px rgb(0 0 0 / 25%);
+  display         : flex;
+  flex-direction  : column;
+  align-items     : flex-start;
+}
+
+.menu-list .menu-button {
+  padding-right: 30px;
+}
+
+.menu-item {
+  white-space: nowrap;
+  user-select: none;
+  cursor     : pointer;
+  padding    : 8px 30px 8px 30px;
+  border-top : 1px solid #403c3b;
+  width      : 100%;
+  font-weight: normal;
+}
+
+.menu-item:hover {
+  background-color: #403939;
+}
+
+.menu-button+.menu-item {
+  margin-top: 4px;
+}
+
+.menu-button:hover {
+  cursor: pointer;
+  color : #fffdf8;
 }
 
 .nav-title-action {
@@ -62,6 +117,10 @@ a:hover {
   align-items: center;
   position   : sticky;
   right      : 4px;
+}
+
+.close-button {
+  margin-right: 8px;
 }
 
 .main-content {
@@ -109,12 +168,15 @@ a:hover {
   font-size       : 120%;
   z-index         : 1;
   padding         : 12px;
-  box-sizing      : border-box;
 }
 
-.astext {
+a.astext {
   color          : #f5f1e8;
   text-decoration: none;
+}
+
+a.astext:hover {
+  color: #f5f1e8;
 }
 
 .aslink {

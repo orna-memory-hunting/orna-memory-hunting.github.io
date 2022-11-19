@@ -1,6 +1,7 @@
 .time-lap-text {
   text-align : center;
   white-space: nowrap;
+  margin     : 0 8px;
 }
 
 .time-lap-button {
@@ -22,9 +23,10 @@
 
 .current-time {
   font-size  : 14px;
-  width      : 36px;
+  width      : 54px;
   text-align : center;
   white-space: nowrap;
+  margin     : 0 8px;
 }
 
 .amitie-list {
