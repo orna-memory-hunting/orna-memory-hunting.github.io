@@ -13,24 +13,31 @@ const summaryTable = document.getElementById('summary-table')
 const summaryTableSearch = document.getElementById('summary-table-search')
 let milestone = null
 let issuesMap = null
+let searchString = null
+let searchTimerId = null
 
 safeExecute(async () => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
+  const search = params.get('search')
 
   milestone = parseInt(params.get('milestone'))
   milestone = isNaN(milestone) ? null : milestone
 
+  if (search) {
+    searchString = summaryTableSearch.value = search
+  }
+
   await loadSummaryTable()
 })
 
-let searchString = null
-let searchTimerId = null
-
 summaryTableSearch.onkeyup = () => {
   const searchStringCur = summaryTableSearch.value.length > 1 ? summaryTableSearch.value : null
+  const params = new URLSearchParams(window.location.hash.replace('#', ''))
 
   if (searchString !== searchStringCur) {
     searchString = searchStringCur
+    params.set('search', searchString)
+    window.history.replaceState(null, '', `/#${params.toString()}`)
     if (searchTimerId) {
       clearTimeout(searchTimerId)
     }
