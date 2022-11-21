@@ -37,7 +37,7 @@ summaryTableSearch.onkeyup = () => {
   if (searchString !== searchStringCur) {
     searchString = searchStringCur
     params.set('search', searchString)
-    window.history.replaceState(null, '', `/#${params.toString()}`)
+    window.history.replaceState(null, '', `#${params.toString()}`)
     if (searchTimerId) {
       clearTimeout(searchTimerId)
     }
