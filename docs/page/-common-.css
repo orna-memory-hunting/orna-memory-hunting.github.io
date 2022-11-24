@@ -61,6 +61,10 @@ a:hover {
   height     : 30px;
 }
 
+.nav-title-no-menu {
+  padding-left: 10px;
+}
+
 .menu-button {
   user-select    : none;
   text-align     : center;
