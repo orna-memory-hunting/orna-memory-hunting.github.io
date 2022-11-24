@@ -188,8 +188,8 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     issue.answer === null
 
   issue.miniСard = `${issue.amitie.name}\n` +
-    `+ ${issue.amitie.plusBlocks.join('\n+')}\n` +
-    `- ${issue.amitie.minusBlocks.join('\n-')}\n` +
+    `+ ${issue.amitie.plusBlocks.join('\n+ ')}\n` +
+    `- ${issue.amitie.minusBlocks.join('\n- ')}\n` +
     `${issue.answer.code} ${issue.answer.textShort}\n` +
     `${issue.timeUTC}, ${issue.timeMSK}, ${issue.milestone}\n` +
     `${window.location.origin}${issue.url}\n` +
