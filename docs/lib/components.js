@@ -116,7 +116,7 @@ export function initComponents() {
     /** @type {HTMLDivElement} */// @ts-ignore
     const elm = event.target
 
-    if (menuList && !elm.classList.contains('menu-button')) {
+    if (menuList && !elm.classList.contains('menu-button') && !elm.parentElement.classList.contains('menu-button')) {
       menuList.classList.add('hide')
     }
     copyButton(event)
