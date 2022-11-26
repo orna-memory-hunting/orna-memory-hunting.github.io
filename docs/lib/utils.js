@@ -87,7 +87,8 @@ async function registerServiceWorker() {
         switch (event.data.name) {
           case 'force-refresh':
             if (event.data.buildNumber !== buildNumber) {
-              window.location.reload()
+              // @ts-ignore
+              window.location = '/'
             }
             break
           case 'pong':

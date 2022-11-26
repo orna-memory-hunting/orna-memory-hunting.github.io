@@ -81,12 +81,6 @@ export function initComponents() {
   const textMultiToggles = document.querySelectorAll('.text-multi-toggle')
   /** @type {Array<HTMLDivElement>} */// @ts-ignore
   const closeButtons = document.querySelectorAll('.close-button')
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const menuButtonOpen = document.getElementById('menu-button-open')
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const menuButtonClose = document.getElementById('menu-button-close')
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const menuList = document.getElementById('menu-list')
 
   if (textToggles) {
     textToggles.forEach(elm => elm.addEventListener('click', textToggleClick))
@@ -113,18 +107,6 @@ export function initComponents() {
     closeButtons.forEach(elm => elm.addEventListener('click', closeOrBack))
   }
   document.addEventListener('click', event => {
-    /** @type {HTMLDivElement} */// @ts-ignore
-    const elm = event.target
-
-    if (menuList && !elm.classList.contains('menu-button') && !elm.parentElement.classList.contains('menu-button')) {
-      menuList.classList.add('hide')
-    }
     copyButton(event)
   })
-
-  if (menuButtonOpen) {
-    menuButtonOpen.onclick = menuButtonClose.onclick = () => {
-      menuList.classList.toggle('hide')
-    }
-  }
 }
