@@ -4,7 +4,7 @@ import { questionList, questionLabels, answerLabels } from '../lib/questions.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
 /** @type {HTMLDivElement} */// @ts-ignore
-const summaryTableName = document.getElementById('summary-table-name')
+const summaryTableName = document.getElementById('summary-table-title')
 /** @type {HTMLDivElement} */// @ts-ignore
 const summaryTableHead = document.getElementById('summary-table-head')
 /** @type {HTMLDivElement} */// @ts-ignore
@@ -164,6 +164,10 @@ async function loadSummaryTable() {
     }
   }
 
-  summaryTableHead.innerHTML = htmlHead
-  summaryTable.innerHTML = html
+  if (!html) {
+    summaryTable.innerHTML = '<div class="summary-table-middle">Нет данных</div>'
+  } else {
+    summaryTableHead.innerHTML = htmlHead
+    summaryTable.innerHTML = html
+  }
 }
