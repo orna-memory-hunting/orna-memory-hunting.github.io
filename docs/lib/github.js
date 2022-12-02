@@ -343,6 +343,56 @@ async function getIssue(number) {
 }
 
 
+/**
+ * @param {IssuesOpts} [options]
+ * @returns {Promise<Array<{login:string,avatar:string,count:number}>>}
+ */
+async function getTopScouts(options = {}) {
+  const restOptions = await getIssuesOpts(options)
+  const topScouts = []
+  const topScoutsMap = {}
+  const perPage = 100
+  let page = 1
+
+  while (true) {
+    const response = await octokit.rest.issues.listForRepo({
+      ...restOptions,
+      per_page: perPage,
+      page
+    })
+
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify({
+        status: response.status,
+        url: response.url,
+        json: response
+      }, null, '  '))
+    }
+
+    const issuesRaw = response.data
+
+    for (const { user: { login, avatar_url } } of issuesRaw) { // eslint-disable-line camelcase
+      if (login in topScoutsMap) {
+        topScoutsMap[login].count++
+      } else {
+        topScouts.push(
+          topScoutsMap[login] = { login, avatar: avatar_url, count: 1 }// eslint-disable-line camelcase
+        )
+      }
+    }
+
+    if (issuesRaw.length < perPage) {
+      break
+    }
+    page++
+  }
+
+  topScouts.sort((b, a) => (a.count > b.count) ? 1 : ((b.count > a.count) ? -1 : 0))
+
+  return topScouts
+}
+
+
 export {
   getMilestoneTitle,
   getMilestoneNumber,
@@ -350,5 +400,6 @@ export {
   getTimeLabels,
   getIssuesList,
   getIssuesMap,
-  getIssue
+  getIssue,
+  getTopScouts
 }

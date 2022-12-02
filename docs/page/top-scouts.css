@@ -1,0 +1,31 @@
+.top-scouts-table {
+  display              : grid;
+  grid-template-columns: 42px 1fr min-content;
+  gap                  : 8px;
+  padding-top          : 8px;
+}
+
+.top-scouts-table-sep {
+  grid-column  : 1 / 4;
+  border-bottom: 1px solid #403c3b;
+}
+
+.top-scouts-table-img {
+  height         : 42px;
+  width          : 42px;
+  background-size: 42px;
+}
+
+.top-scouts-table-r {
+  text-align: right;
+}
+
+.top-scouts-table-middle {
+  grid-column    : 1 / 4;
+  grid-row       : 1;
+  width          : auto;
+  align-items    : center;
+  justify-content: center;
+  display        : flex;
+  padding-top    : calc(50vh - 66px);
+}
