@@ -7,7 +7,8 @@ const menuItems = [
   { url: '-' },
   { url: '/guide/', name: 'Гайд по разведке' },
   // { url: '/faq/', name: 'Популярные вопросы' },
-  { url: 'https://t.me/OrnaOskolki', name: 'Чат поддержки' }
+  { url: 'https://t.me/OrnaOskolki', name: 'Чат поддержки' },
+  { url: 'https://github.com/orna-memory-hunting/project/issues/new/choose', name: 'Сообщить об ошибке' }
 ]
 
 export function initMainMenu() {
