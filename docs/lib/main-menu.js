@@ -5,7 +5,7 @@ const menuItems = [
   { url: '/summary-table/', name: 'Общая таблица' },
   { url: '/top-scouts/', name: 'Топ разведки' },
   { url: '-' },
-  // { url: '/guide/', name: 'Гайд по разведке' },
+  { url: '/guide/', name: 'Гайд по разведке' },
   // { url: '/faq/', name: 'Популярные вопросы' },
   { url: 'https://t.me/OrnaOskolki', name: 'Чат поддержки' }
 ]

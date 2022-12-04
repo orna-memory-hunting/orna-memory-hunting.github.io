@@ -2,7 +2,8 @@ import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { getAnswerByLabels } from './questions.js'
 
 const octokit = new Octokit()
-const repo = { owner: 'orna-memory-hunting', repo: 'storage' }
+const storage = { owner: 'orna-memory-hunting', repo: 'storage' }
+const knowledge = { owner: 'orna-memory-hunting', repo: 'knowledge' }
 
 
 /**
@@ -34,7 +35,7 @@ async function getMilestoneNumber(date) {
 
   if (!milestoneId) {
     const milestones = (await octokit.rest.issues
-      .listMilestones({ state: 'open', ...repo })).data
+      .listMilestones({ state: 'open', ...storage })).data
 
     for (const { number, title } of milestones) {
       if (curMilestoneName === title) {
@@ -60,7 +61,7 @@ async function getMilestoneNumber(date) {
 /* eslint-enable jsdoc/valid-types */
 async function getMilestone(number) {
   return await octokit.rest.issues.getMilestone({
-    ...repo,
+    ...storage,
     milestone_number: number
   })
 }
@@ -213,7 +214,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
 /* eslint-enable jsdoc/valid-types */
 async function getIssuesOpts(options) {
   return {
-    ...repo,
+    ...storage,
     state: options.state || 'open',
     milestone: String(options.milestone || await getMilestoneNumber()),
     labels: (options.labels || []).join(',') || undefined
@@ -335,7 +336,7 @@ async function getIssuesMap(options = {}) {
  */
 async function getIssue(number) {
   const issueRaw = await octokit.rest.issues.get({
-    ...repo,
+    ...storage,
     issue_number: number
   })
 
@@ -393,6 +394,49 @@ async function getTopScouts(options = {}) {
 }
 
 
+/** @returns {Promise<Array<{num:number,title:string,body:string}>>} */
+async function getGuideList() {
+  const guideList = []
+  const perPage = 100
+  let page = 1
+
+  while (true) {
+    const response = await octokit.rest.issues.listForRepo({
+      ...knowledge,
+      state: 'open',
+      labels: 'guide',
+      per_page: perPage,
+      page
+    })
+
+    if (response.status !== 200) {
+      throw new Error(JSON.stringify({
+        status: response.status,
+        url: response.url,
+        json: response
+      }, null, '  '))
+    }
+
+    const issuesRaw = response.data
+
+    for (const { title, body } of issuesRaw) {
+      const num = Number(title.replace(/^#(\d+).*/, '$1'))
+
+      guideList.push({ num: isNaN(num) ? 0 : num, title, body })
+    }
+
+    if (issuesRaw.length < perPage) {
+      break
+    }
+    page++
+  }
+
+  guideList.sort((a, b) => (a.num > b.num) ? 1 : ((b.num > a.num) ? -1 : 0))
+
+  return guideList
+}
+
+
 export {
   getMilestoneTitle,
   getMilestoneNumber,
@@ -401,5 +445,6 @@ export {
   getIssuesList,
   getIssuesMap,
   getIssue,
-  getTopScouts
+  getTopScouts,
+  getGuideList
 }

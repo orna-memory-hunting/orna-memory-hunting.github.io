@@ -1,0 +1,21 @@
+.guide-table {
+  display              : grid;
+  grid-template-columns: 1fr;
+  gap                  : 8px;
+  padding-top          : 8px;
+}
+
+.guide-table-title {
+  font-size      : 24px;
+  line-height    : 28px;
+  cursor         : pointer;
+  text-decoration: underline;
+}
+
+.guide-table-middle {
+  width          : auto;
+  align-items    : center;
+  justify-content: center;
+  display        : flex;
+  padding-top    : calc(50vh - 66px);
+}
