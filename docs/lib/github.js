@@ -394,7 +394,7 @@ async function getTopScouts(options = {}) {
 }
 
 
-/** @returns {Promise<Array<{num:number,title:string,body:string}>>} */
+/** @returns {Promise<Array<{id:number,num:number,title:string,body:string}>>} */
 async function getGuideList() {
   const guideList = []
   const perPage = 100
@@ -419,10 +419,10 @@ async function getGuideList() {
 
     const issuesRaw = response.data
 
-    for (const { title, body } of issuesRaw) {
+    for (const { number, title, body } of issuesRaw) {
       const num = Number(title.replace(/^#(\d+).*/, '$1'))
 
-      guideList.push({ num: isNaN(num) ? 0 : num, title, body })
+      guideList.push({ id: number, num: isNaN(num) ? 0 : num, title, body })
     }
 
     if (issuesRaw.length < perPage) {

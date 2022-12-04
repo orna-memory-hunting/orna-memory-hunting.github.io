@@ -22,7 +22,7 @@ async function loadGuide() {
   let html = ''
 
   for (const guide of guideList) {
-    html += `<div><div id="${guide.num}" class="guide-table-title">${guide.title}</div>` +
+    html += `<div><div id="${guide.id}" class="guide-table-title">${guide.title}</div>` +
       `<div class="guide-table-body hide">${guide.body}</div></div>`
   }
 
