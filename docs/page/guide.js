@@ -50,8 +50,13 @@ guideTable.onclick = event => {
     }
 
     items.forEach(element => element.classList.add('hide'))
-    if (isHide) body.classList.remove('hide')
-    window.history.replaceState(null, '', `#${elm.id}`)
+    if (isHide) {
+      body.classList.remove('hide')
+      window.history.replaceState(null, '', `#${elm.id}`)
+    } else {
+      window.history.replaceState(null, '', '#')
+    }
+
     elm.scrollIntoView()
     document.documentElement.scrollBy({ top: -document.querySelector('.nav-head').clientHeight })
   }
