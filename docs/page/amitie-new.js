@@ -1,4 +1,4 @@
-import { safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
+import { showError, safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
 import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
 import { renderAmitieRow } from '../lib/amitie.js'
@@ -597,7 +597,7 @@ safeExecute(() => {
 
     if (dataBlocks.length) {
       let currentStep = 0
-      const logRecognizingText = (msg) => {
+      const logger = msg => {
         const percent = ((currentStep + msg.progress) / dataBlocks.length * 10000 ^ 0) / 100
 
         if (msg.status === 'recognizing text') {
@@ -609,8 +609,9 @@ safeExecute(() => {
           recognizingTextLog.textContent = msg.status
         }
       }
+      const errorHandler = err => showError(err)
       const scheduler = Tesseract.createScheduler()
-      const workerOption = { corePath: tesseractCore, workerPath: tesseractWorker, logger: logRecognizingText }
+      const workerOption = { corePath: tesseractCore, workerPath: tesseractWorker, logger, errorHandler }
       const worker1 = Tesseract.createWorker(workerOption)
       const worker2 = Tesseract.createWorker(workerOption)
       const langs = Array.from(document.querySelectorAll('.recognizing-lang .active'))

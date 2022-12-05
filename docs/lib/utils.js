@@ -136,6 +136,7 @@ function popup(text) {
 
 
 export {
+  showError,
   safeExecute,
   doAsync,
   nextTick,
