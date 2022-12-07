@@ -615,10 +615,8 @@ safeExecute(async () => {
         }
       }
       const errorHandler = err => showError(err)
-      const scheduler = Tesseract.createScheduler()
       const workerOption = { corePath: tesseractCore, workerPath: tesseractWorker, logger, errorHandler }
-      const worker1 = await Tesseract.createWorker(workerOption)
-      const worker2 = await Tesseract.createWorker(workerOption)
+      const worker = await Tesseract.createWorker(workerOption)
       const langs = Array.from(document.querySelectorAll('.recognizing-lang .active'))
         .reduce((langs, /** @type {HTMLDivElement} */lang) => {
           langs.push(lang.dataset.lang)
@@ -626,12 +624,12 @@ safeExecute(async () => {
           return langs
         }, []).join('+') || 'eng+rus+ukr'
 
-      await Promise.all([worker1.loadLanguage(langs), worker2.loadLanguage(langs)])
-      await Promise.all([worker1.initialize(langs), worker2.initialize(langs)])
-      scheduler.addWorker(worker1)
-      scheduler.addWorker(worker2)
+      await worker.loadLanguage(langs)
+      await worker.initialize(langs)
 
-      let resultsTmp = await Promise.all(dataBlocks.map(dataBlock => {
+      let resultsTmp = []
+
+      for (const dataBlock of dataBlocks) {
         const rCanvas = document.createElement('canvas')
         /** @type {CanvasRenderingContext2D} */// @ts-ignore
         const rContext = rCanvas.getContext('2d')
@@ -642,12 +640,11 @@ safeExecute(async () => {
           0, dataBlock.y, originAmitieCanvas.width, dataBlock.h,
           0, 0, originAmitieCanvas.width, dataBlock.h
         )
+        resultsTmp.push(await worker.recognize(rCanvas)
+          .then((/** @type {import('tesseract.js').RecognizeResult} */result) => (result.data.text || '').trim()))
+      }
 
-        return scheduler.addJob('recognize', rCanvas)
-          .then((/** @type {import('tesseract.js').RecognizeResult} */result) => (result.data.text || '').trim())
-      }))
-
-      await scheduler.terminate()
+      await worker.terminate()
 
       resultsTmp = resultsTmp.reduce((prev, cur) => {
         if (cur) {
