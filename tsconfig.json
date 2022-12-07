@@ -5,6 +5,7 @@
       "webworker",
       "ESNext",
       "DOM"
-    ]
+    ],
+    "esModuleInterop": true
   }
 }

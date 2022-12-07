@@ -3,11 +3,10 @@ import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
 import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
 import { renderAmitieRow } from '../lib/amitie.js'
 
-safeExecute(() => {
-  /** @type {{Tesseract:import('tesseract.js')}} */
-  const { Tesseract } = window
-  const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@3.0.2/tesseract-core.wasm.js'
-  const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@3.0.3/dist/worker.min.js'
+safeExecute(async () => {
+  const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/tesseract.esm.min.js')
+  const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.0/tesseract-core-simd.wasm.js'
+  const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/worker.min.js'
   /** @type {HTMLDivElement} */// @ts-ignore
   const questions = document.getElementById('questions')
   /** @type {HTMLInputElement} */// @ts-ignore
@@ -618,8 +617,8 @@ safeExecute(() => {
       const errorHandler = err => showError(err)
       const scheduler = Tesseract.createScheduler()
       const workerOption = { corePath: tesseractCore, workerPath: tesseractWorker, logger, errorHandler }
-      const worker1 = Tesseract.createWorker(workerOption)
-      const worker2 = Tesseract.createWorker(workerOption)
+      const worker1 = await Tesseract.createWorker(workerOption)
+      const worker2 = await Tesseract.createWorker(workerOption)
       const langs = Array.from(document.querySelectorAll('.recognizing-lang .active'))
         .reduce((langs, /** @type {HTMLDivElement} */lang) => {
           langs.push(lang.dataset.lang)
@@ -627,7 +626,6 @@ safeExecute(() => {
           return langs
         }, []).join('+') || 'eng+rus+ukr'
 
-      await Promise.all([worker1.load(), worker2.load()])
       await Promise.all([worker1.loadLanguage(langs), worker2.loadLanguage(langs)])
       await Promise.all([worker1.initialize(langs), worker2.initialize(langs)])
       scheduler.addWorker(worker1)
@@ -648,6 +646,8 @@ safeExecute(() => {
         return scheduler.addJob('recognize', rCanvas)
           .then((/** @type {import('tesseract.js').RecognizeResult} */result) => (result.data.text || '').trim())
       }))
+
+      await scheduler.terminate()
 
       resultsTmp = resultsTmp.reduce((prev, cur) => {
         if (cur) {
@@ -701,7 +701,7 @@ safeExecute(() => {
 
       updateGithubLink()
 
-      await scheduler.terminate()
+
       recognizingInProgress = false
       amitiUploadField.classList.remove('disable')
     }
