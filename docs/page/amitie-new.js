@@ -171,21 +171,27 @@ safeExecute(() => {
 
     if (recognizingInProgress) return
     safeExecute(async () => {
-      await navigator.clipboard.read().then(clipboardItems => {
-        if (clipboardItems.length) {
-          const [clipboardItem] = clipboardItems
+      await navigator.clipboard.read().catch(() => {
+        amitiUploadField.click()
+        amitieFileFromClipboard.classList.remove('aslink')
+        amitieFileFromClipboard.onclick = null
+      }).then(clipboardItems => {
+        if (clipboardItems) {
+          if (clipboardItems.length) {
+            const [clipboardItem] = clipboardItems
 
-          if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
-            clipboardItem.getType(clipboardItem.types[0]).then(data => {
-              const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
+            if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
+              clipboardItem.getType(clipboardItem.types[0]).then(data => {
+                const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
 
-              doAsync(() => prepareAmitieImage(file))
-            })
+                doAsync(() => prepareAmitieImage(file))
+              })
+            } else {
+              window.alert('Не удалось найти файл изображения!')
+            }
           } else {
             window.alert('Не удалось найти файл изображения!')
           }
-        } else {
-          window.alert('Не удалось найти файл изображения!')
         }
       })
     })
