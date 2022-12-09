@@ -14,12 +14,12 @@
 
 .question,
 .answer {
-  background   : #342828;
-  border-color : #252122;
-  padding      : 12px 10px;
-  display      : inline-block;
-  border-radius: 4px;
-  user-select  : none;
+  background-color: #342828cc;
+  border-color    : #252122;
+  padding         : 12px 10px;
+  display         : inline-block;
+  border-radius   : 4px;
+  user-select     : none;
 }
 
 .question:hover,

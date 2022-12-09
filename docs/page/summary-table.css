@@ -203,7 +203,9 @@ input[type=text].summary-table-search {
 }
 
 .summary-table-search:focus {
-  left   : 12px;
-  right  : 12px;
+  left   : 32px;
+  right  : 48px;
   opacity: 1;
+  bottom : auto;
+  top    : 3px;
 }

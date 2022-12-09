@@ -2,11 +2,15 @@
   box-sizing: border-box;
 }
 
-html,
+html {
+  display       : flex;
+  flex-direction: column;
+  height        : 100%;
+}
+
 body {
   display       : flex;
   flex-direction: column;
-  min-height    : 100%;
   flex-grow     : 1;
   min-width     : min-content;
 }
@@ -16,7 +20,6 @@ body {
   color           : #f5f1e8;
   margin          : 0;
   background-color: #362e2b;
-  height          : 100%;
 }
 
 input[type=text] {
@@ -43,7 +46,6 @@ a:hover {
   align-items     : center;
   padding         : 4px 0;
   border-bottom   : 1px solid #403c3b;
-  min-height      : 32px;
   flex-wrap       : wrap;
   background-color: #362e2b;
   position        : sticky;
@@ -63,6 +65,10 @@ a:hover {
 @media screen and (max-width: 400px) {
   .nav-title {
     flex-direction: column;
+  }
+
+  .nav-title.flex-grow {
+    flex-grow: 0;
   }
 }
 
@@ -136,6 +142,7 @@ a:hover {
   flex-grow     : 1;
   display       : flex;
   flex-direction: column;
+  z-index       : 1;
 }
 
 .sticky-footer {
@@ -145,6 +152,7 @@ a:hover {
   position       : sticky;
   bottom         : 0;
   overflow       : visible;
+  z-index        : 100;
 }
 
 .sticky-footer-center {
@@ -203,7 +211,7 @@ a.astext:hover {
 }
 
 .text-button {
-  background-color: #403939;
+  background-color: #403939cc;
   user-select     : none;
   border-radius   : 4px;
   border          : 1px solid #6c6360;
@@ -258,7 +266,7 @@ a.text-button {
 .text-multi-toggle-item.active {
   text-decoration : underline dashed 1px #9a9898;
   border-color    : #6c6360;
-  background-color: #504949;
+  background-color: #504949cc;
 }
 
 .text-toggle-item:hover,
@@ -273,7 +281,7 @@ a.text-button {
   cursor          : inherit;
   text-decoration : underline dashed 1px #9a9898;
   border-color    : #6c6360;
-  background-color: #504949;
+  background-color: #504949cc;
 }
 
 .green-button {

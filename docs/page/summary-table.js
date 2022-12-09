@@ -11,6 +11,8 @@ const summaryTableHead = document.getElementById('summary-table-head')
 const summaryTable = document.getElementById('summary-table')
 /** @type {HTMLInputElement} */// @ts-ignore
 const summaryTableSearch = document.getElementById('summary-table-search')
+/** @type {HTMLDivElement} */// @ts-ignore
+const searchButton = document.getElementById('search-button')
 let milestone = null
 let issuesMap = null
 let searchString = null
@@ -45,12 +47,15 @@ summaryTableSearch.onkeyup = () => {
   }
 }
 
+searchButton.onclick = () => { summaryTableSearch.focus() }
+
 async function loadSummaryTable() {
   let htmlHead = ''
   let html = ''
   let colid = 0
   let maxQLen = 0
 
+  summaryTable.innerHTML = '<div class="summary-table-middle">Загрузка...</div>'
   summaryTableName.textContent = `${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
   issuesMap = issuesMap || await getIssuesMap({ milestone, state: milestone ? 'all' : 'open' }).catch(err => {
     return err.message === 'milestone not found' ? false : err
@@ -165,6 +170,7 @@ async function loadSummaryTable() {
   }
 
   if (!html) {
+    summaryTableHead.innerHTML = ''
     summaryTable.innerHTML = '<div class="summary-table-middle">Нет данных</div>'
   } else {
     summaryTableHead.innerHTML = htmlHead

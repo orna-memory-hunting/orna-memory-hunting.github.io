@@ -19,8 +19,8 @@ safeExecute(async () => {
 
 
 async function loadTopScouts() {
-  title.textContent = `${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
   topScoutsTable.innerHTML = '<div class="top-scouts-table-middle">Загрузка...</div>'
+  title.textContent = `${milestone ? (await getMilestone(milestone)).data.title : getMilestoneTitle()}`
 
   const topScouts = await getTopScouts({ milestone, state: milestone ? 'all' : 'open' }).catch(err => {
     return err.message === 'milestone not found' ? false : err
