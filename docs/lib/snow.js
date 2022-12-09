@@ -2,8 +2,8 @@ export function addSnow() {
   const style = document.createElement('style')
   const container = document.createElement('div')
   const brW = document.body.clientWidth
-  const snowflakeCnt = document.body.clientHeight * brW * 0.00045 ^ 0
-  const snowflakeStrt = snowflakeCnt * 0.1 ^ 0 || 1
+  const snowflakeCnt = document.body.clientHeight * brW * 0.0004 ^ 0
+  const snowflakeStrt = snowflakeCnt * 0.05 ^ 0 || 1
   const snowflakeTimer = 1000
   const steps = document.body.clientHeight / (brW * 1.5) ^ 0
   const step = 100 / steps
