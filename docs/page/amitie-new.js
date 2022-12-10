@@ -601,6 +601,8 @@ safeExecute(async () => {
     amitiUploadField.classList.add('disable')
 
     if (dataBlocks.length) {
+      const params = new URLSearchParams(window.location.hash.replace('#', ''))
+      const defaults = params.has('tesseractdefaults')
       let currentStep = 0
       const logger = msg => {
         const percent = ((currentStep + msg.progress) / dataBlocks.length * 10000 ^ 0) / 100
@@ -615,7 +617,9 @@ safeExecute(async () => {
         }
       }
       const errorHandler = err => showError(err)
-      const workerOption = { corePath: tesseractCore, workerPath: tesseractWorker, logger, errorHandler }
+      const workerOption = defaults
+        ? { logger, errorHandler }
+        : { corePath: tesseractCore, workerPath: tesseractWorker, logger, errorHandler }
       const worker = await Tesseract.createWorker(workerOption)
       const langs = Array.from(document.querySelectorAll('.recognizing-lang .active'))
         .reduce((langs, /** @type {HTMLDivElement} */lang) => {
