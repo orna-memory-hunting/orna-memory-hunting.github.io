@@ -62,37 +62,6 @@
   flex-direction: column;
 }
 
-.amitie-upload-field {
-  display       : flex;
-  flex-direction: column;
-  text-align    : center;
-  padding       : 6px;
-  border        : dashed 1px #fff;
-  font-size     : 90%;
-  border-radius : 8px;
-  opacity       : 0.5;
-  user-select   : none;
-}
-
-.amitie-file-name {
-  font-weight: bold;
-  font-size  : 90%;
-}
-
-.amitie-upload-field.dragenter,
-.amitie-upload-field:hover {
-  cursor : pointer;
-  opacity: 1;
-}
-
-.amitie-file {
-  display: none;
-}
-
-.amitie-file-from-clipboard {
-  white-space: nowrap;
-}
-
 .amitie-upload-results {
   display       : flex;
   flex-direction: column;

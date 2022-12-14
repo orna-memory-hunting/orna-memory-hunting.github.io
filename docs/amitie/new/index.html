@@ -36,11 +36,13 @@
     </div>
     <div id="amitie-info" class="amitie-info hide">
       <h4>Укажите сведения о найденном осколке</h4>
-      <div id="amitie-upload-field" class="amitie-upload-field">
-        <input id="amitie-file" class="amitie-file" type="file" accept=".jpg, .jpeg, .png">
-        <span>Нажмите для выбора скрина осколка из галереи, перетащите сюда файл или нажмите
-          <span id="amitie-file-from-clipboard" class="aslink amitie-file-from-clipboard">нажмите Ctrl + V</span></span>
-        <div id="amitie-file-name" class="amitie-file-name"></div>
+      <div id="amitie-upload-field" class="upload-field">
+        <input class="upload-field__file" type="file" accept=".jpg, .jpeg, .png">
+        <span>Нажмите для выбора скрина осколка из галереи, перетащите сюда файл.</span>
+        <span id="amitie-file-from-clipboard" class="aslink upload-field__from-clipboard">
+          Или нажмите здесь, для вставки скопированного ранее изображения
+        </span>
+        <div class="upload-field__file-name"></div>
       </div>
       <div id="amitie-upload-results" class="amitie-upload-results hide">
         <canvas id="amitie-canvas" class="amitie-canvas"></canvas>
@@ -141,6 +143,17 @@
           <div data-clone="3" class="text-toggle-item">#3</div>
           <div data-clone="4" class="text-toggle-item">#4</div>
           <div data-clone="5" class="text-toggle-item">#5</div>
+        </div>
+        <div>
+          <div class="field-label">Карта</div>
+          <div id="map-upload-field" class="upload-field">
+            <input class="upload-field__file" type="file" accept=".jpg, .jpeg, .png">
+            <span>Нажмите для выбора скрина из галереи для создания карты, перетащите сюда файл.</span>
+            <span class="aslink upload-field__from-clipboard">
+              Или нажмите здесь, для вставки скопированного ранее изображения
+            </span>
+            <div class="upload-field__file-name"></div>
+          </div>
         </div>
         <div class="clone-amitie-list">
           <div>Уже опубликовано:</div>

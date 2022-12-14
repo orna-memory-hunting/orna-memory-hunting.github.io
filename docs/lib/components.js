@@ -74,6 +74,71 @@ function copyButton(event) {
 }
 
 
+/**
+ * @param {HTMLDivElement}  uploadField
+ * @param {File} file
+ */
+function selectedFile(uploadField, file) {
+  const fileName = uploadField.querySelector('.upload-field__file-name')
+  const event = new window.CustomEvent('selected-file', { detail: { file: file || null } })
+
+  fileName.textContent = file ? `Файл: ${file.name}` : ''
+  uploadField.dispatchEvent(event)
+}
+
+
+function bindUploadFields() {
+  /** @type {Array<HTMLDivElement>} */// @ts-ignore
+  const uploadFields = document.querySelectorAll('.upload-field')
+
+  if (uploadFields) {
+    uploadFields.forEach(elm => {
+      /** @type {HTMLInputElement} */// @ts-ignore
+      const input = elm.querySelector('.upload-field__file')
+
+      if (input) {
+        elm.addEventListener('click', () => {
+          if (!elm.classList.contains('disable')) input.click()
+        })
+        input.addEventListener('change', () => {
+          selectedFile(elm, input.files && input.files[0])
+        })
+      }
+
+      elm.ondragover = (/** @type {DragEvent} */ event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        if (event.dataTransfer.items.length) {
+          elm.classList.add('dragenter')
+        }
+      }
+
+      elm.ondragleave = (/** @type {Event} */ event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        elm.classList.remove('dragenter')
+      }
+
+      elm.ondrop = (/** @type {DragEvent} */ event) => {
+        event.preventDefault()
+        event.stopPropagation()
+        elm.classList.remove('dragenter')
+
+        if (!elm.classList.contains('disable')) {
+          const file = event.dataTransfer && event.dataTransfer.files[0]
+
+          if (file) {
+            selectedFile(elm, file)
+          } else {
+            window.alert('Не удалось получить файл!')
+          }
+        }
+      }
+    })
+  }
+}
+
+
 export function initComponents() {
   /** @type {Array<HTMLDivElement>} */// @ts-ignore
   const textToggles = document.querySelectorAll('.text-toggle')
@@ -109,4 +174,6 @@ export function initComponents() {
   document.addEventListener('click', event => {
     copyButton(event)
   })
+
+  bindUploadFields()
 }

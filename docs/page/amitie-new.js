@@ -96,10 +96,6 @@ safeExecute(async () => {
     updateParams()
   }
 
-  /** @type {HTMLInputElement} */// @ts-ignore
-  const amitieFile = document.getElementById('amitie-file')
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const amitieFileName = document.getElementById('amitie-file-name')
   /** @type {HTMLDivElement} */// @ts-ignore
   const amitiUploadField = document.getElementById('amitie-upload-field')
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -110,59 +106,44 @@ safeExecute(async () => {
   const recognizingText = document.getElementById('recognizing-text')
   /** @type {HTMLSpanElement} */// @ts-ignore
   const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const mapUploadField = document.getElementById('map-upload-field')
 
-  amitiUploadField.onclick = () => {
-    if (recognizingInProgress) return
-    amitieFile.click()
-  }
-
-  amitiUploadField.ondragover = (/** @type {DragEvent} */ event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    if (event.dataTransfer.items.length) {
-      amitiUploadField.classList.add('dragenter')
-    }
-  }
-
-  amitiUploadField.ondragleave = (/** @type {Event} */ event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    amitiUploadField.classList.remove('dragenter')
-  }
-
-  amitiUploadField.ondrop = (/** @type {DragEvent} */ event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    amitiUploadField.classList.remove('dragenter')
-
-    const { files } = event.dataTransfer
-
-    if (recognizingInProgress) return
-    if (files.length) {
-      doAsync(() => prepareAmitieImage(files[0], true))
+  amitiUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
+    if (event.detail.file) {
+      doAsync(() => prepareAmitieImage(event.detail.file, true))
     } else {
-      window.alert('Не удалось найти файл изображения!')
-    }
-  }
-
-  document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
-    /** @type {HTMLDivElement} */// @ts-ignore
-    const input = event.target
-
-    if (input.tagName !== 'INPUT') {
-      event.preventDefault()
-      event.stopPropagation()
-
-      const { files } = event.clipboardData
-
-      if (recognizingInProgress) return
-      if (files.length) {
-        doAsync(() => prepareAmitieImage(files[0]))
-      } else {
-        window.alert('Не удалось найти файл изображения!')
-      }
+      amitieUploadResults.classList.add('hide')
+      amitieCanvasError.classList.add('hide')
+      recognizingText.classList.add('hide')
+      timeFileField.classList.add('hide')
+      amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
     }
   })
+
+  mapUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
+    console.log(event.detail)
+  })
+
+  // Не актуально для мобилки, а на пк не дает понять в какое поле вставляются данные
+  // document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
+  //   /** @type {HTMLDivElement} */// @ts-ignore
+  //   const input = event.target
+
+  //   if (input.tagName !== 'INPUT') {
+  //     event.preventDefault()
+  //     event.stopPropagation()
+
+  //     const { files } = event.clipboardData
+
+  //     if (recognizingInProgress) return
+  //     if (files.length) {
+  //       doAsync(() => prepareAmitieImage(files[0]))
+  //     } else {
+  //       window.alert('Не удалось найти файл изображения!')
+  //     }
+  //   }
+  // })
 
   amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
     event.preventDefault()
@@ -219,21 +200,6 @@ safeExecute(async () => {
     }
   }
 
-  amitieFile.addEventListener('change', handleAmitieFile)
-
-  function handleAmitieFile() {
-    if (amitieFile.files && amitieFile.files.length) {
-      doAsync(() => prepareAmitieImage(amitieFile.files[0], true))
-    } else {
-      amitieFileName.textContent = ''
-      amitieUploadResults.classList.add('hide')
-      amitieCanvasError.classList.add('hide')
-      recognizingText.classList.add('hide')
-      timeFileField.classList.add('hide')
-      amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
-    }
-  }
-
   /** @type {HTMLDivElement} */// @ts-ignore
   const recognizingTextError = document.getElementById('recognizing-text-error')
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -282,7 +248,6 @@ safeExecute(async () => {
 
     updateGithubLink()
 
-    amitieFileName.textContent = `Файл: ${file.name}`
     amitieUploadResults.classList.add('hide')
     amitieCanvasError.classList.add('hide')
     recognizingText.classList.add('hide')
