@@ -1,4 +1,4 @@
-import { popup } from './utils.js'
+import { popup, safeExecute } from './utils.js'
 
 /** @param {Event} event */
 function textToggleClick(event) {
@@ -95,6 +95,8 @@ function bindUploadFields() {
     uploadFields.forEach(elm => {
       /** @type {HTMLInputElement} */// @ts-ignore
       const input = elm.querySelector('.upload-field__file')
+      /** @type {HTMLDivElement} */// @ts-ignore
+      const fromClipboard = elm.querySelector('.upload-field__from-clipboard')
 
       if (input) {
         elm.addEventListener('click', () => {
@@ -104,6 +106,50 @@ function bindUploadFields() {
           selectedFile(elm, input.files && input.files[0])
         })
       }
+
+      // if (fromClipboard) {
+      //   if ('navigator' in window && 'clipboard' in navigator && navigator.clipboard.read) {
+      //     fromClipboard.addEventListener('click', (/** @type {MouseEvent} */ event) => {
+      //       event.preventDefault()
+      //       event.stopPropagation()
+      //       if (!elm.classList.contains('disable')) {
+      //         safeExecute(async () => {
+      //           await navigator.clipboard.read()
+      //             .catch(error => {
+      //               if (error.name === 'NotAllowedError') {
+      //                 input.click()
+      //                 fromClipboard.classList.add('hide')
+      //               } else {
+      //                 throw error
+      //               }
+      //               console.log(error)
+      //             })
+      //             .then(clipboardItems => {
+      //               if (clipboardItems) {
+      //                 if (clipboardItems.length) {
+      //                   const [clipboardItem] = clipboardItems
+
+      //                   if (clipboardItem.types.length) {
+      //                     clipboardItem.getType(clipboardItem.types[0]).then(data => {
+      //                       const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
+
+      //                       selectedFile(elm, file)
+      //                     })
+      //                   } else {
+      //                     window.alert('Не удалось найти файл изображения!')
+      //                   }
+      //                 } else {
+      //                   window.alert('Не удалось получить файл!')
+      //                 }
+      //               }
+      //             })
+      //         })
+      //       }
+      //     })
+      //   } else {
+      //     fromClipboard.classList.add('hide')
+      //   }
+      // }
 
       elm.ondragover = (/** @type {DragEvent} */ event) => {
         event.preventDefault()
