@@ -107,49 +107,57 @@ function bindUploadFields() {
         })
       }
 
-      // if (fromClipboard) {
-      //   if ('navigator' in window && 'clipboard' in navigator && navigator.clipboard.read) {
-      //     fromClipboard.addEventListener('click', (/** @type {MouseEvent} */ event) => {
-      //       event.preventDefault()
-      //       event.stopPropagation()
-      //       if (!elm.classList.contains('disable')) {
-      //         safeExecute(async () => {
-      //           await navigator.clipboard.read()
-      //             .catch(error => {
-      //               if (error.name === 'NotAllowedError') {
-      //                 input.click()
-      //                 fromClipboard.classList.add('hide')
-      //               } else {
-      //                 throw error
-      //               }
-      //               console.log(error)
-      //             })
-      //             .then(clipboardItems => {
-      //               if (clipboardItems) {
-      //                 if (clipboardItems.length) {
-      //                   const [clipboardItem] = clipboardItems
+      if (fromClipboard) {
+        if ('navigator' in window && 'clipboard' in navigator && navigator.clipboard.read) {
+          fromClipboard.addEventListener('click', (/** @type {MouseEvent} */ event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            if (!elm.classList.contains('disable')) {
+              safeExecute(async () => {
+                await navigator.clipboard.read()
+                  .catch(error => {
+                    if (error.name === 'NotAllowedError') {
+                      input.click()
+                      fromClipboard.parentElement.classList.add('hide')
+                    } else {
+                      throw error
+                    }
+                    console.log(error)
+                  })
+                  .then(clipboardItems => {
+                    if (clipboardItems) {
+                      if (clipboardItems.length) {
+                        const [clipboardItem] = clipboardItems
 
-      //                   if (clipboardItem.types.length) {
-      //                     clipboardItem.getType(clipboardItem.types[0]).then(data => {
-      //                       const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
+                        if (clipboardItem.types.length) {
+                          const [accept] = input.accept.split('/')
+                          const [fType] = clipboardItem.types
+                          const sfType = fType.split('/')
 
-      //                       selectedFile(elm, file)
-      //                     })
-      //                   } else {
-      //                     window.alert('Не удалось найти файл изображения!')
-      //                   }
-      //                 } else {
-      //                   window.alert('Не удалось получить файл!')
-      //                 }
-      //               }
-      //             })
-      //         })
-      //       }
-      //     })
-      //   } else {
-      //     fromClipboard.classList.add('hide')
-      //   }
-      // }
+                          if (accept === sfType[0]) {
+                            clipboardItem.getType(fType).then(data => {
+                              const file = new window.File([data], sfType.join('.'), { type: fType })
+
+                              selectedFile(elm, file)
+                            })
+                          } else {
+                            window.alert('Не получить файл требуемого типа!')
+                          }
+                        } else {
+                          window.alert('Не удалось найти файл изображения!')
+                        }
+                      } else {
+                        window.alert('Не удалось получить файл!')
+                      }
+                    }
+                  })
+              })
+            }
+          })
+        } else {
+          fromClipboard.parentElement.classList.add('hide')
+        }
+      }
 
       elm.ondragover = (/** @type {DragEvent} */ event) => {
         event.preventDefault()
@@ -174,7 +182,14 @@ function bindUploadFields() {
           const file = event.dataTransfer && event.dataTransfer.files[0]
 
           if (file) {
-            selectedFile(elm, file)
+            const [accept] = input.accept.split('/')
+            const [fType] = file.type.split('/')
+
+            if (accept === fType) {
+              selectedFile(elm, file)
+            } else {
+              window.alert('Не получить файл требуемого типа!')
+            }
           } else {
             window.alert('Не удалось получить файл!')
           }

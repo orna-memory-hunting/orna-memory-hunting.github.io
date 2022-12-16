@@ -104,8 +104,6 @@ safeExecute(async () => {
   const amitieCanvasError = document.getElementById('amitie-canvas-error')
   /** @type {HTMLDivElement} */// @ts-ignore
   const recognizingText = document.getElementById('recognizing-text')
-  /** @type {HTMLSpanElement} */// @ts-ignore
-  const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
   /** @type {HTMLDivElement} */// @ts-ignore
   const mapUploadField = document.getElementById('map-upload-field')
 
@@ -125,61 +123,6 @@ safeExecute(async () => {
     console.log(event.detail)
   })
 
-  // Не актуально для мобилки, а на пк не дает понять в какое поле вставляются данные
-  // document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
-  //   /** @type {HTMLDivElement} */// @ts-ignore
-  //   const input = event.target
-
-  //   if (input.tagName !== 'INPUT') {
-  //     event.preventDefault()
-  //     event.stopPropagation()
-
-  //     const { files } = event.clipboardData
-
-  //     if (recognizingInProgress) return
-  //     if (files.length) {
-  //       doAsync(() => prepareAmitieImage(files[0]))
-  //     } else {
-  //       window.alert('Не удалось найти файл изображения!')
-  //     }
-  //   }
-  // })
-
-  amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (recognizingInProgress) return
-    safeExecute(async () => {
-      await navigator.clipboard.read().catch(() => {
-        amitiUploadField.click()
-        amitieFileFromClipboard.classList.remove('aslink')
-        amitieFileFromClipboard.onclick = null
-      }).then(clipboardItems => {
-        if (clipboardItems) {
-          if (clipboardItems.length) {
-            const [clipboardItem] = clipboardItems
-
-            if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
-              clipboardItem.getType(clipboardItem.types[0]).then(data => {
-                const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
-
-                doAsync(() => prepareAmitieImage(file))
-              })
-            } else {
-              window.alert('Не удалось найти файл изображения!')
-            }
-          } else {
-            window.alert('Не удалось найти файл изображения!')
-          }
-        }
-      })
-    })
-  }
-  if (!('navigator' in window && 'clipboard' in navigator)) {
-    amitieFileFromClipboard.classList.remove('aslink')
-    amitieFileFromClipboard.onclick = null
-  }
 
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }
 
