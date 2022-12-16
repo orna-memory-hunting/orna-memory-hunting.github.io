@@ -106,6 +106,12 @@ safeExecute(async () => {
   const recognizingText = document.getElementById('recognizing-text')
   /** @type {HTMLDivElement} */// @ts-ignore
   const mapUploadField = document.getElementById('map-upload-field')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const mapUploadResults = document.getElementById('map-upload-results')
+  /** @type {HTMLCanvasElement} */// @ts-ignore
+  const mapCanvas = document.getElementById('map-canvas')
+  /** @type {CanvasRenderingContext2D} */// @ts-ignore
+  const mapContext = mapCanvas.getContext('2d')
 
   amitiUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
     if (event.detail.file) {
@@ -120,7 +126,20 @@ safeExecute(async () => {
   })
 
   mapUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
-    console.log(event.detail)
+    if (event.detail.file) {
+      safeExecute(async () => {
+        const image = new window.Image()
+
+        image.src = URL.createObjectURL(event.detail.file)
+        await new Promise((resolve) => { image.onload = resolve })
+        mapCanvas.width = image.width
+        mapCanvas.height = image.height
+        mapContext.drawImage(image, 0, 0)
+        mapUploadResults.classList.remove('hide')
+      })
+    } else {
+      mapUploadResults.classList.add('hide')
+    }
   })
 
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }

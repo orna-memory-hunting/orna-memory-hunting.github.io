@@ -46,8 +46,8 @@
         </span>
         <div class="upload-field__file-name"></div>
       </div>
-      <div id="amitie-upload-results" class="amitie-upload-results hide">
-        <canvas id="amitie-canvas" class="amitie-canvas"></canvas>
+      <div id="amitie-upload-results" class="upload-results hide">
+        <canvas id="amitie-canvas" class="upload-canvas"></canvas>
         <div id="amitie-canvas-error" class="amitie-canvas-error hide">
           Не удалось разобрать скрин
         </div>
@@ -157,6 +157,16 @@
               для вставки изображения из буфера
             </span>
             <div class="upload-field__file-name"></div>
+          </div>
+          <div id="map-upload-results" class="upload-results hide">
+            <div class="text-toggle clone-field">
+              <span>Пометки:</span>
+              <div data-clone="0" class="text-toggle-item active">Точка заспавна ведьм</div>
+              <div data-clone="1" class="text-toggle-item">Компас на север</div>
+              <div data-clone="2" class="text-toggle-item">Нужная ведьма</div>
+              <div data-clone="3" class="text-toggle-item">Прочие ведьмы</div>
+            </div>
+            <canvas id="map-canvas" class="upload-canvas"></canvas>
           </div>
         </div>
         <div class="clone-amitie-list">
