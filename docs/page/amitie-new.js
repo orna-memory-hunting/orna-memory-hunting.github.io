@@ -21,7 +21,6 @@ safeExecute(async () => {
   const amitieContext = amitieCanvas.getContext('2d')
   /** @type {HTMLDivElement} */// @ts-ignore
   const amitieResults = document.getElementById('amitie-results')
-  let recognizingInProgress = false
 
   questions.innerHTML = renderQuestionList()
 
@@ -96,6 +95,7 @@ safeExecute(async () => {
     updateParams()
   }
 
+
   /** @type {HTMLDivElement} */// @ts-ignore
   const amitiUploadField = document.getElementById('amitie-upload-field')
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -122,7 +122,6 @@ safeExecute(async () => {
   mapUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
     console.log(event.detail)
   })
-
 
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }
 
@@ -499,7 +498,6 @@ safeExecute(async () => {
   recognizingTextButton.onclick = () => doAsync(startRecognizingText)
 
   async function startRecognizingText() {
-    recognizingInProgress = true
     recognizingTextLog.textContent = 'Загрузка Tesseract.js...'
     recognizingLang.classList.add('hide')
     recognizingTextButton.classList.add('hide')
@@ -610,8 +608,6 @@ safeExecute(async () => {
 
       updateGithubLink()
 
-
-      recognizingInProgress = false
       amitiUploadField.classList.remove('disable')
     }
 
