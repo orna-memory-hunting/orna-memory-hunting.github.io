@@ -142,6 +142,18 @@ safeExecute(async () => {
     }
   })
 
+  mapCanvas.onclick = event => {
+    const xPos = (event.pageX - mapCanvas.offsetLeft) * (mapCanvas.width / mapCanvas.clientWidth)
+    const yPos = (event.pageY - mapCanvas.offsetTop) * (mapCanvas.height / mapCanvas.clientHeight)
+    const radius = Math.min(mapCanvas.width, mapCanvas.height) * 0.05
+
+    mapContext.beginPath()
+    mapContext.lineWidth = Math.max(radius * 0.2, 1)
+    mapContext.strokeStyle = '#f0fe'
+    mapContext.ellipse(xPos, yPos, radius, radius, 0, 0, 2 * Math.PI)
+    mapContext.stroke()
+  }
+
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }
 
   /** @param {boolean} status  */
