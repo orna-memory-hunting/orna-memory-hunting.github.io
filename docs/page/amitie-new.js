@@ -112,6 +112,7 @@ safeExecute(async () => {
   const mapCanvas = document.getElementById('map-canvas')
   /** @type {CanvasRenderingContext2D} */// @ts-ignore
   const mapContext = mapCanvas.getContext('2d')
+  const mapData = {}
 
   amitiUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
     if (event.detail.file) {
@@ -134,24 +135,83 @@ safeExecute(async () => {
         await new Promise((resolve) => { image.onload = resolve })
         mapCanvas.width = image.width
         mapCanvas.height = image.height
-        mapContext.drawImage(image, 0, 0)
+        mapData.image = image
+        mapData.spawn = { x: image.width / 2 ^ 0, y: image.height / 2 ^ 0 }
+        drawMapLabels()
         mapUploadResults.classList.remove('hide')
       })
     } else {
+      mapData.image = null
+      mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height)
       mapUploadResults.classList.add('hide')
     }
   })
 
   mapCanvas.onclick = event => {
-    const xPos = (event.pageX - mapCanvas.offsetLeft) * (mapCanvas.width / mapCanvas.clientWidth)
-    const yPos = (event.pageY - mapCanvas.offsetTop) * (mapCanvas.height / mapCanvas.clientHeight)
-    const radius = Math.min(mapCanvas.width, mapCanvas.height) * 0.05
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const elm = document.querySelector('.map-label-tab.active')
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const nextElm = document.querySelector('.map-label-tab.active+.map-label-tab')
+    const { label } = elm.dataset
+    const point = {
+      x: (event.pageX - mapCanvas.offsetLeft) * (mapCanvas.width / mapCanvas.clientWidth),
+      y: (event.pageY - mapCanvas.offsetTop) * (mapCanvas.height / mapCanvas.clientHeight)
+    }
 
-    mapContext.beginPath()
-    mapContext.lineWidth = Math.max(radius * 0.2, 1)
-    mapContext.strokeStyle = '#f0fe'
-    mapContext.ellipse(xPos, yPos, radius, radius, 0, 0, 2 * Math.PI)
-    mapContext.stroke()
+    switch (label) {
+      case 'spawn':
+      case 'compass':
+      case 'witch':
+        mapData[label] = point
+        break
+    }
+
+    if (nextElm && !(nextElm.dataset.label in mapData)) {
+      nextElm.click()
+    }
+
+    drawMapLabels()
+  }
+
+  function drawMapLabels() {
+    const radius = Math.min(mapCanvas.width, mapCanvas.height) * 0.05
+    const fontSize = Math.min(mapCanvas.width, mapCanvas.height) * 0.07
+
+    mapContext.drawImage(mapData.image, 0, 0)
+
+    if (mapData.spawn) {
+      mapContext.beginPath()
+      mapContext.lineWidth = 1
+      mapContext.font = `${fontSize}px 'Roboto', sans-serif`
+      mapContext.fillStyle = '#30de00'
+      mapContext.strokeStyle = '#333'
+      mapContext.fillText('spawn', mapData.spawn.x + radius / 3, mapData.spawn.y - radius / 3)
+      mapContext.strokeText('spawn', mapData.spawn.x + radius / 3, mapData.spawn.y - radius / 3)
+      mapContext.ellipse(mapData.spawn.x, mapData.spawn.y, radius / 4, radius / 4, 0, 0, 2 * Math.PI)
+      mapContext.fill()
+      mapContext.stroke()
+      mapContext.closePath()
+    }
+    if (mapData.compass) {
+      mapContext.beginPath()
+      mapContext.lineWidth = 1
+      mapContext.font = `${fontSize}px 'Roboto', sans-serif`
+      mapContext.fillStyle = '#4fc3f7'
+      mapContext.strokeStyle = '#333'
+      mapContext.fillText('N', mapData.compass.x - fontSize / 3 ^ 0, mapData.compass.y + fontSize / 3 ^ 0)
+      mapContext.strokeText('N', mapData.compass.x - fontSize / 3 ^ 0, mapData.compass.y + fontSize / 3 ^ 0)
+      mapContext.fill()
+      mapContext.stroke()
+      mapContext.closePath()
+    }
+    if (mapData.witch) {
+      mapContext.beginPath()
+      mapContext.lineWidth = Math.max(radius * 0.2, 1)
+      mapContext.strokeStyle = '#f0fe'
+      mapContext.ellipse(mapData.witch.x, mapData.witch.y, radius, radius, 0, 0, 2 * Math.PI)
+      mapContext.stroke()
+      mapContext.closePath()
+    }
   }
 
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }

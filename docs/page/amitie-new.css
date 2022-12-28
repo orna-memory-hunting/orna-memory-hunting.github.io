@@ -151,7 +151,8 @@
 
 .additional-labels,
 .clone-field,
-.clone-amitie-list {
+.clone-amitie-list,
+.map-label-tabs {
   display    : flex;
   column-gap : 12px;
   row-gap    : 6px;
@@ -171,4 +172,8 @@
   align-items: baseline;
   column-gap : 8px;
   flex-wrap  : wrap;
+}
+
+.map-label-tabs {
+  margin-top: 8px;
 }

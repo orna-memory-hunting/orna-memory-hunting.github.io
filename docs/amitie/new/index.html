@@ -147,7 +147,7 @@
           <div data-clone="5" class="text-toggle-item">#5</div>
         </div>
         <div>
-          <div class="field-label">Карта:</div>
+          <h4 class="field-label">Карта</h4>
           <div id="map-upload-field" class="upload-field">
             <input class="upload-field__file" type="file" accept="image/*">
             <span>Нажмите для выбора скрина из галереи для создания карты или перетащите сюда файл</span>
@@ -159,12 +159,12 @@
             <div class="upload-field__file-name"></div>
           </div>
           <div id="map-upload-results" class="upload-results hide">
-            <div class="text-toggle clone-field">
+            <div class="text-toggle map-label-tabs">
               <span>Пометки:</span>
-              <div data-clone="0" class="text-toggle-item active">Точка заспавна ведьм</div>
-              <div data-clone="1" class="text-toggle-item">Компас на север</div>
-              <div data-clone="2" class="text-toggle-item">Нужная ведьма</div>
-              <div data-clone="3" class="text-toggle-item">Прочие ведьмы</div>
+              <div data-label="spawn" class="map-label-tab text-toggle-item">Точка заспавна ведьм</div>
+              <div data-label="compass" class="map-label-tab text-toggle-item active">Компас на север</div>
+              <div data-label="witch" class="map-label-tab text-toggle-item">Нужная ведьма</div>
+              <div data-label="other_witches" class="map-label-tab text-toggle-item">Прочие ведьмы</div>
             </div>
             <canvas id="map-canvas" class="upload-canvas"></canvas>
           </div>
