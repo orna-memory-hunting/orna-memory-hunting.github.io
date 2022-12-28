@@ -112,7 +112,19 @@ safeExecute(async () => {
   const mapCanvas = document.getElementById('map-canvas')
   /** @type {CanvasRenderingContext2D} */// @ts-ignore
   const mapContext = mapCanvas.getContext('2d')
-  const mapData = {}
+  /**
+   * @typedef MapData
+   * @property {number} width
+   * @property {number} height
+   * @property {{x:number,y:number}} [spawn]
+   * @property {{x:number,y:number}} [compass]
+   * @property {{x:number,y:number}} [witch]
+   * @property {Set<{x:number,y:number}>} [other_witches]
+   */
+  /** @type {MapData} */
+  let mapData = null
+  /** @type {HTMLImageElement} */
+  let mapDataImage = null
 
   amitiUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
     if (event.detail.file) {
@@ -133,15 +145,19 @@ safeExecute(async () => {
 
         image.src = URL.createObjectURL(event.detail.file)
         await new Promise((resolve) => { image.onload = resolve })
-        mapCanvas.width = image.width
-        mapCanvas.height = image.height
-        mapData.image = image
-        mapData.spawn = { x: image.width / 2 ^ 0, y: image.height / 2 ^ 0 }
+        mapDataImage = image
+        mapData = {
+          width: image.width,
+          height: image.height,
+          spawn: { x: image.width / 2 ^ 0, y: image.height / 2 ^ 0 }
+        }
+        updateGithubLink()
         drawMapLabels()
         mapUploadResults.classList.remove('hide')
       })
     } else {
-      mapData.image = null
+      mapDataImage = null
+      mapData = null
       mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height)
       mapUploadResults.classList.add('hide')
     }
@@ -154,8 +170,8 @@ safeExecute(async () => {
     const nextElm = document.querySelector('.map-label-tab.active+.map-label-tab')
     const { label } = elm.dataset
     const point = {
-      x: (event.pageX - mapCanvas.offsetLeft) * (mapCanvas.width / mapCanvas.clientWidth),
-      y: (event.pageY - mapCanvas.offsetTop) * (mapCanvas.height / mapCanvas.clientHeight)
+      x: (event.pageX - mapCanvas.offsetLeft) * (mapCanvas.width / mapCanvas.clientWidth) ^ 0,
+      y: (event.pageY - mapCanvas.offsetTop) * (mapCanvas.height / mapCanvas.clientHeight) ^ 0
     }
 
     switch (label) {
@@ -164,21 +180,62 @@ safeExecute(async () => {
       case 'witch':
         mapData[label] = point
         break
+      case 'other_witches':
+        toggleOtherWitches(point)
+        break
     }
 
     if (nextElm && !(nextElm.dataset.label in mapData)) {
       nextElm.click()
     }
 
+    updateGithubLink()
     drawMapLabels()
   }
 
+  /** @param {{x:number,y:number}} point */
+  function toggleOtherWitches(point) {
+    let add = true
+
+    if (!('other_witches' in mapData)) {
+      mapData.other_witches = new Set()
+    }
+
+    for (const prevPoint of mapData.other_witches) {
+      const radius = Math.min(mapData.width, mapData.height) * 0.05
+
+      if (Math.abs(prevPoint.x - point.x) < radius && Math.abs(prevPoint.y - point.y) < radius) {
+        mapData.other_witches.delete(prevPoint)
+        add = false
+      }
+    }
+
+    if (add) {
+      mapData.other_witches.add(point)
+    }
+  }
+
   function drawMapLabels() {
-    const radius = Math.min(mapCanvas.width, mapCanvas.height) * 0.05
-    const fontSize = Math.min(mapCanvas.width, mapCanvas.height) * 0.07
+    const radius = Math.min(mapData.width, mapData.height) * 0.05
+    const fontSize = Math.min(mapData.width, mapData.height) * 0.07
 
-    mapContext.drawImage(mapData.image, 0, 0)
+    mapCanvas.width = mapData.width
+    mapCanvas.height = mapData.height
+    mapContext.drawImage(mapDataImage, 0, 0)
 
+
+    if (mapData.other_witches) {
+      for (const witch of mapData.other_witches) {
+        mapContext.beginPath()
+        mapContext.lineWidth = Math.max(radius * 0.2, 1)
+        mapContext.strokeStyle = '#ff7043'
+        mapContext.ellipse(witch.x, witch.y, radius, radius, 0, 0, 2 * Math.PI)
+        mapContext.moveTo(witch.x - radius * Math.cos(45), witch.y - radius * Math.sin(45))
+        mapContext.lineTo(witch.x + radius * Math.cos(45), witch.y + radius * Math.sin(45))
+        mapContext.stroke()
+        mapContext.closePath()
+      }
+    }
     if (mapData.spawn) {
       mapContext.beginPath()
       mapContext.lineWidth = 1
@@ -207,7 +264,7 @@ safeExecute(async () => {
     if (mapData.witch) {
       mapContext.beginPath()
       mapContext.lineWidth = Math.max(radius * 0.2, 1)
-      mapContext.strokeStyle = '#f0fe'
+      mapContext.strokeStyle = '#30de00'
       mapContext.ellipse(mapData.witch.x, mapData.witch.y, radius, radius, 0, 0, 2 * Math.PI)
       mapContext.stroke()
       mapContext.closePath()
@@ -800,6 +857,10 @@ safeExecute(async () => {
       const milestone = getMilestoneTitle(time)
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
+      const mapDataStr = mapData
+        ? `\n<!-- &witch_map=${JSON
+          .stringify({ ...mapData, other_witches: Array.from(mapData.other_witches || []) })} -->`
+        : ''
 
       sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
         `title=${encodeURIComponent(amitiePlus1.value)}` +
@@ -808,7 +869,8 @@ safeExecute(async () => {
         `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
         encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
         encodeURIComponent(`### Минусы\n${minusBlocks}`) +
-        encodeURIComponent(hiddenInfo)
+        encodeURIComponent(hiddenInfo) +
+        encodeURIComponent(mapDataStr)
 
       doAsync(checkCloneAmitieList)
     })
