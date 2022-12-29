@@ -96,10 +96,11 @@ function getTimeLabels(utcHours) {
  * @property {string} body
  * @property {import('./questions.js').AnswerData} answer
  * @property {string} answerLabel
+ * @property {number} clone
  * @property {Amitie} amitie
  * @property {string} miniСard
  * @property {boolean} broken
- * @property {import('../lib/amitie.js').MapData} witchMap
+ * @property {import('../lib/amitie.js').NormalizedMapData} witchMap
  */
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -122,6 +123,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     body,
     answer: null,
     answerLabel: '',
+    clone: 0,
     amitie: {
       name: title,
       plusBlocks: [title],
@@ -141,8 +143,10 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     if (name.startsWith('q.')) {
       const [q, a] = name.replace(/q.(\d)-([А-Я]).*/, '$1-$2').split('-')
 
-      issue.answer = getAnswerByLabels(q, a)
-      issue.answerLabel = name
+      if (q && a) {
+        issue.answer = getAnswerByLabels(q, a)
+        issue.answerLabel = name
+      }
       continue
     } else if (name.startsWith('time ')) {
       if (name.endsWith('UTC')) {
@@ -157,12 +161,16 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
       continue
     } else if (name === 'NOT FOUND') {
       issue.broken = true
+    } else if (label.name.startsWith('clone #')) {
+      const clone = parseInt(label.name.replace('clone #', ''))
+
+      if (!isNaN(clone)) issue.clone = clone
     }
     issue.labels.push({ name, description, color })
   }
 
   if (bodyList.length > 2) {
-    if ((/# [А-ЯA-Z]/).test(bodyList[0])) {
+    if ((/# [А-Яа-яA-Za-z]/).test(bodyList[0])) {
       issue.amitie.name = bodyList.shift()
       issue.amitie.name = issue.amitie.name
         .replace('# ', '').trim()

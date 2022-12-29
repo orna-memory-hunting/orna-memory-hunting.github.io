@@ -152,7 +152,8 @@
 .additional-labels,
 .clone-field,
 .clone-amitie-list,
-.map-label-tabs {
+.map-label-tabs,
+.other-map-list {
   display    : flex;
   column-gap : 12px;
   row-gap    : 6px;
@@ -162,6 +163,12 @@
 
 .clone-amitie-list-items {
   width         : 100%;
+  display       : flex;
+  flex-direction: column;
+  row-gap       : 8px;
+}
+
+.other-map-list-items {
   display       : flex;
   flex-direction: column;
   row-gap       : 8px;

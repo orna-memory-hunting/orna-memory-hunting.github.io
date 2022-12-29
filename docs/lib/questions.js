@@ -133,7 +133,7 @@ function renderQuestionList() {
 }
 
 
-/** @typedef {{qid:number,aid:number,q:string,sq:string,a:string,sa:string,qLabel:string,aLabel:string,label:string,code:string,text:string,textShort:string}} AnswerData */
+/** @typedef {{qid:number,aid:number,q:string,sq:string,a:string,sa:string,qLabel:string,aLabel:string,labelQ:string,label:string,code:string,text:string,textShort:string}} AnswerData */
 /**
  * @param {number} qid
  * @param {number} aid
@@ -154,6 +154,7 @@ function getAnswerData(qid, aid) {
     sa,
     qLabel,
     aLabel,
+    labelQ: `q.${qLabel}`,
     label: `q.${qLabel}-${aLabel} / ${sq} - ${sa}`,
     code: `${qLabel}.${aLabel}.`,
     text: `${sq} - ${sa}`,

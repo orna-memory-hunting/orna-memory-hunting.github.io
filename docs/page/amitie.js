@@ -77,6 +77,7 @@ safeExecute(() => {
       /** @type {HTMLCanvasElement} */// @ts-ignore
       const canvas = document.createElement('canvas')
 
+      canvas.classList.add('witch-map-canvas')
       drawWitchMapLabels(canvas, issue.witchMap)
       witchMapContainer.innerHTML = ''
       witchMapContainer.append(canvas)

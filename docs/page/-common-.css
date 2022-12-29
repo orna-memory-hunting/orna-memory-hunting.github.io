@@ -404,6 +404,12 @@ h4 {
   row-gap   : 4px;
 }
 
+.witch-map-canvas {
+  max-width : 100%;
+  border    : 1px solid #777;
+  background: #0005 url(https://playorna.com/static//img/light.png) no-repeat;
+}
+
 .fatal-error {
   background-color: #fff0f0;
   color           : #ff1e1f;

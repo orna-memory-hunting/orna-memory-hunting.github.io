@@ -17,12 +17,6 @@
   margin-left: 16px;
 }
 
-.witch-map-container canvas {
-  max-width : 100%;
-  border    : 1px solid #777;
-  background: #0005 url(https://playorna.com/static//img/light.png) no-repeat;
-}
-
 .open-on-github {
   margin: 16px 0;
 }

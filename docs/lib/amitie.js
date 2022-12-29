@@ -27,6 +27,8 @@ function renderAmitieRow(amitie) {
  * @typedef MapData
  * @property {number} width
  * @property {number} height
+ * @property {number} radius
+ * @property {number} fontSize
  * @property {{x:number,y:number}} [spawn]
  * @property {{x:number,y:number}} [compass]
  * @property {{x:number,y:number}} [witch]
@@ -34,13 +36,11 @@ function renderAmitieRow(amitie) {
  */
 /**
  * @param {HTMLCanvasElement} mapCanvas
- * @param {MapData} mapData
+ * @param {MapData|NormalizedMapData} mapData
  * @param {HTMLImageElement} [mapDataImage]
  */
 function drawWitchMapLabels(mapCanvas, mapData, mapDataImage) {
   const mapContext = mapCanvas.getContext('2d')
-  const radius = Math.min(mapData.width, mapData.height) * 0.05
-  const fontSize = Math.min(mapData.width, mapData.height) * 0.07
 
   mapCanvas.width = mapData.width
   mapCanvas.height = mapData.height
@@ -54,11 +54,11 @@ function drawWitchMapLabels(mapCanvas, mapData, mapDataImage) {
   if (mapData.other_witches) {
     for (const witch of mapData.other_witches) {
       mapContext.beginPath()
-      mapContext.lineWidth = Math.max(radius * 0.2, 1)
+      mapContext.lineWidth = Math.max(mapData.radius * 0.2, 1)
       mapContext.strokeStyle = '#ff7043'
-      mapContext.ellipse(witch.x, witch.y, radius, radius, 0, 0, 2 * Math.PI)
-      mapContext.moveTo(witch.x - radius * Math.cos(45), witch.y - radius * Math.sin(45))
-      mapContext.lineTo(witch.x + radius * Math.cos(45), witch.y + radius * Math.sin(45))
+      mapContext.ellipse(witch.x, witch.y, mapData.radius, mapData.radius, 0, 0, 2 * Math.PI)
+      mapContext.moveTo(witch.x - mapData.radius * Math.cos(45), witch.y - mapData.radius * Math.sin(45))
+      mapContext.lineTo(witch.x + mapData.radius * Math.cos(45), witch.y + mapData.radius * Math.sin(45))
       mapContext.stroke()
       mapContext.closePath()
     }
@@ -66,12 +66,12 @@ function drawWitchMapLabels(mapCanvas, mapData, mapDataImage) {
   if (mapData.spawn) {
     mapContext.beginPath()
     mapContext.lineWidth = 1
-    mapContext.font = `${fontSize}px 'Roboto', sans-serif`
+    mapContext.font = `${mapData.fontSize}px 'Roboto', sans-serif`
     mapContext.fillStyle = '#30de00'
     mapContext.strokeStyle = '#333'
-    mapContext.fillText('spawn', mapData.spawn.x + radius / 3, mapData.spawn.y - radius / 3)
-    mapContext.strokeText('spawn', mapData.spawn.x + radius / 3, mapData.spawn.y - radius / 3)
-    mapContext.ellipse(mapData.spawn.x, mapData.spawn.y, radius / 4, radius / 4, 0, 0, 2 * Math.PI)
+    mapContext.fillText('spawn', mapData.spawn.x + mapData.radius / 3, mapData.spawn.y - mapData.radius / 3)
+    mapContext.strokeText('spawn', mapData.spawn.x + mapData.radius / 3, mapData.spawn.y - mapData.radius / 3)
+    mapContext.ellipse(mapData.spawn.x, mapData.spawn.y, mapData.radius / 4, mapData.radius / 4, 0, 0, 2 * Math.PI)
     mapContext.fill()
     mapContext.stroke()
     mapContext.closePath()
@@ -79,26 +79,87 @@ function drawWitchMapLabels(mapCanvas, mapData, mapDataImage) {
   if (mapData.compass) {
     mapContext.beginPath()
     mapContext.lineWidth = 1
-    mapContext.font = `${fontSize}px 'Roboto', sans-serif`
+    mapContext.font = `${mapData.fontSize}px 'Roboto', sans-serif`
     mapContext.fillStyle = '#4fc3f7'
     mapContext.strokeStyle = '#333'
-    mapContext.fillText('N', mapData.compass.x - fontSize / 3 ^ 0, mapData.compass.y + fontSize / 3 ^ 0)
-    mapContext.strokeText('N', mapData.compass.x - fontSize / 3 ^ 0, mapData.compass.y + fontSize / 3 ^ 0)
+    mapContext.fillText('N', mapData.compass.x - mapData.fontSize / 3 ^ 0, mapData.compass.y + mapData.fontSize / 3 ^ 0)
+    mapContext.strokeText('N', mapData.compass.x - mapData.fontSize / 3 ^ 0, mapData.compass.y + mapData.fontSize / 3 ^ 0)
     mapContext.fill()
     mapContext.stroke()
     mapContext.closePath()
   }
   if (mapData.witch) {
     mapContext.beginPath()
-    mapContext.lineWidth = Math.max(radius * 0.2, 1)
+    mapContext.lineWidth = Math.max(mapData.radius * 0.2, 1)
     mapContext.strokeStyle = '#30de00'
-    mapContext.ellipse(mapData.witch.x, mapData.witch.y, radius, radius, 0, 0, 2 * Math.PI)
+    mapContext.ellipse(mapData.witch.x, mapData.witch.y, mapData.radius, mapData.radius, 0, 0, 2 * Math.PI)
     mapContext.stroke()
     mapContext.closePath()
   }
 }
 
+/**
+ * @typedef NormalizedMapData
+ * @property {number} width
+ * @property {number} height
+ * @property {number} radius
+ * @property {number} fontSize
+ * @property {{x:number,y:number}} [spawn]
+ * @property {{x:number,y:number}} [compass]
+ * @property {{x:number,y:number}} [witch]
+ * @property {Array<{x:number,y:number}>} [other_witches]
+ */
+/**
+ * @param {MapData} mapData
+ * @returns {NormalizedMapData}
+ */
+function normalizeMapData(mapData) {
+  /** @type {NormalizedMapData} */
+  const nMapData = { width: 0, height: 0, radius: mapData.radius, fontSize: mapData.fontSize }
+  let [nX, nY] = [mapData.width, mapData.height]
+
+  for (const [key, value] of Object.entries(mapData)) {
+    if (typeof value === 'object') {
+      if (value instanceof Set) {
+        nMapData[key] = []
+        for (const point of value) {
+          nX = Math.min(nX, point.x - nMapData.radius * 2)
+          nY = Math.min(nY, point.y - nMapData.radius * 2)
+          nMapData.width = Math.max(nMapData.width, point.x + nMapData.radius * 2)
+          nMapData.height = Math.max(nMapData.height, point.y + nMapData.radius * 2)
+          nMapData[key].push({ ...point })
+        }
+      } else {
+        nX = Math.min(nX, value.x - nMapData.radius * 2)
+        nY = Math.min(nY, value.y - nMapData.radius * 2)
+        nMapData.width = Math.max(nMapData.width, value.x + nMapData.radius * 2)
+        nMapData.height = Math.max(nMapData.height, value.y + nMapData.radius * 2)
+        nMapData[key] = { ...value }
+      }
+    }
+  }
+
+  nMapData.width -= nX
+  nMapData.height -= nY
+  for (const value of Object.values(nMapData)) {
+    if (typeof value === 'object') {
+      if (value instanceof Array) {
+        for (const point of value) {
+          point.x -= nX
+          point.y -= nY
+        }
+      } else {
+        value.x -= nX
+        value.y -= nY
+      }
+    }
+  }
+
+  return nMapData
+}
+
 export {
   renderAmitieRow,
-  drawWitchMapLabels
+  drawWitchMapLabels,
+  normalizeMapData
 }
