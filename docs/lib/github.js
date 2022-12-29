@@ -99,6 +99,7 @@ function getTimeLabels(utcHours) {
  * @property {Amitie} amitie
  * @property {string} miniСard
  * @property {boolean} broken
+ * @property {import('../lib/amitie.js').MapData} witchMap
  */
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -127,6 +128,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
       minusBlocks: ['?']
     },
     miniСard: '',
+    witchMap: null,
     broken: false
   }
   const bodyList = body.split('### ')
@@ -195,6 +197,15 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     `${issue.timeUTC}, ${issue.timeMSK}, ${issue.milestone}\n` +
     `${window.location.origin}${issue.url}\n` +
     '#поделисьосколком'
+
+  if ((/&witch_map=/).test(body)) {
+    body.replace(/&witch_map=(.*) -->/, (_, map) => (issue.witchMap = map))
+    try {
+      issue.witchMap = JSON.parse(issue.witchMap)
+    } catch (_) {
+      issue.witchMap = null
+    }
+  }
 
   return issue
 }

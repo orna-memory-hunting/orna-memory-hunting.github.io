@@ -1,7 +1,7 @@
 import { showError, safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
 import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
-import { renderAmitieRow } from '../lib/amitie.js'
+import { renderAmitieRow, drawWitchMapLabels } from '../lib/amitie.js'
 
 safeExecute(async () => {
   const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/tesseract.esm.min.js')
@@ -110,18 +110,7 @@ safeExecute(async () => {
   const mapUploadResults = document.getElementById('map-upload-results')
   /** @type {HTMLCanvasElement} */// @ts-ignore
   const mapCanvas = document.getElementById('map-canvas')
-  /** @type {CanvasRenderingContext2D} */// @ts-ignore
-  const mapContext = mapCanvas.getContext('2d')
-  /**
-   * @typedef MapData
-   * @property {number} width
-   * @property {number} height
-   * @property {{x:number,y:number}} [spawn]
-   * @property {{x:number,y:number}} [compass]
-   * @property {{x:number,y:number}} [witch]
-   * @property {Set<{x:number,y:number}>} [other_witches]
-   */
-  /** @type {MapData} */
+  /** @type {import('../lib/amitie.js').MapData} */
   let mapData = null
   /** @type {HTMLImageElement} */
   let mapDataImage = null
@@ -152,13 +141,13 @@ safeExecute(async () => {
           spawn: { x: image.width / 2 ^ 0, y: image.height / 2 ^ 0 }
         }
         updateGithubLink()
-        drawMapLabels()
+        drawWitchMapLabels(mapCanvas, mapData, mapDataImage)
         mapUploadResults.classList.remove('hide')
       })
     } else {
       mapDataImage = null
       mapData = null
-      mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height)
+      mapCanvas.getContext('2d').clearRect(0, 0, mapCanvas.width, mapCanvas.height)
       mapUploadResults.classList.add('hide')
     }
   })
@@ -190,7 +179,7 @@ safeExecute(async () => {
     }
 
     updateGithubLink()
-    drawMapLabels()
+    drawWitchMapLabels(mapCanvas, mapData, mapDataImage)
   }
 
   /** @param {{x:number,y:number}} point */
@@ -212,62 +201,6 @@ safeExecute(async () => {
 
     if (add) {
       mapData.other_witches.add(point)
-    }
-  }
-
-  function drawMapLabels() {
-    const radius = Math.min(mapData.width, mapData.height) * 0.05
-    const fontSize = Math.min(mapData.width, mapData.height) * 0.07
-
-    mapCanvas.width = mapData.width
-    mapCanvas.height = mapData.height
-    mapContext.drawImage(mapDataImage, 0, 0)
-
-
-    if (mapData.other_witches) {
-      for (const witch of mapData.other_witches) {
-        mapContext.beginPath()
-        mapContext.lineWidth = Math.max(radius * 0.2, 1)
-        mapContext.strokeStyle = '#ff7043'
-        mapContext.ellipse(witch.x, witch.y, radius, radius, 0, 0, 2 * Math.PI)
-        mapContext.moveTo(witch.x - radius * Math.cos(45), witch.y - radius * Math.sin(45))
-        mapContext.lineTo(witch.x + radius * Math.cos(45), witch.y + radius * Math.sin(45))
-        mapContext.stroke()
-        mapContext.closePath()
-      }
-    }
-    if (mapData.spawn) {
-      mapContext.beginPath()
-      mapContext.lineWidth = 1
-      mapContext.font = `${fontSize}px 'Roboto', sans-serif`
-      mapContext.fillStyle = '#30de00'
-      mapContext.strokeStyle = '#333'
-      mapContext.fillText('spawn', mapData.spawn.x + radius / 3, mapData.spawn.y - radius / 3)
-      mapContext.strokeText('spawn', mapData.spawn.x + radius / 3, mapData.spawn.y - radius / 3)
-      mapContext.ellipse(mapData.spawn.x, mapData.spawn.y, radius / 4, radius / 4, 0, 0, 2 * Math.PI)
-      mapContext.fill()
-      mapContext.stroke()
-      mapContext.closePath()
-    }
-    if (mapData.compass) {
-      mapContext.beginPath()
-      mapContext.lineWidth = 1
-      mapContext.font = `${fontSize}px 'Roboto', sans-serif`
-      mapContext.fillStyle = '#4fc3f7'
-      mapContext.strokeStyle = '#333'
-      mapContext.fillText('N', mapData.compass.x - fontSize / 3 ^ 0, mapData.compass.y + fontSize / 3 ^ 0)
-      mapContext.strokeText('N', mapData.compass.x - fontSize / 3 ^ 0, mapData.compass.y + fontSize / 3 ^ 0)
-      mapContext.fill()
-      mapContext.stroke()
-      mapContext.closePath()
-    }
-    if (mapData.witch) {
-      mapContext.beginPath()
-      mapContext.lineWidth = Math.max(radius * 0.2, 1)
-      mapContext.strokeStyle = '#30de00'
-      mapContext.ellipse(mapData.witch.x, mapData.witch.y, radius, radius, 0, 0, 2 * Math.PI)
-      mapContext.stroke()
-      mapContext.closePath()
     }
   }
 

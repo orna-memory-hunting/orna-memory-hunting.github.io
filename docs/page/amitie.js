@@ -1,5 +1,6 @@
 import { safeExecute, doAsync, escapeHTML } from '../lib/utils.js'
 import { getIssue } from '../lib/github.js'
+import { drawWitchMapLabels } from '../lib/amitie.js'
 
 safeExecute(() => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
@@ -25,6 +26,8 @@ safeExecute(() => {
   const timeBlock = document.getElementById('time-block')
   /** @type {HTMLDivElement} */// @ts-ignore
   const periodBlock = document.getElementById('period-block')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const witchMapContainer = document.getElementById('witch-map-container')
   /** @type {HTMLLinkElement} */// @ts-ignore
   const openOnGitHub = document.getElementById('open-on-github')
 
@@ -69,5 +72,16 @@ safeExecute(() => {
     timeBlock.innerHTML = `<div>${issue.timeLocal}</div><div>${issue.timeUTC} / ${issue.timeMSK}</div>`
 
     periodBlock.innerHTML = `<div>${escapeHTML(issue.milestone)}</div>`
+
+    if (issue.witchMap) {
+      /** @type {HTMLCanvasElement} */// @ts-ignore
+      const canvas = document.createElement('canvas')
+
+      drawWitchMapLabels(canvas, issue.witchMap)
+      witchMapContainer.innerHTML = ''
+      witchMapContainer.append(canvas)
+    } else {
+      witchMapContainer.innerHTML = 'Нет'
+    }
   })
 })
