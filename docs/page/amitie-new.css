@@ -161,17 +161,16 @@
   flex-wrap  : wrap;
 }
 
-.clone-amitie-list-items {
+.clone-amitie-list-items,
+.other-map-list-items {
   width         : 100%;
   display       : flex;
   flex-direction: column;
   row-gap       : 8px;
 }
 
-.other-map-list-items {
-  display       : flex;
-  flex-direction: column;
-  row-gap       : 8px;
+.other-map-list-items .witch-map-canvas {
+  max-width: 50%;
 }
 
 .clone-amitie {

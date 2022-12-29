@@ -871,7 +871,8 @@ safeExecute(async () => {
           const mAmitie = document.createElement('div')
           const canvas = document.createElement('canvas')
 
-          mAmitie.innerHTML = renderAmitieRow(issue)
+          mAmitie.innerHTML = `<div>${issue.answer.aLabel}. ${issue.answer.a}</div>` +
+            renderAmitieRow(issue)
           otherMapList.append(mAmitie)
           canvas.classList.add('witch-map-canvas')
           drawWitchMapLabels(canvas, issue.witchMap)

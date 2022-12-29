@@ -88,6 +88,7 @@ function getTimeLabels(utcHours) {
  * @property {string} urlGH
  * @property {string} title
  * @property {Labels} labels
+ * @property {number} milestoneNumber
  * @property {string} milestone
  * @property {number} utcHours
  * @property {string} timeUTC
@@ -115,6 +116,7 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     urlGH: html_url, // eslint-disable-line camelcase
     title,
     labels: [],
+    milestoneNumber: (milestone || { number: null }).number,
     milestone: (milestone || { title: '' }).title,
     utcHours: null,
     timeUTC: '',

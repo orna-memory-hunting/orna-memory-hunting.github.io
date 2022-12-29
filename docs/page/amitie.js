@@ -1,6 +1,6 @@
 import { safeExecute, doAsync, escapeHTML } from '../lib/utils.js'
-import { getIssue } from '../lib/github.js'
-import { drawWitchMapLabels } from '../lib/amitie.js'
+import { getIssue, getTimeLabels, getIssuesList } from '../lib/github.js'
+import { drawWitchMapLabels, renderAmitieRow } from '../lib/amitie.js'
 
 safeExecute(() => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
@@ -30,6 +30,8 @@ safeExecute(() => {
   const witchMapContainer = document.getElementById('witch-map-container')
   /** @type {HTMLLinkElement} */// @ts-ignore
   const openOnGitHub = document.getElementById('open-on-github')
+
+  window.addEventListener('popstate', () => { window.location.reload() })
 
   doAsync(async () => {
     const issue = await getIssue(issueNumber)
@@ -81,6 +83,33 @@ safeExecute(() => {
       drawWitchMapLabels(canvas, issue.witchMap)
       witchMapContainer.innerHTML = ''
       witchMapContainer.append(canvas)
+    } else if (issue.milestone) {
+      witchMapContainer.innerHTML = 'Загрузка...'
+
+      const { timeUTC } = getTimeLabels(issue.utcHours)
+      const mapIssues = await getIssuesList({
+        milestone: issue.milestoneNumber,
+        labels: ['witch-map', issue.answer.labelQ, timeUTC]
+      })
+
+      witchMapContainer.innerHTML = ''
+      for (const mapIssue of mapIssues) {
+        if (mapIssue.clone === issue.clone) {
+          /** @type {HTMLCanvasElement} */// @ts-ignore
+          const mAmitie = document.createElement('div')
+          const canvas = document.createElement('canvas')
+
+          mAmitie.innerHTML = `<div>${mapIssue.answer.aLabel}. ${mapIssue.answer.a}</div>` +
+            renderAmitieRow(mapIssue)
+          witchMapContainer.append(mAmitie)
+          canvas.classList.add('witch-map-canvas')
+          drawWitchMapLabels(canvas, mapIssue.witchMap)
+          witchMapContainer.append(canvas)
+        }
+      }
+      if (!witchMapContainer.innerHTML) {
+        witchMapContainer.innerHTML = 'Нет'
+      }
     } else {
       witchMapContainer.innerHTML = 'Нет'
     }
