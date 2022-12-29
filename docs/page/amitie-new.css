@@ -169,6 +169,14 @@
   row-gap       : 8px;
 }
 
+.other-map-list-items {
+  align-items: flex-start;
+}
+
+.witch-map-amitie {
+  width: 100%;
+}
+
 .other-map-list-items .witch-map-canvas {
   max-width: 50%;
 }

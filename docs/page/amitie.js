@@ -99,6 +99,7 @@ safeExecute(() => {
           const mAmitie = document.createElement('div')
           const canvas = document.createElement('canvas')
 
+          mAmitie.classList.add('witch-map-amitie')
           mAmitie.innerHTML = `<div>${mapIssue.answer.aLabel}. ${mapIssue.answer.a}</div>` +
             renderAmitieRow(mapIssue)
           witchMapContainer.append(mAmitie)
