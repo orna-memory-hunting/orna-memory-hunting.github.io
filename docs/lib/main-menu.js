@@ -7,7 +7,7 @@ const menuItems = [
   { url: '-' },
   { url: '/guide/', name: 'Гайд по разведке' },
   // { url: '/faq/', name: 'Популярные вопросы' },
-  { url: 'https://t.me/OrnaOskolki', name: 'Чат поддержки' },
+  { url: 'https://t.me/ornaMemoryHunts/16813', name: 'Чат поддержки' },
   { url: 'https://github.com/orna-memory-hunting/project/issues/new/choose', name: 'Сообщить об ошибке' }
 ]
 
@@ -49,6 +49,10 @@ export function initMainMenu() {
       item.classList.add('astext')
       item.href = url
       item.textContent = name
+
+      if (url.startsWith('http')) {
+        item.target = '_blank'
+      }
 
       menuList.append(item)
     }

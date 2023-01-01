@@ -17,6 +17,17 @@
   margin-left: 16px;
 }
 
+.witch-map-container {
+  display       : flex;
+  flex-direction: column;
+  align-items   : flex-start;
+  row-gap       : 8px;
+}
+
+.witch-map-amitie {
+  width: 100%;
+}
+
 .open-on-github {
   margin: 16px 0;
 }

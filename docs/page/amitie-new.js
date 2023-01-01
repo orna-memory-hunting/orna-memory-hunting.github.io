@@ -1,7 +1,7 @@
 import { showError, safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
 import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
-import { renderAmitieRow } from '../lib/amitie.js'
+import { renderAmitieRow, drawWitchMapLabels, normalizeMapData } from '../lib/amitie.js'
 
 safeExecute(async () => {
   const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/tesseract.esm.min.js')
@@ -21,7 +21,6 @@ safeExecute(async () => {
   const amitieContext = amitieCanvas.getContext('2d')
   /** @type {HTMLDivElement} */// @ts-ignore
   const amitieResults = document.getElementById('amitie-results')
-  let recognizingInProgress = false
 
   questions.innerHTML = renderQuestionList()
 
@@ -96,10 +95,7 @@ safeExecute(async () => {
     updateParams()
   }
 
-  /** @type {HTMLInputElement} */// @ts-ignore
-  const amitieFile = document.getElementById('amitie-file')
-  /** @type {HTMLDivElement} */// @ts-ignore
-  const amitieFileName = document.getElementById('amitie-file-name')
+
   /** @type {HTMLDivElement} */// @ts-ignore
   const amitiUploadField = document.getElementById('amitie-upload-field')
   /** @type {HTMLDivElement} */// @ts-ignore
@@ -108,96 +104,112 @@ safeExecute(async () => {
   const amitieCanvasError = document.getElementById('amitie-canvas-error')
   /** @type {HTMLDivElement} */// @ts-ignore
   const recognizingText = document.getElementById('recognizing-text')
-  /** @type {HTMLSpanElement} */// @ts-ignore
-  const amitieFileFromClipboard = document.getElementById('amitie-file-from-clipboard')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const mapUploadField = document.getElementById('map-upload-field')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const mapUploadResults = document.getElementById('map-upload-results')
+  /** @type {HTMLCanvasElement} */// @ts-ignore
+  const mapCanvas = document.getElementById('map-canvas')
+  /** @type {import('../lib/amitie.js').MapData} */
+  let mapData = null
+  /** @type {HTMLImageElement} */
+  let mapDataImage = null
+  let hasMapData = false
 
-  amitiUploadField.onclick = () => {
-    if (recognizingInProgress) return
-    amitieFile.click()
-  }
-
-  amitiUploadField.ondragover = (/** @type {DragEvent} */ event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    if (event.dataTransfer.items.length) {
-      amitiUploadField.classList.add('dragenter')
-    }
-  }
-
-  amitiUploadField.ondragleave = (/** @type {Event} */ event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    amitiUploadField.classList.remove('dragenter')
-  }
-
-  amitiUploadField.ondrop = (/** @type {DragEvent} */ event) => {
-    event.preventDefault()
-    event.stopPropagation()
-    amitiUploadField.classList.remove('dragenter')
-
-    const { files } = event.dataTransfer
-
-    if (recognizingInProgress) return
-    if (files.length) {
-      doAsync(() => prepareAmitieImage(files[0], true))
+  amitiUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
+    if (event.detail.file) {
+      doAsync(() => prepareAmitieImage(event.detail.file, true))
     } else {
-      window.alert('Не удалось найти файл изображения!')
-    }
-  }
-
-  document.addEventListener('paste', (/** @type {ClipboardEvent} */event) => {
-    /** @type {HTMLDivElement} */// @ts-ignore
-    const input = event.target
-
-    if (input.tagName !== 'INPUT') {
-      event.preventDefault()
-      event.stopPropagation()
-
-      const { files } = event.clipboardData
-
-      if (recognizingInProgress) return
-      if (files.length) {
-        doAsync(() => prepareAmitieImage(files[0]))
-      } else {
-        window.alert('Не удалось найти файл изображения!')
-      }
+      amitieUploadResults.classList.add('hide')
+      amitieCanvasError.classList.add('hide')
+      recognizingText.classList.add('hide')
+      timeFileField.classList.add('hide')
+      amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
     }
   })
 
-  amitieFileFromClipboard.onclick = (/** @type {MouseEvent} */event) => {
-    event.preventDefault()
-    event.stopPropagation()
+  mapUploadField.addEventListener('selected-file', (/** @type {CustomEvent} */ event) => {
+    hasMapData = false
+    if (event.detail.file) {
+      safeExecute(async () => {
+        const image = new window.Image()
 
-    if (recognizingInProgress) return
-    safeExecute(async () => {
-      await navigator.clipboard.read().catch(() => {
-        amitiUploadField.click()
-        amitieFileFromClipboard.classList.remove('aslink')
-        amitieFileFromClipboard.onclick = null
-      }).then(clipboardItems => {
-        if (clipboardItems) {
-          if (clipboardItems.length) {
-            const [clipboardItem] = clipboardItems
-
-            if (clipboardItem.types.length && clipboardItem.types[0].startsWith('image')) {
-              clipboardItem.getType(clipboardItem.types[0]).then(data => {
-                const file = new window.File([data], 'image.png', { type: clipboardItem.types[0] })
-
-                doAsync(() => prepareAmitieImage(file))
-              })
-            } else {
-              window.alert('Не удалось найти файл изображения!')
-            }
-          } else {
-            window.alert('Не удалось найти файл изображения!')
-          }
+        image.src = URL.createObjectURL(event.detail.file)
+        await new Promise((resolve) => { image.onload = resolve })
+        mapDataImage = image
+        mapData = {
+          width: image.width,
+          height: image.height,
+          radius: Math.min(image.width, image.height) * 0.05 ^ 0,
+          fontSize: Math.min(image.width, image.height) * 0.07 ^ 0,
+          spawn: { x: image.width / 2 ^ 0, y: image.height / 2 ^ 0 }
         }
+        updateGithubLink()
+        drawWitchMapLabels(mapCanvas, mapData, mapDataImage)
+        mapUploadResults.classList.remove('hide')
       })
-    })
+    } else {
+      mapDataImage = null
+      mapData = null
+      mapCanvas.getContext('2d').clearRect(0, 0, mapCanvas.width, mapCanvas.height)
+      mapUploadResults.classList.add('hide')
+    }
+  })
+
+  mapCanvas.onclick = event => {
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const elm = document.querySelector('.map-label-tab.active')
+    /** @type {HTMLDivElement} */// @ts-ignore
+    const nextElm = document.querySelector('.map-label-tab.active+.map-label-tab')
+    const { label } = elm.dataset
+    const point = {
+      x: (event.pageX - mapCanvas.offsetLeft) * (mapCanvas.width / mapCanvas.clientWidth) ^ 0,
+      y: (event.pageY - mapCanvas.offsetTop) * (mapCanvas.height / mapCanvas.clientHeight) ^ 0
+    }
+
+    switch (label) {
+      case 'spawn':
+      case 'compass':
+      case 'witch':
+        mapData[label] = point
+        break
+      case 'other_witches':
+        toggleOtherWitches(point)
+        break
+    }
+
+    if (nextElm && !(nextElm.dataset.label in mapData)) {
+      nextElm.click()
+    }
+
+    if ('compass' in mapData && 'witch' in mapData) {
+      hasMapData = true
+    }
+
+    updateGithubLink()
+    drawWitchMapLabels(mapCanvas, mapData, mapDataImage)
   }
-  if (!('navigator' in window && 'clipboard' in navigator)) {
-    amitieFileFromClipboard.classList.remove('aslink')
-    amitieFileFromClipboard.onclick = null
+
+  /** @param {{x:number,y:number}} point */
+  function toggleOtherWitches(point) {
+    let add = true
+
+    if (!('other_witches' in mapData)) {
+      mapData.other_witches = new Set()
+    }
+
+    for (const prevPoint of mapData.other_witches) {
+      const radius = Math.min(mapData.width, mapData.height) * 0.05
+
+      if (Math.abs(prevPoint.x - point.x) < radius && Math.abs(prevPoint.y - point.y) < radius) {
+        mapData.other_witches.delete(prevPoint)
+        add = false
+      }
+    }
+
+    if (add) {
+      mapData.other_witches.add(point)
+    }
   }
 
   timeSelect.onchange = () => { updateParams(); updateGithubLink() }
@@ -216,21 +228,6 @@ safeExecute(async () => {
       updateGithubLink()
     } else {
       amitieInfo.classList.add('hide')
-    }
-  }
-
-  amitieFile.addEventListener('change', handleAmitieFile)
-
-  function handleAmitieFile() {
-    if (amitieFile.files && amitieFile.files.length) {
-      doAsync(() => prepareAmitieImage(amitieFile.files[0], true))
-    } else {
-      amitieFileName.textContent = ''
-      amitieUploadResults.classList.add('hide')
-      amitieCanvasError.classList.add('hide')
-      recognizingText.classList.add('hide')
-      timeFileField.classList.add('hide')
-      amitieContext.clearRect(0, 0, amitieCanvas.width, amitieCanvas.height)
     }
   }
 
@@ -282,7 +279,6 @@ safeExecute(async () => {
 
     updateGithubLink()
 
-    amitieFileName.textContent = `Файл: ${file.name}`
     amitieUploadResults.classList.add('hide')
     amitieCanvasError.classList.add('hide')
     recognizingText.classList.add('hide')
@@ -591,7 +587,6 @@ safeExecute(async () => {
   recognizingTextButton.onclick = () => doAsync(startRecognizingText)
 
   async function startRecognizingText() {
-    recognizingInProgress = true
     recognizingTextLog.textContent = 'Загрузка Tesseract.js...'
     recognizingLang.classList.add('hide')
     recognizingTextButton.classList.add('hide')
@@ -702,8 +697,6 @@ safeExecute(async () => {
 
       updateGithubLink()
 
-
-      recognizingInProgress = false
       amitiUploadField.classList.remove('disable')
     }
 
@@ -801,10 +794,13 @@ safeExecute(async () => {
       const cloneElm = document.querySelector('#clone-field .active')
       const clone = cloneElm ? Number(cloneElm.dataset.clone) : 0
       const cloneLabel = clone ? `,clone #${clone}` : ''
-      const labels = `${answer.label},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${cloneLabel}`
+      const wMap = hasMapData ? ',witch-map' : ''
+      const aLabel = `${answer.labelQ},${answer.label}`
+      const labels = `${aLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${cloneLabel}${wMap}`
       const milestone = getMilestoneTitle(time)
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
+      const mapDataStr = hasMapData ? `\n<!-- &witch_map=${JSON.stringify(normalizeMapData(mapData))} -->` : ''
 
       sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
         `title=${encodeURIComponent(amitiePlus1.value)}` +
@@ -813,7 +809,8 @@ safeExecute(async () => {
         `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
         encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
         encodeURIComponent(`### Минусы\n${minusBlocks}`) +
-        encodeURIComponent(hiddenInfo)
+        encodeURIComponent(hiddenInfo) +
+        encodeURIComponent(mapDataStr)
 
       doAsync(checkCloneAmitieList)
     })
@@ -821,8 +818,11 @@ safeExecute(async () => {
 
   /** @type {HTMLDivElement} */// @ts-ignore
   const cloneAmitieList = document.getElementById('clone-amitie-list')
+  const otherMapList = document.getElementById('other-map-list')
   /** @type {HTMLDivElement} */// @ts-ignore
   const cloneAmitieResult = document.getElementById('clone-amitie-result')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const otherMapResult = document.getElementById('other-map-result')
   let lastCloneProps = ''
 
   async function checkCloneAmitieList() {
@@ -847,29 +847,50 @@ safeExecute(async () => {
     lastCloneProps = cloneProps
     cloneAmitieResult.innerHTML = 'Загрузка...'
     cloneAmitieList.classList.add('hide')
+    otherMapList.classList.add('hide')
+    otherMapList.innerHTML = ''
+    otherMapResult.classList.remove('hide')
 
-    const issues = await getIssuesList({ milestone, labels: [answer.label, timeUTC] })
+    const issues = await getIssuesList({ milestone, labels: [answer.labelQ, timeUTC] })
     let html = ''
     let maxClone = 0
 
     if (issues.length > 0) {
       for (const issue of issues) {
-        html += renderAmitieRow(issue)
+        if (answer.code === issue.answer.code) {
+          maxClone = maxClone || 1
+          html += renderAmitieRow(issue)
 
-        if (issue.labels.length) {
-          for (const label of issue.labels) {
-            if (label.name.startsWith('clone #')) {
-              const clone = parseInt(label.name.replace('clone #', ''))
-
-              if (!isNaN(clone)) maxClone = Math.max(maxClone, clone)
-              if (maxClone > 5) maxClone = 5
-            }
+          if (issue.clone) {
+            maxClone = Math.max(maxClone, issue.clone + 1)
+            if (maxClone > 5) maxClone = 5
           }
         }
+        if (issue.witchMap) {
+          /** @type {HTMLCanvasElement} */// @ts-ignore
+          const mAmitie = document.createElement('div')
+          const canvas = document.createElement('canvas')
+
+          mAmitie.classList.add('witch-map-amitie')
+          mAmitie.innerHTML = `<div>${issue.answer.aLabel}. ${issue.answer.a}</div>` +
+            renderAmitieRow(issue)
+          otherMapList.append(mAmitie)
+          canvas.classList.add('witch-map-canvas')
+          drawWitchMapLabels(canvas, issue.witchMap)
+          otherMapList.append(canvas)
+          otherMapList.classList.remove('hide')
+          otherMapResult.classList.add('hide')
+        }
       }
-      cloneAmitieList.innerHTML = html
-      cloneAmitieResult.classList.add('hide')
-      cloneAmitieList.classList.remove('hide')
+      if (html) {
+        cloneAmitieList.innerHTML = html
+        cloneAmitieResult.classList.add('hide')
+        cloneAmitieList.classList.remove('hide')
+      } else {
+        cloneAmitieList.classList.add('hide')
+        cloneAmitieResult.classList.remove('hide')
+        cloneAmitieResult.innerHTML = 'Нет'
+      }
     } else {
       cloneAmitieList.classList.add('hide')
       cloneAmitieResult.classList.remove('hide')
@@ -881,7 +902,7 @@ safeExecute(async () => {
       document.querySelector('#clone-field div[data-clone="0"]').click()
     } else if (maxClone < 5) {
       // @ts-ignore
-      document.querySelector(`#clone-field div[data-clone="${maxClone + 1}"]`).click()
+      document.querySelector(`#clone-field div[data-clone="${maxClone}"]`).click()
     } else {
       // @ts-ignore
       document.querySelector('#clone-field div[data-clone="1"]').click()

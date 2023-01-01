@@ -308,6 +308,38 @@ a.text-button {
   border-color: #f5f1e8;
 }
 
+.field-label {
+  margin-bottom: 4px;
+}
+
+.upload-field {
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  text-align    : center;
+  padding       : 6px;
+  border        : dashed 1px #fff;
+  font-size     : 90%;
+  border-radius : 8px;
+  opacity       : 0.5;
+  user-select   : none;
+}
+
+.upload-field.dragenter,
+.upload-field:hover {
+  cursor : pointer;
+  opacity: 1;
+}
+
+.upload-field__file {
+  display: none;
+}
+
+.upload-field__file-name {
+  font-weight: bold;
+  font-size  : 90%;
+}
+
 h4 {
   margin: 12px 0px 6px;
 }
@@ -370,6 +402,12 @@ h4 {
   display   : flex;
   column-gap: 4px;
   row-gap   : 4px;
+}
+
+.witch-map-canvas {
+  max-width : 100%;
+  border    : 1px solid #777;
+  background: #0005 url(https://playorna.com/static//img/light.png) no-repeat;
 }
 
 .fatal-error {

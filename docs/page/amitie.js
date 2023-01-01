@@ -1,5 +1,6 @@
 import { safeExecute, doAsync, escapeHTML } from '../lib/utils.js'
-import { getIssue } from '../lib/github.js'
+import { getIssue, getTimeLabels, getIssuesList } from '../lib/github.js'
+import { drawWitchMapLabels, renderAmitieRow } from '../lib/amitie.js'
 
 safeExecute(() => {
   const params = new URLSearchParams(window.location.hash.replace('#', ''))
@@ -25,8 +26,12 @@ safeExecute(() => {
   const timeBlock = document.getElementById('time-block')
   /** @type {HTMLDivElement} */// @ts-ignore
   const periodBlock = document.getElementById('period-block')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const witchMapContainer = document.getElementById('witch-map-container')
   /** @type {HTMLLinkElement} */// @ts-ignore
   const openOnGitHub = document.getElementById('open-on-github')
+
+  window.addEventListener('popstate', () => { window.location.reload() })
 
   doAsync(async () => {
     const issue = await getIssue(issueNumber)
@@ -69,5 +74,45 @@ safeExecute(() => {
     timeBlock.innerHTML = `<div>${issue.timeLocal}</div><div>${issue.timeUTC} / ${issue.timeMSK}</div>`
 
     periodBlock.innerHTML = `<div>${escapeHTML(issue.milestone)}</div>`
+
+    if (issue.witchMap) {
+      /** @type {HTMLCanvasElement} */// @ts-ignore
+      const canvas = document.createElement('canvas')
+
+      canvas.classList.add('witch-map-canvas')
+      drawWitchMapLabels(canvas, issue.witchMap)
+      witchMapContainer.innerHTML = ''
+      witchMapContainer.append(canvas)
+    } else if (issue.milestone) {
+      witchMapContainer.innerHTML = 'Загрузка...'
+
+      const { timeUTC } = getTimeLabels(issue.utcHours)
+      const mapIssues = await getIssuesList({
+        milestone: issue.milestoneNumber,
+        labels: ['witch-map', issue.answer.labelQ, timeUTC]
+      })
+
+      witchMapContainer.innerHTML = ''
+      for (const mapIssue of mapIssues) {
+        if (mapIssue.clone === issue.clone) {
+          /** @type {HTMLCanvasElement} */// @ts-ignore
+          const mAmitie = document.createElement('div')
+          const canvas = document.createElement('canvas')
+
+          mAmitie.classList.add('witch-map-amitie')
+          mAmitie.innerHTML = `<div>${mapIssue.answer.aLabel}. ${mapIssue.answer.a}</div>` +
+            renderAmitieRow(mapIssue)
+          witchMapContainer.append(mAmitie)
+          canvas.classList.add('witch-map-canvas')
+          drawWitchMapLabels(canvas, mapIssue.witchMap)
+          witchMapContainer.append(canvas)
+        }
+      }
+      if (!witchMapContainer.innerHTML) {
+        witchMapContainer.innerHTML = 'Нет'
+      }
+    } else {
+      witchMapContainer.innerHTML = 'Нет'
+    }
   })
 })

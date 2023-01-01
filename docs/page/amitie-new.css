@@ -62,46 +62,15 @@
   flex-direction: column;
 }
 
-.amitie-upload-field {
-  display       : flex;
-  flex-direction: column;
-  text-align    : center;
-  padding       : 6px;
-  border        : dashed 1px #fff;
-  font-size     : 90%;
-  border-radius : 8px;
-  opacity       : 0.5;
-  user-select   : none;
-}
-
-.amitie-file-name {
-  font-weight: bold;
-  font-size  : 90%;
-}
-
-.amitie-upload-field.dragenter,
-.amitie-upload-field:hover {
-  cursor : pointer;
-  opacity: 1;
-}
-
-.amitie-file {
-  display: none;
-}
-
-.amitie-file-from-clipboard {
-  white-space: nowrap;
-}
-
-.amitie-upload-results {
+.upload-results {
   display       : flex;
   flex-direction: column;
   align-items   : center;
 }
 
-.amitie-canvas {
+.upload-canvas {
   max-width : 100%;
-  border    : 1px solid;
+  border    : 1px solid #777;
   margin-top: 8px;
 }
 
@@ -182,7 +151,9 @@
 
 .additional-labels,
 .clone-field,
-.clone-amitie-list {
+.clone-amitie-list,
+.map-label-tabs,
+.other-map-list {
   display    : flex;
   column-gap : 12px;
   row-gap    : 6px;
@@ -190,11 +161,24 @@
   flex-wrap  : wrap;
 }
 
-.clone-amitie-list-items {
+.clone-amitie-list-items,
+.other-map-list-items {
   width         : 100%;
   display       : flex;
   flex-direction: column;
   row-gap       : 8px;
+}
+
+.other-map-list-items {
+  align-items: flex-start;
+}
+
+.witch-map-amitie {
+  width: 100%;
+}
+
+.other-map-list-items .witch-map-canvas {
+  max-width: 50%;
 }
 
 .clone-amitie {
@@ -202,4 +186,8 @@
   align-items: baseline;
   column-gap : 8px;
   flex-wrap  : wrap;
+}
+
+.map-label-tabs {
+  margin-top: 8px;
 }
