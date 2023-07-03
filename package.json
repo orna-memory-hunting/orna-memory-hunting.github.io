@@ -6,14 +6,14 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "fastify": "4.6.0",
-    "@fastify/static": "6.5.0",
-    "@fastify/caching": "8.0.1"
+    "fastify": "4.19.1",
+    "@fastify/static": "6.10.2",
+    "@fastify/caching": "8.3.0"
   },
   "devDependencies": {
     "@nodutilus/project-config": "latest",
     "octokit": "2.0.10",
-    "tesseract.js": "4.0.0"
+    "tesseract.js": "4.1.1"
   },
   "engines": {
     "node": ">=16"

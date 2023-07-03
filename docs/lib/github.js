@@ -1,10 +1,13 @@
 import { Octokit } from 'https://cdn.skypack.dev/octokit@2.0.10'
 import { getAnswerByLabels } from './questions.js'
 
+const opts = new URLSearchParams(window.location.search)
+const storageName = opts.get('s') || window.localStorage.getItem('storage') || 'storage'
 const octokit = new Octokit()
-const storage = { owner: 'orna-memory-hunting', repo: 'storage' }
+const storage = { owner: 'orna-memory-hunting', repo: storageName }
 const knowledge = { owner: 'orna-memory-hunting', repo: 'knowledge' }
 
+window.localStorage.setItem('storage', storageName)
 
 /**
  * @param {Date} [date]
@@ -31,7 +34,7 @@ function getMilestoneTitle(date) {
  */
 async function getMilestoneNumber(date) {
   const curMilestoneName = getMilestoneTitle(date)
-  let milestoneId = window.sessionStorage.getItem(`milestone_${curMilestoneName}`)
+  let milestoneId = window.sessionStorage.getItem(`milestone_${storageName}_${curMilestoneName}`)
 
   if (!milestoneId) {
     const milestones = (await octokit.rest.issues
@@ -40,7 +43,7 @@ async function getMilestoneNumber(date) {
     for (const { number, title } of milestones) {
       if (curMilestoneName === title) {
         milestoneId = number + ''
-        window.sessionStorage.setItem(`milestone_${curMilestoneName}`, milestoneId)
+        window.sessionStorage.setItem(`milestone_${storageName}_${curMilestoneName}`, milestoneId)
         break
       }
     }

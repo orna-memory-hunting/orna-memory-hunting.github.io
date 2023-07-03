@@ -46,7 +46,7 @@ safeExecute(() => {
     const params = new URLSearchParams(window.location.hash.replace('#', ''))
 
     params.delete('utcHours')
-    window.history.replaceState(null, '', `/#${params.toString()}`)
+    window.history.replaceState(null, '', `#${params.toString()}`)
     utcHours = dt.getUTCHours()
     timeLapText.textContent = `${hr}:00 - ${hr}:59`
     navTimeBack.textContent = `<- ${hr}:00`
@@ -65,7 +65,7 @@ safeExecute(() => {
     const params = new URLSearchParams(window.location.hash.replace('#', ''))
 
     params.set('utcHours', utcHours + '')
-    window.history.replaceState(null, '', `/#${params.toString()}`)
+    window.history.replaceState(null, '', `#${params.toString()}`)
     timeLapText.textContent = `${hr}:00 - ${hr}:59`
     navTimeBack.textContent = `<- ${hr}:00`
     navTimeForward.textContent = `${hr}:59 ->`

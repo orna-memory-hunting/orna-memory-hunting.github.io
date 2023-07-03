@@ -4,9 +4,9 @@ import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } f
 import { renderAmitieRow, drawWitchMapLabels, normalizeMapData } from '../lib/amitie.js'
 
 safeExecute(async () => {
-  const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/tesseract.esm.min.js')
-  const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.0/tesseract-core-simd.wasm.js'
-  const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/worker.min.js'
+  const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.esm.min.js')
+  const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4.1.1/tesseract-core-simd.wasm.js'
+  const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/worker.min.js'
   /** @type {HTMLDivElement} */// @ts-ignore
   const questions = document.getElementById('questions')
   /** @type {HTMLInputElement} */// @ts-ignore

@@ -435,3 +435,15 @@ h4 {
   display   : inline-block;
   text-align: center;
 }
+
+.base-list {
+  display       : flex;
+  flex-direction: column;
+  gap           : 12px;
+  margin        : 12px;
+}
+
+.base-list__item {
+  display       : flex;
+  flex-direction: column;
+}
