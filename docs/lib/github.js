@@ -462,6 +462,7 @@ async function getGuideList() {
 
 
 export {
+  storageName,
   getMilestoneTitle,
   getMilestoneNumber,
   getMilestone,
