@@ -1,12 +1,12 @@
 import { showError, safeExecute, doAsync, nextTick, nextAnimationFrame } from '../lib/utils.js'
 import { renderQuestionList, getSelectedAnswer } from '../lib/questions.js'
-import { getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
+import { storageName, getIssuesList, getMilestoneNumber, getMilestoneTitle, getTimeLabels } from '../lib/github.js'
 import { renderAmitieRow, drawWitchMapLabels, normalizeMapData } from '../lib/amitie.js'
 
 safeExecute(async () => {
-  const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/tesseract.esm.min.js')
-  const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.0/tesseract-core-simd.wasm.js'
-  const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@4.0.0/dist/worker.min.js'
+  const { default: Tesseract } = await import('https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.esm.min.js')
+  const tesseractCore = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@4.0.4/tesseract-core-simd.wasm.js'
+  const tesseractWorker = 'https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/worker.min.js'
   /** @type {HTMLDivElement} */// @ts-ignore
   const questions = document.getElementById('questions')
   /** @type {HTMLInputElement} */// @ts-ignore
@@ -802,7 +802,7 @@ safeExecute(async () => {
         `\n<!-- &milestone=${milestone} -->`
       const mapDataStr = hasMapData ? `\n<!-- &witch_map=${JSON.stringify(normalizeMapData(mapData))} -->` : ''
 
-      sendToGithubLink.href = 'https://github.com/orna-memory-hunting/storage/issues/new?' +
+      sendToGithubLink.href = `https://github.com/orna-memory-hunting/${storageName}/issues/new?` +
         `title=${encodeURIComponent(amitiePlus1.value)}` +
         `&labels=${encodeURIComponent(labels)}` +
         `&milestone=${milestone}` +

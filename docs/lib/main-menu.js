@@ -5,6 +5,8 @@ const menuItems = [
   { url: '/summary-table/', name: 'Общая таблица' },
   { url: '/top-scouts/', name: 'Топ разведки' },
   { url: '-' },
+  { url: '/select-storage/', name: 'Выбор группы разведки' },
+  { url: '-' },
   { url: '/guide/', name: 'Гайд по разведке' },
   // { url: '/faq/', name: 'Популярные вопросы' },
   { url: 'https://t.me/ornaMemoryHunts/16813', name: 'Чат поддержки' },
