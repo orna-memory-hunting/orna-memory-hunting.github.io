@@ -32,6 +32,18 @@ input[type=text] {
   padding      : 4px;
 }
 
+textarea {
+  width        : 100%;
+  resize       : vertical;
+  appearance   : none;
+  color        : #f5f1e8;
+  font-size    : 16px;
+  background   : transparent;
+  border       : 1px solid #777;
+  border-radius: 4px;
+  padding      : 4px;
+}
+
 a {
   color: #7986cb;
 }

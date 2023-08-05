@@ -249,6 +249,8 @@ safeExecute(async () => {
   const amitieMinus2 = document.getElementById('amitie-minus2')
   /** @type {HTMLInputElement} */// @ts-ignore
   const amitieMinus3 = document.getElementById('amitie-minus3')
+  /** @type {HTMLTextAreaElement} */// @ts-ignore
+  const amitieComment = document.getElementById('amitie-comment')
   let dataBlocks = []
   let originAmitieCanvas = document.createElement('canvas')
 
@@ -798,6 +800,7 @@ safeExecute(async () => {
       const aLabel = `${answer.labelQ},${answer.label}`
       const labels = `${aLabel},${timeUTC},${timeMSK}${qualityLabel}${addLabels}${cloneLabel}${wMap}`
       const milestone = getMilestoneTitle(time)
+      const comment = amitieComment.value ? encodeURIComponent(`### Комментарий\n${amitieComment.value}`) : ''
       const hiddenInfo = `\n\n<!-- &labels=${labels} -->` +
         `\n<!-- &milestone=${milestone} -->`
       const mapDataStr = hasMapData ? `\n<!-- &witch_map=${JSON.stringify(normalizeMapData(mapData))} -->` : ''
@@ -808,7 +811,7 @@ safeExecute(async () => {
         `&milestone=${milestone}` +
         `&body=${encodeURIComponent(`# ${amitieName.value}\n`)}` +
         encodeURIComponent(`### Плюсы\n${plusBlocks}`) +
-        encodeURIComponent(`### Минусы\n${minusBlocks}`) +
+        encodeURIComponent(`### Минусы\n${minusBlocks}`) + comment +
         encodeURIComponent(hiddenInfo) +
         encodeURIComponent(mapDataStr)
 
@@ -915,6 +918,10 @@ safeExecute(async () => {
   const pQ = parseInt(params.get('q'))
   const pA = parseInt(params.get('a'))
   const pT = parseInt(params.get('t'))
+  const pN = params.get('n')
+  const pB = params.get('b')
+  const pD = params.get('d')
+  const pC = params.get('c')
   let canUpdateParams = false
 
   if (!isNaN(pQ)) {
@@ -938,6 +945,29 @@ safeExecute(async () => {
     timeSelect.value = ('0' + new Date(new Date().setUTCHours(pT)).getHours()).slice(-2)
     timeSelect.setAttribute('first-load-ready', 'true')
   }
+  if (pN) {
+    amitieName.value = pN
+  }
+  if (pB) {
+    /** @type {Array<string>} */
+    const baffs = JSON.parse(pB)
+    /** @type {Array<string>} */
+    const debaffs = JSON.parse(pD)
+    const pls = [amitiePlus1, amitiePlus2, amitiePlus3]
+    const mns = [amitieMinus1, amitieMinus2, amitieMinus3]
+
+    if (baffs.length === debaffs.length) { // @ts-ignore
+      document.querySelector(`#quality-field div[data-quality="${baffs.length}"]`).click()
+      for (let index = 0; index < baffs.length; index++) {
+        pls[index].value = baffs[index]
+        mns[index].value = debaffs[index]
+      }
+    }
+  }
+  if (pC) {
+    amitieComment.value = pC
+  }
+  updateGithubLink()
   canUpdateParams = true
 
   function updateParams() {
