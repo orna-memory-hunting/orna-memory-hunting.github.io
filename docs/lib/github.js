@@ -83,7 +83,7 @@ function getTimeLabels(utcHours) {
 }
 
 
-/** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[]}} Amitie */
+/** @typedef {{name:string,plusBlocks:string[],minusBlocks:string[],comment:string}} Amitie */
 /** @typedef {Array<{name:string,description:string,color:string}>} Labels */
 /**
  * @typedef Issue
@@ -132,7 +132,8 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
     amitie: {
       name: title,
       plusBlocks: [title],
-      minusBlocks: ['?']
+      minusBlocks: ['?'],
+      comment: ''
     },
     miniСard: '',
     witchMap: null,
@@ -172,6 +173,16 @@ function parseIssue({ number, html_url, title, labels, milestone, body }) { // e
       if (!isNaN(clone)) issue.clone = clone
     }
     issue.labels.push({ name, description, color })
+  }
+
+  if (bodyList[bodyList.length - 1].startsWith('Комментарий')) {
+    const comment = bodyList.pop()
+      .replace(/<!--.*-->/ig, '')
+      .trim().split('\n')
+
+    comment.shift()
+
+    issue.amitie.comment = comment.join('\n')
   }
 
   if (bodyList.length > 2) {
