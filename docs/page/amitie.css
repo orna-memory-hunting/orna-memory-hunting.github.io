@@ -13,6 +13,10 @@
   margin : 0 6px;
 }
 
+.comment-block {
+  white-space: pre-wrap;
+}
+
 .answer {
   margin-left: 16px;
 }

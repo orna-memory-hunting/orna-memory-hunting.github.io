@@ -21,6 +21,10 @@ safeExecute(() => {
   /** @type {HTMLDivElement} */// @ts-ignore
   const labelsBlocks = document.getElementById('labels-blocks')
   /** @type {HTMLDivElement} */// @ts-ignore
+  const commentContainer = document.getElementById('comment-container')
+  /** @type {HTMLDivElement} */// @ts-ignore
+  const commentBlock = document.getElementById('comment-block')
+  /** @type {HTMLDivElement} */// @ts-ignore
   const questionBlock = document.getElementById('question-block')
   /** @type {HTMLDivElement} */// @ts-ignore
   const timeBlock = document.getElementById('time-block')
@@ -54,6 +58,11 @@ safeExecute(() => {
       html += `<div>${escapeHTML(minus)}</div>`
     }
     minusBlocks.innerHTML = html
+
+    if (issue.amitie.comment) {
+      commentContainer.classList.remove('hide')
+      commentBlock.textContent = issue.amitie.comment
+    }
 
     html = ''
     if (issue.labels.length) {
